@@ -23,5 +23,25 @@ model Country {
   id    Int     @id @default(autoincrement())
   name  String? @unique
   expected_budget Float  @default(0.00)
+  expenses Expense[]
+}
+
+model Category {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  expenses Expense[]
+}
+
+model Expense {
+  id    Int         @id @default(autoincrement())
+  countryId   Int
+  categoryId  Int?
+
+  country     Country   @relation(fields: [countryId], references: [id])
+  category    Category? @relation(fields: [categoryId], references: [id])
+
+  name String
+  value Float   @default(0.00)
+  date DateTime @default(now())
 }
 
