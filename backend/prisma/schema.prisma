@@ -22,7 +22,7 @@ model User {
 model Country {
   id    Int     @id @default(autoincrement())
   name  String? @unique
-  expected_budget Float  @default(0.00)
+  expectedBudget Float  @default(0.00)
   expenses Expense[]
 }
 

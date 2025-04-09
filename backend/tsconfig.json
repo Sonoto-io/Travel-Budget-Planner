@@ -29,6 +29,8 @@
       // "@layouts/*": ["src/layouts/*"],
       // "@themeComponents/*": ["src/themeComponents/*"],
       // "@assets/*": ["src/assets/*"]
+      "@routes/*": ["./routes/*"],
+      "@repositories/*": ["./repositories/*"]
     }
   }
 }

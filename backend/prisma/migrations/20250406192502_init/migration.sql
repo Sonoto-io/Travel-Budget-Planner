@@ -11,7 +11,7 @@ CREATE TABLE "User" (
 CREATE TABLE "Country" (
     "id" SERIAL NOT NULL,
     "name" TEXT,
-    "expected_budget" DOUBLE PRECISION NOT NULL DEFAULT 0.00,
+    "expectedBudget" DOUBLE PRECISION NOT NULL DEFAULT 0.00,
 
     CONSTRAINT "Country_pkey" PRIMARY KEY ("id")
 );

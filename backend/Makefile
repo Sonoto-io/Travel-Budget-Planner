@@ -1,2 +1,2 @@
 dev-up:
-	bun index.ts
+	bun --watch index.js

@@ -24,7 +24,7 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`db.localhost`)"
+      - "traefik.http.routers.db.rule=Host(`db.localhost`)"
 
   pgadmin:
     image: dpage/pgadmin4:8.6

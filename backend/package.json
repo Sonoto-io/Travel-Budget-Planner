@@ -2,6 +2,10 @@
   "name": "backend",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "start": "bun run index.ts",
+    "watch": "bun --watch index.ts"
+  },
   "private": true,
   "devDependencies": {
     "@types/bun": "latest",
@@ -11,6 +15,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@prisma/client": "^6.5.0"
+    "@prisma/client": "^6.6.0",
+    "elysia": "^1.2.25"
   }
 }
