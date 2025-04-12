@@ -1,0 +1,3 @@
+interface CategoryUpsertModel {
+  name: string;
+}

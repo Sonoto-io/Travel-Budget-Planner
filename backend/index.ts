@@ -1,8 +1,14 @@
 import { Elysia } from "elysia";
-import { categoryRoutes } from "@routes/category";
+import { configureCategoriesRoutes } from "@routes/CategoriesRoutes";
+import { swagger } from "@elysiajs/swagger";
 
 const app = new Elysia()
-  .use(categoryRoutes)
+  .use(
+    swagger({
+      path: "/v1/swagger",
+    })
+  )
+  .use(configureCategoriesRoutes)
   .get("/", () => "Hello from root!")
   .listen(3000);
 
