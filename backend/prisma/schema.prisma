@@ -14,28 +14,28 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
+  id    String     @db.Uuid @id
   name  String?
   token String?
 }
 
 model Country {
-  id    Int     @id @default(autoincrement())
+  id    String     @id @db.Uuid
   name  String? @unique
   expectedBudget Float  @default(0.00)
   expenses Expense[]
 }
 
 model Category {
-  id    Int     @id @default(autoincrement())
+  id    String     @id @db.Uuid
   name  String  @unique
   expenses Expense[]
 }
 
 model Expense {
-  id    Int         @id @default(autoincrement())
-  countryId   Int
-  categoryId  Int?
+  id    String         @id @db.Uuid
+  countryId   String
+  categoryId  String?
 
   country     Country   @relation(fields: [countryId], references: [id])
   category    Category? @relation(fields: [categoryId], references: [id])

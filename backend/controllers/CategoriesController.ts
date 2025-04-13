@@ -1,12 +1,12 @@
 import type { Category } from "@prisma/client";
-import { categoryRepository } from "@repositories/CategoriesRepository";
+import { categoryRepository } from "@repositories/categoriesRepository";
 import { t } from "elysia";
 
 export const categoriesController = {
   getAll() {
     return categoryRepository.getAll();
   },
-  create(body: CategoryUpsertModel) {
+  create(body: ICategoryUpsert) {
     const category = {
       name: body.name,
     };
@@ -20,7 +20,7 @@ export const categoriesController = {
     const res = categoryRepository.delete(id);
     return { message: "Category deleted", data: res };
   },
-  update(body: CategoryUpsertModel, { params: { id } }: IdParam) {
+  update(body: ICategoryUpsert, { params: { id } }: IdParam) {
     const category = {
       id: id,
       name: body.name,

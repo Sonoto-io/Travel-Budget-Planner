@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { configureCategoriesRoutes } from "@routes/CategoriesRoutes";
+import { configureCategoriesRoutes } from "@routes/categoriesRoutes";
 import { swagger } from "@elysiajs/swagger";
 
 const app = new Elysia()

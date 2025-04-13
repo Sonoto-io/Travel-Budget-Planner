@@ -1,3 +1,3 @@
-interface CategoryUpsertModel {
+interface ICategoryUpsert {
   name: string;
 }
