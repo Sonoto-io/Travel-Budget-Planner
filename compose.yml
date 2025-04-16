@@ -60,7 +60,7 @@ services:
       - "traefik.http.routers.backend.rule=Host(`backend.localhost`)"
 
   frontend:
-    build: ./frontend/.docker/
+    build: ./frontend/
     volumes:
       - "./frontend:/app"
       - "/app/node_modules"
