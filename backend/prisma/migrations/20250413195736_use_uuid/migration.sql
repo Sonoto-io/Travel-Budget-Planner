@@ -33,8 +33,10 @@ ADD CONSTRAINT "Country_pkey" PRIMARY KEY ("id");
 ALTER TABLE "Expense" DROP CONSTRAINT "Expense_pkey",
 DROP COLUMN "id",
 ADD COLUMN     "id" UUID NOT NULL,
-ALTER COLUMN "countryId" SET DATA TYPE TEXT,
-ALTER COLUMN "categoryId" SET DATA TYPE TEXT,
+DROP COLUMN "countryId",
+ADD COLUMN  "countryId" UUID NOT NULL,
+DROP COLUMN "categoryId",
+ADD COLUMN  "categoryId" UUID,
 ADD CONSTRAINT "Expense_pkey" PRIMARY KEY ("id");
 
 -- AlterTable

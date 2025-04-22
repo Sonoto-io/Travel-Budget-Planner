@@ -25,13 +25,11 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false,
     "paths": {
-      // "@components/*": ["src/components/*"],
-      // "@layouts/*": ["src/layouts/*"],
-      // "@themeComponents/*": ["src/themeComponents/*"],
-      // "@assets/*": ["src/assets/*"]
-      "@routes/*": ["./routes/*"],
-      "@repositories/*": ["./repositories/*"],
-      "@controllers/*": ["./controllers/*"]
+      "@index": ["./index.ts"],
+      "@*": ["./src/*"],
+      "@routes/*": ["./src/routes/*"],
+      "@repositories/*": ["./src/repositories/*"],
+      "@controllers/*": ["./src/controllers/*"]
     }
   }
 }

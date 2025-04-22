@@ -20,22 +20,22 @@ model User {
 }
 
 model Country {
-  id    String     @id @db.Uuid
+  id    String  @id @db.Uuid
   name  String? @unique
   expectedBudget Float  @default(0.00)
   expenses Expense[]
 }
 
 model Category {
-  id    String     @id @db.Uuid
+  id    String  @id @db.Uuid
   name  String  @unique
   expenses Expense[]
 }
 
 model Expense {
-  id    String         @id @db.Uuid
-  countryId   String
-  categoryId  String?
+  id    String          @id @db.Uuid
+  countryId   String    @db.Uuid
+  categoryId  String?   @db.Uuid
 
   country     Country   @relation(fields: [countryId], references: [id])
   category    Category? @relation(fields: [categoryId], references: [id])

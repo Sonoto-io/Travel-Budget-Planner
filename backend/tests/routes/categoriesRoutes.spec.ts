@@ -1,10 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import { Elysia } from "elysia";
+import { app } from "@index";
 
 describe("Category", () => {
   it("create a Category success", async () => {
-    const app = new Elysia().get("/", () => "hi");
-
     const response = await app
       .handle(new Request("http://localhost/"))
       .then((res) => res.text());

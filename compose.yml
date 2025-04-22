@@ -38,6 +38,7 @@ services:
 
   backend:
     build: ./backend
+    env_file: ".env.development.local"
     environment:
       CLIENT_ID: ${CLIENT_ID}
       CLIENT_SECRET: ${CLIENT_SECRET}
@@ -56,19 +57,36 @@ services:
     ports:
       - 3000:3000
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`backend.localhost`)"
+      traefik.enable: true
+      traefik.http.routers.backend.rule: Host(`app.localhost`) && PathPrefix(`/api`)
+      traefik.http.routers.backend.service: backend_service
+      traefik.http.services.backend_service.loadbalancer.server.port: 3000
+      traefik.http.middlewares.strip-api.stripprefix.prefixes: /api
+      traefik.http.routers.backend.middlewares: strip-api
+      traefik.http.routers.backend.priority: "10"
+
+    develop:
+      watch:
+        - path: ./backend
+          action: rebuild
 
   frontend:
     build: ./frontend/
+    env_file: ".env.development.local"
     volumes:
       - "./frontend:/app"
       - "/app/node_modules"
     ports:
       - 8080:8080
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`frontend.localhost`)"
-
+      traefik.enable: true
+      traefik.http.routers.frontend.rule: Host(`app.localhost`)
+      traefik.http.routers.frontend.priority: "1"
+      traefik.http.routers.frontend.service: frontend_service
+      traefik.http.services.frontend_service.loadbalancer.server.port: 8080
+    develop:
+      watch:
+        - path: ./frontend
+          action: rebuild
 volumes:
   postgres_data:
