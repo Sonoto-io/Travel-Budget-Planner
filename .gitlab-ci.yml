@@ -1,51 +1,58 @@
-docker-build:
-  image: docker:cli
-  stage: build
-  services:
-    - docker:dind
+stages:
+  - build
+  - test
+  - deploy
 
+docker-build-frontend:
+  stage: build
+  image: docker:cli
+  services: [docker:dind]
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-  # All branches are tagged with $DOCKER_IMAGE_NAME (defaults to commit ref slug)
-  # Default branch is also tagged with `latest`
   script:
-    - docker build --pull -t "$DOCKER_IMAGE_NAME" .
-    - docker push "$DOCKER_IMAGE_NAME"
-    - |
-      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE:latest"
-        docker push "$CI_REGISTRY_IMAGE:latest"
-      fi
-  # Run this job in a branch where a Dockerfile exists
-  rules:
-    - if: $CI_COMMIT_BRANCH
-      exists:
-        - Dockerfile
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_NAME:
-          [
-            $CI_REGISTRY_IMAGE-frontend:$CI_COMMIT_REF_SLUG,
-            $CI_REGISTRY_IMAGE-backend:$CI_COMMIT_REF_SLUG,
-          ]
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_SLUG" -f frontend/docker/Dockerfile frontend/
+    - docker push "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_SLUG"
+
+docker-build-backend:
+  stage: build
+  image: docker:cli
+  services: [docker:dind]
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG" -f backend/docker/Dockerfile backend/
+    - docker push "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG"
 
 unit-tests:
   stage: test
+  image: $CI_REGISTRY_IMAGE/$APP:$CI_COMMIT_REF_SLUG
+  variables:
+    DATABASE_URL: "postgresql://tbpuser:tbppassword@localhost:5432/travel_budget_planner"
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
     - cd $APP && make tests
+  coverage: "/All files[^|]*|[^|]*\\s+([\\d\\.]+)/"
   parallel:
     matrix:
       - APP: [frontend, backend]
 
-lint:
+backend-lint:
   stage: test
+  image: oven/bun:1
+  before_script:
+    - apt-get update && apt-get install make
   script:
-    - cd $APP && make lint
-  parallel:
-    matrix:
-      - APP: [frontend, backend]
-# deploy-frontend:
-#   stage: deploy
+    - cd backend
+    - bun install --dev
+    - make lint
 
-# deploy-backend:
-#   stage: deploy
+frontend-lint:
+  stage: test
+  image: node:current-bullseye
+  before_script:
+    - apt-get update && apt-get install -y make
+  script:
+    - cd frontend
+    - npm ci
+    - npm run lint

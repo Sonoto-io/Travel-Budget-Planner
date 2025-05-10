@@ -6,19 +6,25 @@
     "start": "bun run index.ts",
     "watch": "bun --watch index.ts",
     "db:deploy": "npx prisma migrate deploy && npx prisma generate",
-    "prisma": "npx prisma"
+    "prisma": "npx prisma",
+    "lint": "npx eslint"
   },
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest",
-    "prisma": "^6.6.0"
+    "@eslint/js": "^9.25.1",
+    "@types/bun": "^1.2.10",
+    "eslint": "^9.25.1",
+    "prisma": "^6.7.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.31.0"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
+    "@elysiajs/eden": "^1.2.0",
     "@elysiajs/swagger": "^1.2.2",
-    "@prisma/client": "^6.6.0",
+    "@prisma/client": "^6.7.0",
     "elysia": "^1.2.25"
   }
 }

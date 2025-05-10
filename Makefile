@@ -6,5 +6,6 @@ dev-up:
 	$(COMPOSE_DEV) watch
 
 .PHONY: dev-down
-down:
-	docker-compose down
+dev-down:
+	$(COMPOSE_DEV) down -v --remove-orphans
+
