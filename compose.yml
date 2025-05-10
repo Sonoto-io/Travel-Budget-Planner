@@ -37,7 +37,9 @@ services:
       - "5050:80"
 
   backend:
-    build: ./backend
+    build:
+      context: backend
+      dockerfile: docker/Dockerfile
     env_file: ".env.development.local"
     environment:
       CLIENT_ID: ${CLIENT_ID}
@@ -48,6 +50,12 @@ services:
       JWK_URL: ${JWK_URL}
       ALGORITHM: ${ALGORITHM}
       DATABASE_URL: ${DATABASE_URL}
+    healthcheck:
+      test: curl --fail http://localhost:3000/ || exit 1
+      interval: 40s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
     depends_on:
       db:
         condition: service_started
@@ -64,14 +72,15 @@ services:
       traefik.http.middlewares.strip-api.stripprefix.prefixes: /api
       traefik.http.routers.backend.middlewares: strip-api
       traefik.http.routers.backend.priority: "10"
-
     develop:
       watch:
         - path: ./backend
           action: rebuild
 
   frontend:
-    build: ./frontend/
+    build:
+      context: frontend
+      dockerfile: docker/Dockerfile
     env_file: ".env.development.local"
     volumes:
       - "./frontend:/app"

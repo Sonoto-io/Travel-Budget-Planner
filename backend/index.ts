@@ -16,3 +16,5 @@ const app = new Elysia()
   });
 
 console.log(`🔥 Server running at http://localhost:3000`);
+
+export type App = typeof app;

@@ -1,0 +1,49 @@
+services:
+  db:
+    image: postgres:17.4
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=travel_budget_planner
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  backend:
+    build:
+      context: backend
+      dockerfile: docker/Dockerfile
+    environment:
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
+      AUTHORIZE_URL: ${AUTHORIZE_URL}
+      TOKEN_URL: ${TOKEN_URL}
+      REDIRECT_URI: ${REDIRECT_URI}
+      JWK_URL: ${JWK_URL}
+      ALGORITHM: ${ALGORITHM}
+      DATABASE_URL: ${DATABASE_URL}
+    healthcheck:
+      test: curl --fail http://localhost:3000/ || exit 1
+      interval: 40s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      db:
+        condition: service_started
+        restart: true
+    ports:
+      - 3000:3000
+
+  frontend:
+    build:
+      context: frontend
+      dockerfile: docker/Dockerfile
+    volumes:
+      - "/app/node_modules"
+    ports:
+      - 80:8080
+
+volumes:
+  postgres_data:
