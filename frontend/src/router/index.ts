@@ -1,16 +1,22 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 import HomeView from "@/views/HomeView.vue";
-import LoginView from "@/views/LoginView.vue";
-const routes: Array<RouteRecordRaw> = [
+import CountryView from "@/views/CountryView.vue";
+import ManagementView from "@/views/ManagementView.vue";
+const routes = [
   {
     path: "/",
-    name: "home",
+    name: "dashboard",
     component: HomeView,
   },
   {
-    path: "/login",
-    name: "login",
-    component: LoginView,
+    path: "/country/:code",
+    name: "country",
+    component: CountryView,
+  },
+  {
+    path: "/management/:item",
+    name: "management",
+    component: ManagementView,
   },
 ];
 

@@ -1,13 +1,34 @@
-<script setup lang="ts">
-import { Image } from "primevue";
-//TODO: add tailwindcss
-</script>
-
 <template>
-  <div class="w-full flex flex-row">
-    <button class="visible md:invisible"><icon class="pi pi-check" /></button>
-    <p>Travel Planner</p>
-    <Image />
-    <div>v0.0.1</div>
+  <div
+    class="flex h-20 w-full flex-row place-content-between items-center gap-4 p-4 md:justify-start"
+  >
+    <div
+      class="block md:hidden"
+      @click.stop="
+        $emit('toggleNavbar');
+        toggleNavbar();
+      "
+    >
+      <span
+        :class="[
+          'pi',
+          isNavbarVisible ? 'pi-minus' : 'pi-bars',
+          'cursor-pointer',
+        ]"
+      />
+    </div>
+    <img :src="logo" alt="Logo" class="h-full" />
+    <h1>Travel Planner</h1>
   </div>
 </template>
+
+<script setup lang="ts">
+import logo from "@images/logo.svg";
+import { ref, onMounted, onUnmounted } from "vue";
+
+const isNavbarVisible = ref(false);
+
+const toggleNavbar = () => {
+  isNavbarVisible.value = !isNavbarVisible.value;
+};
+</script>

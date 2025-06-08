@@ -42,7 +42,7 @@ COPY --from=prerelease /app/prisma/ ./prisma/
 COPY --from=prerelease /app/docker/entrypoint.sh .
 
 RUN chown -R bun:bun node_modules
-RUN mkdir -p /app/src/generated/prisma/client
+RUN mkdir -p /app/node_modules/.prisma
 # run the app
 USER bun
 EXPOSE 3000/tcp
