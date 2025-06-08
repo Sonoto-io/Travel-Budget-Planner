@@ -6,6 +6,5 @@ echo "Setting Prisma up..."
 bunx prisma generate
 bunx prisma migrate deploy
 
-
 echo "Starting backend..."
-bun run index.ts
+bun run --watch index.ts

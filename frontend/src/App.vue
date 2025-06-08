@@ -1,13 +1,11 @@
 <template>
   <MainLayout>
-    <template #header>
-      <HeaderBar />
-    </template>
     <router-view />
   </MainLayout>
+  <Toast />
 </template>
 
 <script setup lang="ts">
 import MainLayout from "./layouts/MainLayout.vue";
-import HeaderBar from "./components/HeaderBar.vue";
+import Toast from "primevue/toast";
 </script>

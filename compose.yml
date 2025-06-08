@@ -60,8 +60,6 @@ services:
       db:
         condition: service_started
         restart: true
-    volumes:
-      - ./backend:/app
     ports:
       - 3000:3000
     labels:
@@ -75,27 +73,26 @@ services:
     develop:
       watch:
         - path: ./backend
-          action: rebuild
+          target: /app
+          action: sync
 
   frontend:
     build:
       context: frontend
       dockerfile: docker/Dockerfile
     env_file: ".env.development.local"
-    volumes:
-      - "./frontend:/app"
-      - "/app/node_modules"
     ports:
-      - 8080:8080
+      - 5173:5173
     labels:
       traefik.enable: true
       traefik.http.routers.frontend.rule: Host(`app.localhost`)
       traefik.http.routers.frontend.priority: "1"
       traefik.http.routers.frontend.service: frontend_service
-      traefik.http.services.frontend_service.loadbalancer.server.port: 8080
+      traefik.http.services.frontend_service.loadbalancer.server.port: 5173
     develop:
       watch:
         - path: ./frontend
-          action: rebuild
+          target: /app
+          action: sync
 volumes:
   postgres_data:

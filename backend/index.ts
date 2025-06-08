@@ -9,7 +9,7 @@ const app = new Elysia()
     })
   )
   .use(configureCategoriesRoutes)
-  .get("/", () => "Hello from root!")
+  .get("/", () => "Hello from root !")
   .listen({
     port: 3000,
     hostname: "0.0.0.0",
