@@ -28,7 +28,6 @@
           name="user"
           :options="props.selectValues.users"
           optionLabel="label"
-          optionValue="label"
           class="min-w-30"
         />
         <label for="user">
@@ -47,7 +46,7 @@
         <Select
           name="currency"
           :options="props.selectValues.currencies"
-          optionLabel="displayName"
+          optionLabel="label"
           class="min-w-50"
         />
         <label for="currency">
@@ -63,8 +62,8 @@
     <!-- Price -->
     <div class="flex flex-col gap-2">
       <IftaLabel>
-        <InputText name="price.value" class="min-w-30" />
-        <label for="price.value">
+        <InputText name="price" class="min-w-30"/>
+        <label for="price">
           Price
           <span class="text-red-500">*</span>
         </label>
@@ -92,13 +91,12 @@
       <IftaLabel>
         <Select
           name="category"
-          :options="props.selectValues.categories"
+          :options="categories"
           optionLabel="label"
-          optionValue="label"
           class="min-w-50"
           @change="
-            selectSubcategories = fetchSubCategories($form.category.value);
-            $form.subcategory.value = '';
+            selectSubcategories = fetchSubCategories($form.category.value.label);
+            $form.subcategory.value.label = '';
           "
         />
         <label for="category">
@@ -118,7 +116,6 @@
         name="subcategory"
         :options="selectSubcategories"
         optionLabel="label"
-        optionValue="label"
         class="min-w-50"
       />
       <label for="subcategory">
@@ -137,7 +134,7 @@
 
 <script setup lang="ts">
 import { Form } from "@primevue/forms";
-import { reactive, ref } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import { useToast } from "primevue/usetoast";
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 import InputText from "primevue/inputtext";
@@ -150,47 +147,92 @@ import Select from "primevue/select";
 import type { FormSelectValues } from "@/models/FormSelectValues";
 import { fetchSubCategories } from "@/utils/SubcategoryUtils";
 import IftaLabel from 'primevue/iftalabel';
+import { id } from "happy-dom/lib/PropertySymbol";
 
 const props = defineProps<{
   selectValues: FormSelectValues;
 }>();
+
 const emit = defineEmits(["addExpense"]);
 
+const categories = computed(() => props.selectValues["categories"] ?? []);
+console.log("Categories:", categories.value);
+
+
 const toast = useToast();
-const selectSubcategories = ref(fetchSubCategories(props.selectValues.categories[0].label));
+const selectSubcategories = ref(fetchSubCategories(props.selectValues.categories[0]?.label) ?? []);
+
 const initialValues = reactive({
   date: new Date(),
-  user: props.selectValues.users[0].label,
-  currency: props.selectValues.currencies[0],
-  price: 0.00,
+  user: {
+    id: 0,
+    label: "",
+  },
+  currency: {
+    ident: "",
+    name: "",
+    label: "",
+    conversion: 1,
+  },
+  price: "",
   note: "",
-  category: props.selectValues.categories[0].label,
-  subcategory: "",
+  category: {
+    id: "",
+    label: "",
+  },
+  subcategory: {
+    label: "",
+  },
 });
+
+watch(
+  () => props.selectValues,
+  (newValues) => {
+    if (newValues.users.length > 0 && initialValues.user.label == "") {
+      initialValues.user.id = newValues.users[0].id;
+      initialValues.user.label = newValues.users[0].label;
+    }
+    if (newValues.currencies.length > 0 && initialValues.currency.label == "") {
+      // didn't find better way to make the form react to currency change
+      initialValues.currency.ident = newValues.currencies[0].ident;
+      initialValues.currency.name = newValues.currencies[0].name;
+      initialValues.currency.label = newValues.currencies[0].label;
+      initialValues.currency.conversion = newValues.currencies[0].conversion;
+    }
+    if (newValues.categories.length > 0 && initialValues.category.label == "") {
+      console.log("Setting initial category:", newValues.categories[0].label);
+      initialValues.category.label = newValues.categories[0].label;
+      initialValues.category.id = newValues.categories[0].id ?? "";
+      // Update subcategories too if you want
+      selectSubcategories.value = fetchSubCategories(initialValues.category.label);
+      if (selectSubcategories.value.length > 0) {
+        initialValues.subcategory.label = selectSubcategories.value[0].label;
+      }
+    }
+  },
+  { deep: true, immediate: true }
+);
 
 const resolver = zodResolver(
   z.object({
     date: z.coerce.date({ required_error: "Date is required" }),
-    user: z.enum(
-      props.selectValues.users.map((u) => u.label) as [string, ...string[]],
-    ),
+    user: z.object({
+      id: z.number().int().positive("User ID must be a positive integer"),
+      label : z.string().min(1, "User is required")}),
     currency: z.object({
       ident: z.string(),
       name: z.string(),
-      displayName: z.string(),
+      label: z.string().min(1, "Currency is required"),
       conversion: z.number(),
     }),
-    price: z.object({
-      value: z.string().regex(/^\d+(\.\d{1,2})?$/, "Enter a valid amount"),
-    }),
+    price: z.coerce.number().positive("Price must be positive"),
     note: z.string().optional(),
-    category: z.enum(
-      props.selectValues.categories.map((c) => c.label) as [
-        string,
-        ...string[],
-      ],
-    ),
-    subcategory: z.string().optional(),
+    category: z.object({
+      id: z.string().optional(),
+      label: z.string().min(1, "Category is required"),
+    }),
+    subcategory: z.object({
+      label : z.string().min(1, "User is required")}).optional(),
   }),
 );
 
@@ -207,7 +249,7 @@ const onFormSubmit = ({ valid, values, reset }) => {
       date: values.date,
       user: values.user,
       currency: values.currency,
-      price: parseFloat(values.price.value),
+      price: values.price,
       note: values.note,
       category: values.category,
       subcategory: values.subcategory,
@@ -215,8 +257,4 @@ const onFormSubmit = ({ valid, values, reset }) => {
   }
 };
 
-// TODO : fetch from db where category name == category
-const updateSubCategories = (category) => {
-  props.selectValues.subcategories.value = [{ label: `${category} sub` }];
-};
 </script>
