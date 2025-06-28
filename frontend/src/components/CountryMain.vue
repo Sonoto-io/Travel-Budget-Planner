@@ -10,54 +10,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive } from "vue";
+import { ref, onMounted, reactive, computed, ComputedRef } from "vue";
 import ExpenseTable from "@/components/ExpenseTable.vue";
 import { getExpenses } from "@/api/expenses";
 import ExpenseForm from "@/components/ExpenseForm.vue";
+import { getCategories } from "@/api/categories";
+import type { FormSelectValues } from "@/models/FormSelectValues";
+import { getCurrencies } from "@/api/currencies";
+import { getUsers } from "@/api/users";
 
 const expenses = ref([]);
+const selectCategories = ref([]);
+const selectCurrencies = ref([]);
+const selectUsers = ref([]);
 
-onMounted(() => {
-  expenses.value = getExpenses();
+onMounted(async () => {
+  expenses.value = await getExpenses().then((res) => res.data).catch((err) => {
+    console.error("Error fetching expenses:", err);
+    return [];
+  });
+  selectCategories.value = await getCategories().then((res) => res.data).catch((err) => {
+    console.error("Error fetching categories:", err);
+    return [];
+  });
+  selectCurrencies.value = await getCurrencies().then((res) => res.data).catch((err) => {
+    console.error("Error fetching categories:", err);
+    return [];
+  });
+
+  selectUsers.value = await getUsers().then((res) => res.data).catch((err) => {
+    console.error("Error fetching users:", err);
+    return [];
+  });
+
 });
 
-// Select values fetch
-
-const selectCategories = ref([
-  // TODO: fetch from api
-  { label: "test" },
-  { label: "waf" },
-  { label: "wouf" },
-]);
-
-const selectSubCategories = ref([
-  // TODO: fetch from api depending on category
-  { label: "test sub" },
-  { label: "waf sub" },
-  { label: "wouf sub" },
-]);
-
-const selectCurrencies = ref([
-  // TODO: fetch from api
-  { ident: "fr-FR", name: "EUR", displayName: "Euro", conversion: 1 },
-  { ident: "ja-JP", name: "JPY", displayName: "Yen", conversion: 0.0061 },
-  { ident: "us-US", name: "USD", displayName: "Dollar", conversion: 0.9 },
-]);
-
-const selectUsers = ref([
-  // TODO: fetch from api depending on category
-  { label: "Sonoto" },
-  { label: "Antoine" },
-]);
-
-const selectValues: FormSelectValues = {
+const selectValues: ComputedRef<FormSelectValues> = computed(() => ({
   categories: selectCategories.value,
-  subcategories: selectSubCategories.value,
   currencies: selectCurrencies.value,
   users: selectUsers.value,
-};
+}));
 
 const handleAddExpense = (expense) => {
+  console.log("Adding expense:", expense);
   expenses.value.unshift(expense);
 };
 </script>

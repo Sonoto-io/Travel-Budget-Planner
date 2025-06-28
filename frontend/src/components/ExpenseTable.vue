@@ -11,6 +11,7 @@
     :customSort="true"
     tableStyle="min-width: 50rem"
   >
+    <!-- Date Column -->
     <Column
       field="date"
       header="Date"
@@ -24,18 +25,22 @@
         <DatePicker v-model="data[field]" class="min-w-30" />
       </template>
     </Column>
+    <!-- User Column -->
     <Column field="user" header="User">
+      <template #body="{ data, field }">
+        {{ data[field].label }}
+      </template>
       <template #editor="{ data, field }">
         <Select
-          v-model="data[field]"
+          v-model="data[field].label"
           :options="selectValues.users"
           optionLabel="label"
-          optionValue="label"
           fluid
           class="min-w-30"
         />
       </template>
     </Column>
+    <!-- Currency Column -->
     <Column
       field="currency"
       header="Currency"
@@ -49,12 +54,13 @@
         <Select
           v-model="data[field]"
           :options="selectValues.currencies"
-          optionLabel="displayName"
+          optionLabel="label"
           fluid
           class="min-w-50"
         />
       </template>
     </Column>
+    <!-- Price Column -->
     <Column field="price" header="Price" sortable>
       <template #body="{ data, field }">
         {{ formatCurrency(data[field], data["currency"]) }}
@@ -62,6 +68,7 @@
       <template #editor="{ data, field }">
         <InputText v-model="data[field]" class="w-30" /></template
     ></Column>
+    <!-- Price in my currency Column -->
     <Column field="price" header="Price in my currency" sortable>
       <template #body="{ data, field }">
         {{
@@ -69,6 +76,7 @@
         }}
       </template>
     </Column>
+    <!-- Note Column -->
     <Column field="note" header="Note">
       <template #body="{ data, field }">
         <div class="max-w-50 truncate">{{ data[field] }}</div>
@@ -77,32 +85,42 @@
         <Textarea v-model="data[field]" rows="1" cols="10"
       /></template>
     </Column>
+    <!-- Category Column -->
     <Column field="category" header="Category" sortable>
+      <template #body="{ data, field }">
+        {{ data[field].label }}
+      </template>
       <template #editor="{ data, field }">
         <Select
           v-model="data[field]"
           :options="selectValues.categories"
-          optionLabel="label"
-          optionValue="label"
           fluid
           class="min-w-50"
+          optionLabel="label"
+          defaultValue="data[field].label"
+
           @change="
-            selectSubcategories = fetchSubCategories(data['category']);
+            selectSubcategories = fetchSubCategories(data['category'].label);
             data['subcategory'] = null;
           "
         /> </template
     ></Column>
+    <!-- Sub Category Column -->
     <Column field="subcategory" header="Sub Category" sortable>
+      <template #body="{ data, field }">
+        {{ data[field].label }}
+      </template>
       <template #editor="{ data, field }">
         <Select
           v-model="data[field]"
           :options="selectSubcategories"
           optionLabel="label"
-          optionValue="label"
+          defaultValue="data[field].label"
           fluid
           class="min-w-50"
         /> </template
     ></Column>
+    <!-- Edit Column -->
     <Column
       header="Edit"
       :rowEditor="true"
@@ -128,15 +146,15 @@ const props = defineProps<{
   selectValues: FormSelectValues;
 }>();
 
-const expenses = defineModel();
+const expenses = defineModel<Array<Expense>>();
 const editingRows = ref([]);
 const mainCurrency = ref({ ident: "fr-FR", name: "EUR" }); // TODO: fetch from api
 const selectSubcategories = ref(fetchSubCategories(
-    props.selectValues.categories[0].label
-  ));
+    props.selectValues.categories[0]?.label
+  ) ?? []);
 
 
-const onRowEditSave = (event) => {
+const onRowEditSave = (event: { newData: any; index: any; }) => {
   let { newData, index } = event;
 
   expenses.value[index] = newData;

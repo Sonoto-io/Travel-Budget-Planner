@@ -1,16 +1,24 @@
+version: "3.8"  # Always good to specify
+
 services:
   reverse-proxy:
     image: traefik:v3.3.5
-    # Enables the web UI and tells Traefik to listen to docker
-    command: --api.insecure=true --providers.docker
+    command:
+      - --api.insecure=true
+      - --providers.docker
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http.tls=true
+      - --certificatesresolvers.devresolver.acme.tlschallenge=true
+      - --certificatesresolvers.devresolver.acme.email=you@example.com
+      - --certificatesresolvers.devresolver.acme.storage=/letsencrypt/acme.json
     ports:
-      # The HTTP port
       - "80:80"
-      # The Web UI (enabled by --api.insecure=true)
+      - "443:443"
       - "8081:8080"
     volumes:
-      # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./certs:/certs
 
   db:
     image: postgres:17.4
@@ -51,7 +59,7 @@ services:
       ALGORITHM: ${ALGORITHM}
       DATABASE_URL: ${DATABASE_URL}
     healthcheck:
-      test: curl --fail http://localhost:3000/ || exit 1
+      test: ["CMD", "curl", "--fail", "http://localhost:3000/"]
       interval: 40s
       timeout: 30s
       retries: 3
@@ -59,17 +67,18 @@ services:
     depends_on:
       db:
         condition: service_started
-        restart: true
     ports:
-      - 3000:3000
+      - "3000:3000"
     labels:
       traefik.enable: true
-      traefik.http.routers.backend.rule: Host(`app.localhost`) && PathPrefix(`/api`)
-      traefik.http.routers.backend.service: backend_service
+      traefik.http.routers.backend-router.rule: Host(`app.localhost`) && PathPrefix(`/api`)
+      traefik.http.routers.backend-router.service: backend_service
       traefik.http.services.backend_service.loadbalancer.server.port: 3000
       traefik.http.middlewares.strip-api.stripprefix.prefixes: /api
-      traefik.http.routers.backend.middlewares: strip-api
-      traefik.http.routers.backend.priority: "10"
+      traefik.http.routers.backend-router.middlewares: strip-api
+      traefik.http.routers.backend-router.priority: "10"
+      traefik.http.routers.backend-router.tls: true
+
     develop:
       watch:
         - path: ./backend
@@ -82,17 +91,19 @@ services:
       dockerfile: docker/Dockerfile
     env_file: ".env.development.local"
     ports:
-      - 5173:5173
+      - "5173:5173"
     labels:
       traefik.enable: true
       traefik.http.routers.frontend.rule: Host(`app.localhost`)
       traefik.http.routers.frontend.priority: "1"
       traefik.http.routers.frontend.service: frontend_service
       traefik.http.services.frontend_service.loadbalancer.server.port: 5173
+      traefik.http.routers.frontend.tls: true
     develop:
       watch:
         - path: ./frontend
           target: /app
           action: sync
+
 volumes:
   postgres_data:
