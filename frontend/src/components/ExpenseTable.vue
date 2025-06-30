@@ -5,19 +5,15 @@
     editMode="row"
     dataKey="id"
     @row-edit-save="onRowEditSave"
-    sortField="date" 
+    @row-edit-init="handleCategorySelect($event.data['category'])"
+    sortField="date"
     :defaultSortOrder="-1"
     sortMode="single"
     :customSort="true"
     tableStyle="min-width: 50rem"
   >
     <!-- Date Column -->
-    <Column
-      field="date"
-      header="Date"
-      sortable
-      :sortField="formatDate"
-    >
+    <Column field="date" header="Date" sortable :sortField="formatDate">
       <template #body="{ data, field }">
         {{ formatDate(data[field]) }}
       </template>
@@ -32,10 +28,9 @@
       </template>
       <template #editor="{ data, field }">
         <Select
-          v-model="data[field].label"
+          v-model="data[field]"
           :options="selectValues.users"
           optionLabel="label"
-          fluid
           class="min-w-30"
         />
       </template>
@@ -48,14 +43,13 @@
       sortField="currency.name"
     >
       <template #body="{ data, field }">
-        {{ data["currency"].name }}
+        {{ data[field].name }}
       </template>
       <template #editor="{ data, field }">
         <Select
           v-model="data[field]"
           :options="selectValues.currencies"
           optionLabel="label"
-          fluid
           class="min-w-50"
         />
       </template>
@@ -94,15 +88,9 @@
         <Select
           v-model="data[field]"
           :options="selectValues.categories"
-          fluid
           class="min-w-50"
           optionLabel="label"
-          defaultValue="data[field].label"
-
-          @change="
-            selectSubcategories = fetchSubCategories(data['category'].label);
-            data['subcategory'] = null;
-          "
+          @change="handleCategorySelect($event.value)"
         /> </template
     ></Column>
     <!-- Sub Category Column -->
@@ -115,9 +103,8 @@
           v-model="data[field]"
           :options="selectSubcategories"
           optionLabel="label"
-          defaultValue="data[field].label"
-          fluid
           class="min-w-50"
+          @show="handleCategorySelect(data.category)"
         /> </template
     ></Column>
     <!-- Edit Column -->
@@ -149,25 +136,31 @@ const props = defineProps<{
 const expenses = defineModel<Array<Expense>>();
 const editingRows = ref([]);
 const mainCurrency = ref({ ident: "fr-FR", name: "EUR" }); // TODO: fetch from api
-const selectSubcategories = ref(fetchSubCategories(
-    props.selectValues.categories[0]?.label
-  ) ?? []);
+const selectSubcategories = ref();
 
+const handleCategorySelect = async (category: Category) => {
+  try {
+    selectSubcategories.value = await fetchSubCategories(category);
+  } catch (error) {
+    console.error("Error fetching subcategories:", error);
+    selectSubcategories.value = [];
+  }
+};
 
-const onRowEditSave = (event: { newData: any; index: any; }) => {
+const onRowEditSave = (event: { newData: any; index: any }) => {
   let { newData, index } = event;
-
   expenses.value[index] = newData;
 };
 
 const formatDate = (line) => {
-  if (line instanceof Date || typeof line === 'string') {
+  if (line instanceof Date || typeof line === "string") {
     return line instanceof Date ? line.toISOString().slice(0, 10) : line;
   }
-  if (line && typeof line === 'object' && 'date' in line) {
-    return line.date instanceof Date ? line.date.toISOString().slice(0, 10) : line.date;
+  if (line && typeof line === "object" && "date" in line) {
+    return line.date instanceof Date
+      ? line.date.toISOString().slice(0, 10)
+      : line.date;
   }
-  return '';
+  return "";
 };
-
 </script>

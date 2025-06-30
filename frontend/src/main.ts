@@ -10,7 +10,7 @@ import router from "./router";
 async function main() {
   if (import.meta.env.DEV) {
     console.log("Starting MSW worker in development mode");
-    await worker.start()
+    await worker.start();
   }
 
   const app = createApp(App);
@@ -24,4 +24,4 @@ async function main() {
   app.mount("#app");
 }
 
-main()
+main();

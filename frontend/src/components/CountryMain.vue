@@ -1,7 +1,10 @@
 <template>
-  <div class="flex flex-col overflow-x-scroll gap-4">
+  <div class="flex flex-col gap-4 overflow-x-scroll">
     <div class="">
-      <ExpenseForm :selectValues="selectValues" @addExpense="handleAddExpense"/>
+      <ExpenseForm
+        :selectValues="selectValues"
+        @addExpense="handleAddExpense"
+      />
     </div>
     <div class="">
       <ExpenseTable :selectValues="selectValues" v-model="expenses" />
@@ -25,24 +28,32 @@ const selectCurrencies = ref([]);
 const selectUsers = ref([]);
 
 onMounted(async () => {
-  expenses.value = await getExpenses().then((res) => res.data).catch((err) => {
-    console.error("Error fetching expenses:", err);
-    return [];
-  });
-  selectCategories.value = await getCategories().then((res) => res.data).catch((err) => {
-    console.error("Error fetching categories:", err);
-    return [];
-  });
-  selectCurrencies.value = await getCurrencies().then((res) => res.data).catch((err) => {
-    console.error("Error fetching categories:", err);
-    return [];
-  });
+  expenses.value = await getExpenses()
+    .then((res) => res.data)
+    .catch((err) => {
+      console.error("Error fetching expenses:", err);
+      return [];
+    });
 
-  selectUsers.value = await getUsers().then((res) => res.data).catch((err) => {
-    console.error("Error fetching users:", err);
-    return [];
-  });
+  selectCategories.value = await getCategories()
+    .then((res) => res.data)
+    .catch((err) => {
+      console.error("Error fetching categories:", err);
+      return [];
+    });
+  selectCurrencies.value = await getCurrencies()
+    .then((res) => res.data)
+    .catch((err) => {
+      console.error("Error fetching categories:", err);
+      return [];
+    });
 
+  selectUsers.value = await getUsers()
+    .then((res) => res.data)
+    .catch((err) => {
+      console.error("Error fetching users:", err);
+      return [];
+    });
 });
 
 const selectValues: ComputedRef<FormSelectValues> = computed(() => ({
@@ -52,7 +63,6 @@ const selectValues: ComputedRef<FormSelectValues> = computed(() => ({
 }));
 
 const handleAddExpense = (expense) => {
-  console.log("Adding expense:", expense);
   expenses.value.unshift(expense);
 };
 </script>

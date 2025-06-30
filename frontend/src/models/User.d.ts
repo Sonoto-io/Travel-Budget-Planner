@@ -1,4 +1,4 @@
 interface User {
-    id: number;
-    label: string;
-    }
+  id: string;
+  label: string;
+}

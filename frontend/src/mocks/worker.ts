@@ -1,7 +1,16 @@
-import { setupWorker } from 'msw/browser';
-import { categoriesHandlers } from './categories'
-import { expensesHandlers } from './expenses';
-import { currenciesHandlers } from './currencies';
-import { usersHandlers } from './users';
+import { setupWorker } from "msw/browser";
+import { categoriesHandlers } from "./categories";
+import { expensesHandlers } from "./expenses";
+import { currenciesHandlers } from "./currencies";
+import { usersHandlers } from "./users";
+import { subcategoriesHandlers } from "./subcategories";
 
-export const worker = setupWorker(...[categoriesHandlers, expensesHandlers, currenciesHandlers, usersHandlers].flat());
+export const worker = setupWorker(
+  ...[
+    categoriesHandlers,
+    expensesHandlers,
+    currenciesHandlers,
+    usersHandlers,
+    subcategoriesHandlers,
+  ].flat(),
+);
