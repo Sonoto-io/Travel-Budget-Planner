@@ -4,7 +4,7 @@
     :initialValues
     :resolver="resolver"
     @submit="onFormSubmit"
-    class="flex items-center  gap-4"
+    class="flex items-center gap-4"
   >
     <!-- Date -->
     <div class="flex flex-col gap-2">
@@ -62,7 +62,7 @@
     <!-- Price -->
     <div class="flex flex-col gap-2">
       <IftaLabel>
-        <InputText name="price" class="min-w-30"/>
+        <InputText name="price" class="min-w-30" />
         <label for="price">
           Price
           <span class="text-red-500">*</span>
@@ -76,10 +76,8 @@
     <!-- Note -->
     <div>
       <IftaLabel>
-      <Textarea name="note" rows="1" cols="30" class="min-w-50" />
-          <label for="note">
-          Note
-        </label>
+        <Textarea name="note" rows="1" cols="30" class="min-w-50" />
+        <label for="note"> Note </label>
       </IftaLabel>
       <Message v-if="$form.note?.invalid" severity="error">{{
         $form.note.error?.message
@@ -94,10 +92,7 @@
           :options="categories"
           optionLabel="label"
           class="min-w-50"
-          @change="
-            selectSubcategories = fetchSubCategories($form.category.value.label);
-            $form.subcategory.value.label = '';
-          "
+          @change="handleCategorySelect($event.value)"
         />
         <label for="category">
           Category
@@ -112,15 +107,13 @@
     <!-- Subcategory -->
     <div>
       <IftaLabel>
-      <Select
-        name="subcategory"
-        :options="selectSubcategories"
-        optionLabel="label"
-        class="min-w-50"
-      />
-      <label for="subcategory">
-          Subcategory
-        </label>
+        <Select
+          name="subcategory"
+          :options="selectSubcategories"
+          optionLabel="label"
+          class="min-w-50"
+        />
+        <label for="subcategory"> Subcategory </label>
       </IftaLabel>
       <Message v-if="$form.subcategory?.invalid" severity="error">{{
         $form.subcategory.error?.message
@@ -136,7 +129,7 @@
 import { Form } from "@primevue/forms";
 import { computed, reactive, ref, watch } from "vue";
 import { useToast } from "primevue/usetoast";
-import { zodResolver } from '@primevue/forms/resolvers/zod';
+import { zodResolver } from "@primevue/forms/resolvers/zod";
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
 import Message from "primevue/message";
@@ -146,7 +139,7 @@ import DatePicker from "primevue/datepicker";
 import Select from "primevue/select";
 import type { FormSelectValues } from "@/models/FormSelectValues";
 import { fetchSubCategories } from "@/utils/SubcategoryUtils";
-import IftaLabel from 'primevue/iftalabel';
+import IftaLabel from "primevue/iftalabel";
 import { id } from "happy-dom/lib/PropertySymbol";
 
 const props = defineProps<{
@@ -158,9 +151,8 @@ const emit = defineEmits(["addExpense"]);
 const categories = computed(() => props.selectValues["categories"] ?? []);
 console.log("Categories:", categories.value);
 
-
 const toast = useToast();
-const selectSubcategories = ref(fetchSubCategories(props.selectValues.categories[0]?.label) ?? []);
+const selectSubcategories = ref([]);
 
 const initialValues = reactive({
   date: new Date(),
@@ -181,13 +173,15 @@ const initialValues = reactive({
     label: "",
   },
   subcategory: {
+    id: "",
     label: "",
+    category_id: "",
   },
 });
 
 watch(
   () => props.selectValues,
-  (newValues) => {
+  async (newValues) => {
     if (newValues.users.length > 0 && initialValues.user.label == "") {
       initialValues.user.id = newValues.users[0].id;
       initialValues.user.label = newValues.users[0].label;
@@ -200,17 +194,23 @@ watch(
       initialValues.currency.conversion = newValues.currencies[0].conversion;
     }
     if (newValues.categories.length > 0 && initialValues.category.label == "") {
-      console.log("Setting initial category:", newValues.categories[0].label);
       initialValues.category.label = newValues.categories[0].label;
       initialValues.category.id = newValues.categories[0].id ?? "";
-      // Update subcategories too if you want
-      selectSubcategories.value = fetchSubCategories(initialValues.category.label);
-      if (selectSubcategories.value.length > 0) {
+      try {
+        selectSubcategories.value = await fetchSubCategories(
+          newValues.categories[0],
+        );
         initialValues.subcategory.label = selectSubcategories.value[0].label;
+        initialValues.subcategory.id = selectSubcategories.value[0].id ?? "";
+        initialValues.subcategory.category_id =
+          selectSubcategories.value[0].category_id ?? "";
+      } catch (error) {
+        console.error("Error fetching subcategories:", error);
+        selectSubcategories.value = [];
       }
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 );
 
 const resolver = zodResolver(
@@ -218,7 +218,8 @@ const resolver = zodResolver(
     date: z.coerce.date({ required_error: "Date is required" }),
     user: z.object({
       id: z.number().int().positive("User ID must be a positive integer"),
-      label : z.string().min(1, "User is required")}),
+      label: z.string().min(1, "User is required"),
+    }),
     currency: z.object({
       ident: z.string(),
       name: z.string(),
@@ -232,19 +233,32 @@ const resolver = zodResolver(
       label: z.string().min(1, "Category is required"),
     }),
     subcategory: z.object({
-      label : z.string().min(1, "User is required")}).optional(),
+      id: z.string().optional(),
+      label: z.string().min(1, "Subcategory is required"),
+    }),
+    categoriy_id: z.string().optional(),
   }),
 );
 
+const handleCategorySelect = async (category: Category) => {
+  try {
+    selectSubcategories.value = await fetchSubCategories(category);
+  } catch (error) {
+    console.error("Error fetching subcategories:", error);
+    selectSubcategories.value = [];
+  }
+};
 
-const onFormSubmit = ({ valid, values, reset }) => {
+const onFormSubmit = async ({ valid, values, reset }) => {
   if (valid) {
     toast.add({
       severity: "success",
       summary: "Form is submitted.",
       life: 3000,
     });
-    reset(); 
+    reset();
+    selectSubcategories.value =
+      (await fetchSubCategories(initialValues.category)) ?? [];
     emit("addExpense", {
       date: values.date,
       user: values.user,
@@ -256,5 +270,4 @@ const onFormSubmit = ({ valid, values, reset }) => {
     });
   }
 };
-
 </script>
