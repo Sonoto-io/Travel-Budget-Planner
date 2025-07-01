@@ -84,6 +84,17 @@
       }}</Message>
     </div>
 
+    <!-- Location -->
+    <div>
+      <IftaLabel>
+        <InputText name="location" />
+        <label for="location"> Location </label>
+      </IftaLabel>
+      <Message v-if="$form.location?.invalid" severity="error">{{
+        $form.location.error?.message
+      }}</Message>
+    </div>
+
     <!-- Category -->
     <div class="flex flex-col gap-2">
       <IftaLabel>
@@ -149,7 +160,6 @@ const props = defineProps<{
 const emit = defineEmits(["addExpense"]);
 
 const categories = computed(() => props.selectValues["categories"] ?? []);
-console.log("Categories:", categories.value);
 
 const toast = useToast();
 const selectSubcategories = ref([]);
@@ -157,7 +167,7 @@ const selectSubcategories = ref([]);
 const initialValues = reactive({
   date: new Date(),
   user: {
-    id: 0,
+    id: "",
     label: "",
   },
   currency: {
@@ -168,6 +178,7 @@ const initialValues = reactive({
   },
   price: "",
   note: "",
+  location: "",
   category: {
     id: "",
     label: "",
@@ -178,6 +189,35 @@ const initialValues = reactive({
     category_id: "",
   },
 });
+
+const FormData = z.object({
+    date: z.coerce.date({ required_error: "Date is required" }),
+    user: z.object({
+      id: z.string(),
+      label: z.string().min(1, "User is required"),
+    }),
+    currency: z.object({
+      ident: z.string(),
+      name: z.string(),
+      label: z.string().min(1, "Currency is required"),
+      conversion: z.number(),
+    }),
+    price: z.coerce.number().positive("Price must be positive"),
+    note: z.string().optional(),
+    location: z.string().optional(),
+    category: z.object({
+      id: z.string().optional(),
+      label: z.string().min(1, "Category is required"),
+    }),
+    subcategory: z.object({
+      id: z.string().optional(),
+      label: z.string().min(1, "Subcategory is required"),
+      categoriy_id: z.string().optional(),
+    }),
+  })
+
+const resolver = zodResolver(FormData)
+
 
 watch(
   () => props.selectValues,
@@ -203,7 +243,7 @@ watch(
         initialValues.subcategory.label = selectSubcategories.value[0].label;
         initialValues.subcategory.id = selectSubcategories.value[0].id ?? "";
         initialValues.subcategory.category_id =
-          selectSubcategories.value[0].category_id ?? "";
+        selectSubcategories.value[0].category_id ?? "";
       } catch (error) {
         console.error("Error fetching subcategories:", error);
         selectSubcategories.value = [];
@@ -211,33 +251,6 @@ watch(
     }
   },
   { deep: true, immediate: true },
-);
-
-const resolver = zodResolver(
-  z.object({
-    date: z.coerce.date({ required_error: "Date is required" }),
-    user: z.object({
-      id: z.number().int().positive("User ID must be a positive integer"),
-      label: z.string().min(1, "User is required"),
-    }),
-    currency: z.object({
-      ident: z.string(),
-      name: z.string(),
-      label: z.string().min(1, "Currency is required"),
-      conversion: z.number(),
-    }),
-    price: z.coerce.number().positive("Price must be positive"),
-    note: z.string().optional(),
-    category: z.object({
-      id: z.string().optional(),
-      label: z.string().min(1, "Category is required"),
-    }),
-    subcategory: z.object({
-      id: z.string().optional(),
-      label: z.string().min(1, "Subcategory is required"),
-    }),
-    categoriy_id: z.string().optional(),
-  }),
 );
 
 const handleCategorySelect = async (category: Category) => {
@@ -265,6 +278,7 @@ const onFormSubmit = async ({ valid, values, reset }) => {
       currency: values.currency,
       price: values.price,
       note: values.note,
+      location: values.location,
       category: values.category,
       subcategory: values.subcategory,
     });
