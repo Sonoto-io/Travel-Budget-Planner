@@ -21,6 +21,7 @@
         <DatePicker v-model="data[field]" class="min-w-30" />
       </template>
     </Column>
+
     <!-- User Column -->
     <Column field="user" header="User">
       <template #body="{ data, field }">
@@ -35,6 +36,7 @@
         />
       </template>
     </Column>
+
     <!-- Currency Column -->
     <Column
       field="currency"
@@ -54,6 +56,7 @@
         />
       </template>
     </Column>
+
     <!-- Price Column -->
     <Column field="price" header="Price" sortable>
       <template #body="{ data, field }">
@@ -62,6 +65,7 @@
       <template #editor="{ data, field }">
         <InputText v-model="data[field]" class="w-30" /></template
     ></Column>
+
     <!-- Price in my currency Column -->
     <Column field="price" header="Price in my currency" sortable>
       <template #body="{ data, field }">
@@ -70,6 +74,7 @@
         }}
       </template>
     </Column>
+
     <!-- Note Column -->
     <Column field="note" header="Note">
       <template #body="{ data, field }">
@@ -79,6 +84,17 @@
         <Textarea v-model="data[field]" rows="1" cols="10"
       /></template>
     </Column>
+
+    <!-- Location Column -->
+    <Column field="location" header="Location" sortable>
+      <template #body="{ data, field }">
+        <div class="max-w-50 truncate">{{ data[field] }}</div>
+      </template>
+      <template #editor="{ data, field }">
+        <InputText v-model="data[field]" rows="1" cols="10"
+      /></template>
+    </Column>
+
     <!-- Category Column -->
     <Column field="category" header="Category" sortable>
       <template #body="{ data, field }">
@@ -93,6 +109,7 @@
           @change="handleCategorySelect($event.value)"
         /> </template
     ></Column>
+
     <!-- Sub Category Column -->
     <Column field="subcategory" header="Sub Category" sortable>
       <template #body="{ data, field }">
@@ -107,6 +124,7 @@
           @show="handleCategorySelect(data.category)"
         /> </template
     ></Column>
+
     <!-- Edit Column -->
     <Column
       header="Edit"
