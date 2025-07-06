@@ -4,6 +4,7 @@ import { expensesHandlers } from "./expenses";
 import { currenciesHandlers } from "./currencies";
 import { usersHandlers } from "./users";
 import { subcategoriesHandlers } from "./subcategories";
+import { countriesHandlers } from "./countries";
 
 export const worker = setupWorker(
   ...[
@@ -12,5 +13,6 @@ export const worker = setupWorker(
     currenciesHandlers,
     usersHandlers,
     subcategoriesHandlers,
+    countriesHandlers
   ].flat(),
 );

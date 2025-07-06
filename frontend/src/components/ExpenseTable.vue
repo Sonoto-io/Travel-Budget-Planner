@@ -153,7 +153,7 @@ const props = defineProps<{
 
 const expenses = defineModel<Array<Expense>>();
 const editingRows = ref([]);
-const mainCurrency = ref({ ident: "fr-FR", name: "EUR" }); // TODO: fetch from api
+const mainCurrency = ref({ id: "fr-FR", name: "EUR" }); // TODO: fetch from api
 const selectSubcategories = ref();
 
 const handleCategorySelect = async (category: Category) => {

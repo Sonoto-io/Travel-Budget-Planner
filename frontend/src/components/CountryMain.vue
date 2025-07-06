@@ -7,13 +7,13 @@
       />
     </div>
     <div class="">
-      <ExpenseTable :selectValues="selectValues" v-model="expenses" />
+      <ExpenseTable :selectValues="selectValues" v-model="expenses"  />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed, ComputedRef } from "vue";
+import { ref, onMounted, reactive, computed, ComputedRef, watchEffect } from "vue";
 import ExpenseTable from "@/components/ExpenseTable.vue";
 import { getExpenses } from "@/api/expenses";
 import ExpenseForm from "@/components/ExpenseForm.vue";
@@ -21,20 +21,25 @@ import { getCategories } from "@/api/categories";
 import type { FormSelectValues } from "@/models/FormSelectValues";
 import { getCurrencies } from "@/api/currencies";
 import { getUsers } from "@/api/users";
+import { useCountryStore } from "@/stores/countryStore";
 
 const expenses = ref([]);
 const selectCategories = ref([]);
 const selectCurrencies = ref([]);
 const selectUsers = ref([]);
 
-onMounted(async () => {
-  expenses.value = await getExpenses()
-    .then((res) => res.data)
-    .catch((err) => {
-      console.error("Error fetching expenses:", err);
-      return [];
-    });
+const countryStore = useCountryStore()
 
+watchEffect(async () => {
+    expenses.value = await getExpenses(countryStore.currentCountry.id)
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("Error fetching expenses:", err);
+        return [];
+      });
+})
+
+onMounted(async () => {
   selectCategories.value = await getCategories()
     .then((res) => res.data)
     .catch((err) => {
@@ -62,7 +67,7 @@ const selectValues: ComputedRef<FormSelectValues> = computed(() => ({
   users: selectUsers.value,
 }));
 
-const handleAddExpense = (expense) => {
+const handleAddExpense = (expense: Expense) => {
   expenses.value.unshift(expense);
 };
 </script>

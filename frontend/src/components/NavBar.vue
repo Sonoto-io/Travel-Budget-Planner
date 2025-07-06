@@ -33,32 +33,43 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { ref, computed, onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
 import PanelMenu from "primevue/panelmenu";
+import { getCountries } from "@/api/countries";
+import { useToast } from "primevue/usetoast";
+import { useCountryStore } from "@/stores/countryStore";
 
-const router = useRouter();
+const toast = useToast();
 const route = useRoute();
+const countryStore = useCountryStore()
 
-const countryList = [
-  { label: "France", route: "/country/fr", code: "fr" },
-  { label: "Germany", route: "/country/de", code: "de" },
-  { label: "Japan", route: "/country/jp", code: "jp" },
-];
+const currentCountry = ref("Select a country")
 
-const currentCountry = computed(() => {
-  console.log(route.path);
-  if (route.path.includes("/country/")) {
-    const country = countryList.filter(
-      (country) => country.code == route.params.code,
-    );
-    if (country.length == 1) {
-      return country.pop().label;
+const countryMenuItems = ref([])
+
+watch(
+  () => route.path,
+  () => {
+    if (route.path.startsWith("/country/")) {
+      currentCountry.value = countryStore.currentCountry?.label ?? "Select a country"
+    } else {
+      return "Country Expenses";
     }
-  } else {
-    return "Country Expenses";
   }
-}); // TODO get from store and then get from url / router path
+)
+
+onMounted(async () => {
+  countryStore.countryList = (await getCountries()).data
+  countryMenuItems.value = countryStore.countryList.map((country) =>  {
+    country.route = `/country/${country.shortname}`
+    return country
+  })
+  }
+)
+
+const updateCurrentCountry = (shortname: string) => {
+}
 
 const items = ref([
   {
@@ -69,14 +80,7 @@ const items = ref([
   {
     label: currentCountry,
     icon: "pi pi-globe",
-    items: [
-      {
-        label: "France",
-        route: "/country/fr",
-      },
-      { label: "Germany", route: "/country/de" },
-      { label: "Japan", route: "/country/jp" },
-    ],
+    items: countryMenuItems,
   },
   {
     label: "Management",
