@@ -1,6 +1,6 @@
 export type Currency = {
-  id: string;
   name: string;
-  ident: string;
-  displayName: string;
+  id: string;
+  label: string;
+  conversion: number
 };

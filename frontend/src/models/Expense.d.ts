@@ -1,9 +1,10 @@
 interface Expense {
   id: string;
+  country_id: string,
   date: string;
   price: number;
   currency: {
-    ident: string;
+    id: string;
     name: string;
     displayName: string;
     conversion: number;

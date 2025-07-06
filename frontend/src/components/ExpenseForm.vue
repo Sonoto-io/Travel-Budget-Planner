@@ -138,7 +138,7 @@
 
 <script setup lang="ts">
 import { Form } from "@primevue/forms";
-import { computed, reactive, ref, watch } from "vue";
+import { computed, onMounted, reactive, ref, watch, watchEffect } from "vue";
 import { useToast } from "primevue/usetoast";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import InputText from "primevue/inputtext";
@@ -151,7 +151,8 @@ import Select from "primevue/select";
 import type { FormSelectValues } from "@/models/FormSelectValues";
 import { fetchSubCategories } from "@/utils/SubcategoryUtils";
 import IftaLabel from "primevue/iftalabel";
-import { id } from "happy-dom/lib/PropertySymbol";
+import { useCountryStore } from "@/stores/countryStore";
+import { useRoute } from "vue-router";
 
 const props = defineProps<{
   selectValues: FormSelectValues;
@@ -163,6 +164,7 @@ const categories = computed(() => props.selectValues["categories"] ?? []);
 
 const toast = useToast();
 const selectSubcategories = ref([]);
+const countryStore = useCountryStore()
 
 const initialValues = reactive({
   date: new Date(),
@@ -171,9 +173,9 @@ const initialValues = reactive({
     label: "",
   },
   currency: {
-    ident: "",
-    name: "",
     label: "",
+    id: "",
+    name: "",
     conversion: 1,
   },
   price: "",
@@ -197,7 +199,7 @@ const FormData = z.object({
       label: z.string().min(1, "User is required"),
     }),
     currency: z.object({
-      ident: z.string(),
+      id: z.string(),
       name: z.string(),
       label: z.string().min(1, "Currency is required"),
       conversion: z.number(),
@@ -217,7 +219,14 @@ const FormData = z.object({
   })
 
 const resolver = zodResolver(FormData)
+const route = useRoute()
 
+watch(route, () => {
+  initialValues.currency.id = countryStore.currentMainCurrency.id
+  initialValues.currency.label = countryStore.currentMainCurrency.label
+  initialValues.currency.name = countryStore.currentMainCurrency.name
+  initialValues.currency.conversion = countryStore.currentMainCurrency.conversion
+})
 
 watch(
   () => props.selectValues,
@@ -228,7 +237,7 @@ watch(
     }
     if (newValues.currencies.length > 0 && initialValues.currency.label == "") {
       // didn't find better way to make the form react to currency change
-      initialValues.currency.ident = newValues.currencies[0].ident;
+      initialValues.currency.id = newValues.currencies[0].id;
       initialValues.currency.name = newValues.currencies[0].name;
       initialValues.currency.label = newValues.currencies[0].label;
       initialValues.currency.conversion = newValues.currencies[0].conversion;
@@ -281,6 +290,7 @@ const onFormSubmit = async ({ valid, values, reset }) => {
       location: values.location,
       category: values.category,
       subcategory: values.subcategory,
+      country_id: countryStore.currentCountry.id
     });
   }
 };
