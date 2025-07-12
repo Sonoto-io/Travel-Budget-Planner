@@ -6,6 +6,9 @@
         @addExpense="handleAddExpense"
       />
     </div>
+    <div>
+      <Dashboard :countryId="countryStore.currentCountry.id"/>
+    </div>
     <div class="">
       <ExpenseTable :selectValues="selectValues" v-model="expenses"  />
     </div>
@@ -22,6 +25,7 @@ import type { FormSelectValues } from "@/models/FormSelectValues";
 import { getCurrencies } from "@/api/currencies";
 import { getUsers } from "@/api/users";
 import { useCountryStore } from "@/stores/countryStore";
+import Dashboard from "./Dashboard.vue";
 
 const expenses = ref([]);
 const selectCategories = ref([]);
@@ -38,6 +42,7 @@ watchEffect(async () => {
         return [];
       });
 })
+
 
 onMounted(async () => {
   selectCategories.value = await getCategories()

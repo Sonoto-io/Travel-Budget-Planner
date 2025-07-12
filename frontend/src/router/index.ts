@@ -30,9 +30,12 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, _from, next) => {
-  const countryStore = useCountryStore()
-  countryStore.countryList = (await getCountries()).data
-  await countryStore.setCurrentCountryData(to.params.shortname)
+  if (to.fullPath.startsWith("/country/")) {
+    const countryStore = useCountryStore()
+    countryStore.countryList = (await getCountries()).data
+    await countryStore.setCurrentCountryData(to.params.shortname)
+  }
+
 
   next()
 })
