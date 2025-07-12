@@ -138,7 +138,6 @@
 import Column from "primevue/column";
 import DataTable from "primevue/datatable";
 import { ref } from "vue";
-import { getExpenses } from "@/api/expenses";
 import InputText from "primevue/inputtext";
 import DatePicker from "primevue/datepicker";
 import Textarea from "primevue/textarea";
