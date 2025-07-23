@@ -13,6 +13,6 @@ export const worker = setupWorker(
     currenciesHandlers,
     usersHandlers,
     subcategoriesHandlers,
-    countriesHandlers
+    countriesHandlers,
   ].flat(),
 );

@@ -1,10 +1,21 @@
 import axios from "axios";
-import type { Country } from "@/models/Country";
 
 export const getCountries = () => {
-  return axios.get("/api/countries/");
+  return axios
+    .get("/api/countries/")
+    .then((response) => response.data.countries)
+    .catch((error: any) => {
+      console.error("Error fetching countries :", error);
+      return [];
+    });
 };
 
 export const getCountryByShortname = (countryShortname: string) => {
-  return axios.get<Country>(`/api/countries/?country_shortname=${countryShortname}`);
+  return axios
+    .get(`/api/countries/?country_shortname=${countryShortname}`)
+    .then((response) => response.data.country)
+    .catch((error: any) => {
+      console.error("Error fetching countries :", error);
+      return [];
+    });
 };
