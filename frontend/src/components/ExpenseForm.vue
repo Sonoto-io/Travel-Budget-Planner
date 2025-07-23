@@ -4,10 +4,10 @@
     :initialValues
     :resolver="resolver"
     @submit="onFormSubmit"
-    class="flex items-center gap-4"
+    class="flex flex-wrap items-center gap-4"
   >
     <!-- Date -->
-    <div class="flex flex-col gap-2">
+    <div class="flex grow flex-col gap-2">
       <IftaLabel>
         <DatePicker name="date" class="min-w-30" />
         <label for="date">
@@ -21,7 +21,7 @@
     </div>
 
     <!-- User -->
-    <div class="flex flex-col gap-2">
+    <div class="flex grow flex-col gap-2">
       <IftaLabel>
         <Select
           inputId="user"
@@ -41,13 +41,13 @@
     </div>
 
     <!-- Currency -->
-    <div class="flex flex-col gap-2">
+    <div class="flex grow flex-col gap-2">
       <IftaLabel>
         <Select
           name="currency"
           :options="props.selectValues.currencies"
           optionLabel="label"
-          class="min-w-50"
+          class="min-w-30"
         />
         <label for="currency">
           Currency
@@ -60,7 +60,7 @@
     </div>
 
     <!-- Price -->
-    <div class="flex flex-col gap-2">
+    <div class="flex grow flex-col gap-2">
       <IftaLabel>
         <InputText name="price" class="min-w-30" />
         <label for="price">
@@ -74,9 +74,9 @@
     </div>
 
     <!-- Note -->
-    <div>
+    <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <Textarea name="note" rows="1" cols="30" class="min-w-50" />
+        <Textarea name="note" rows="1" cols="20" />
         <label for="note"> Note </label>
       </IftaLabel>
       <Message v-if="$form.note?.invalid" severity="error">{{
@@ -85,7 +85,7 @@
     </div>
 
     <!-- Location -->
-    <div>
+    <div class="flex grow flex-col gap-2">
       <IftaLabel>
         <InputText name="location" />
         <label for="location"> Location </label>
@@ -102,7 +102,7 @@
           name="category"
           :options="categories"
           optionLabel="label"
-          class="min-w-50"
+          class="min-w-30"
           @change="handleCategorySelect($event.value)"
         />
         <label for="category">
@@ -122,7 +122,7 @@
           name="subcategory"
           :options="selectSubcategories"
           optionLabel="label"
-          class="min-w-50"
+          class="min-w-30"
         />
         <label for="subcategory"> Subcategory </label>
       </IftaLabel>
@@ -138,7 +138,7 @@
 
 <script setup lang="ts">
 import { Form } from "@primevue/forms";
-import { computed, onMounted, reactive, ref, watch, watchEffect } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import { useToast } from "primevue/usetoast";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import InputText from "primevue/inputtext";
@@ -164,7 +164,7 @@ const categories = computed(() => props.selectValues["categories"] ?? []);
 
 const toast = useToast();
 const selectSubcategories = ref([]);
-const countryStore = useCountryStore()
+const countryStore = useCountryStore();
 
 const initialValues = reactive({
   date: new Date(),
@@ -193,40 +193,41 @@ const initialValues = reactive({
 });
 
 const FormData = z.object({
-    date: z.coerce.date({ required_error: "Date is required" }),
-    user: z.object({
-      id: z.string(),
-      label: z.string().min(1, "User is required"),
-    }),
-    currency: z.object({
-      id: z.string(),
-      name: z.string(),
-      label: z.string().min(1, "Currency is required"),
-      conversion: z.number(),
-    }),
-    price: z.coerce.number().positive("Price must be positive"),
-    note: z.string().optional(),
-    location: z.string().optional(),
-    category: z.object({
-      id: z.string().optional(),
-      label: z.string().min(1, "Category is required"),
-    }),
-    subcategory: z.object({
-      id: z.string().optional(),
-      label: z.string().min(1, "Subcategory is required"),
-      categoriy_id: z.string().optional(),
-    }),
-  })
+  date: z.coerce.date({ required_error: "Date is required" }),
+  user: z.object({
+    id: z.string(),
+    label: z.string().min(1, "User is required"),
+  }),
+  currency: z.object({
+    id: z.string(),
+    name: z.string(),
+    label: z.string().min(1, "Currency is required"),
+    conversion: z.number(),
+  }),
+  price: z.coerce.number().positive("Price must be positive"),
+  note: z.string().optional(),
+  location: z.string().optional(),
+  category: z.object({
+    id: z.string().optional(),
+    label: z.string().min(1, "Category is required"),
+  }),
+  subcategory: z.object({
+    id: z.string().optional(),
+    label: z.string().min(1, "Subcategory is required"),
+    categoriy_id: z.string().optional(),
+  }),
+});
 
-const resolver = zodResolver(FormData)
-const route = useRoute()
+const resolver = zodResolver(FormData);
+const route = useRoute();
 
 watch(route, () => {
-  initialValues.currency.id = countryStore.currentMainCurrency.id
-  initialValues.currency.label = countryStore.currentMainCurrency.label
-  initialValues.currency.name = countryStore.currentMainCurrency.name
-  initialValues.currency.conversion = countryStore.currentMainCurrency.conversion
-})
+  initialValues.currency.id = countryStore.currentMainCurrency.id;
+  initialValues.currency.label = countryStore.currentMainCurrency.label;
+  initialValues.currency.name = countryStore.currentMainCurrency.name;
+  initialValues.currency.conversion =
+    countryStore.currentMainCurrency.conversion;
+});
 
 watch(
   () => props.selectValues,
@@ -252,7 +253,7 @@ watch(
         initialValues.subcategory.label = selectSubcategories.value[0].label;
         initialValues.subcategory.id = selectSubcategories.value[0].id ?? "";
         initialValues.subcategory.category_id =
-        selectSubcategories.value[0].category_id ?? "";
+          selectSubcategories.value[0].category_id ?? "";
       } catch (error) {
         console.error("Error fetching subcategories:", error);
         selectSubcategories.value = [];
@@ -290,7 +291,7 @@ const onFormSubmit = async ({ valid, values, reset }) => {
       location: values.location,
       category: values.category,
       subcategory: values.subcategory,
-      country_id: countryStore.currentCountry.id
+      country_id: countryStore.currentCountry.id,
     });
   }
 };

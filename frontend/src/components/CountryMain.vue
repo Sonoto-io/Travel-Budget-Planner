@@ -7,16 +7,16 @@
       />
     </div>
     <div>
-      <Dashboard :countryId="countryStore.currentCountry.id"/>
+      <Dashboard :countryId="countryStore.currentCountry.id" />
     </div>
     <div class="">
-      <ExpenseTable :selectValues="selectValues" v-model="expenses"  />
+      <ExpenseTable :selectValues="selectValues" v-model="expenses" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed, ComputedRef, watchEffect } from "vue";
+import { ref, onMounted, computed, ComputedRef, watchEffect } from "vue";
 import ExpenseTable from "@/components/ExpenseTable.vue";
 import { getExpenses } from "@/api/expenses";
 import ExpenseForm from "@/components/ExpenseForm.vue";
@@ -32,38 +32,17 @@ const selectCategories = ref([]);
 const selectCurrencies = ref([]);
 const selectUsers = ref([]);
 
-const countryStore = useCountryStore()
+const countryStore = useCountryStore();
 
 watchEffect(async () => {
-    expenses.value = await getExpenses(countryStore.currentCountry.id)
-      .then((res) => res.data)
-      .catch((err) => {
-        console.error("Error fetching expenses:", err);
-        return [];
-      });
-})
-
+  expenses.value = await getExpenses(countryStore.currentCountry.id);
+});
 
 onMounted(async () => {
-  selectCategories.value = await getCategories()
-    .then((res) => res.data)
-    .catch((err) => {
-      console.error("Error fetching categories:", err);
-      return [];
-    });
-  selectCurrencies.value = await getCurrencies()
-    .then((res) => res.data)
-    .catch((err) => {
-      console.error("Error fetching categories:", err);
-      return [];
-    });
+  selectCategories.value = await getCategories();
+  selectCurrencies.value = await getCurrencies();
 
-  selectUsers.value = await getUsers()
-    .then((res) => res.data)
-    .catch((err) => {
-      console.error("Error fetching users:", err);
-      return [];
-    });
+  selectUsers.value = await getUsers();
 });
 
 const selectValues: ComputedRef<FormSelectValues> = computed(() => ({
@@ -74,5 +53,6 @@ const selectValues: ComputedRef<FormSelectValues> = computed(() => ({
 
 const handleAddExpense = (expense: Expense) => {
   expenses.value.unshift(expense);
+  // TODO: add to db
 };
 </script>

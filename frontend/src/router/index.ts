@@ -23,7 +23,6 @@ const routes = [
   },
 ];
 
-
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
@@ -31,13 +30,12 @@ const router = createRouter({
 
 router.beforeEach(async (to, _from, next) => {
   if (to.fullPath.startsWith("/country/")) {
-    const countryStore = useCountryStore()
-    countryStore.countryList = (await getCountries()).data
-    await countryStore.setCurrentCountryData(to.params.shortname)
+    const countryStore = useCountryStore();
+    countryStore.countryList = (await getCountries());
+    await countryStore.setCurrentCountryData(to.params.shortname);
   }
 
-
-  next()
-})
+  next();
+});
 
 export default router;

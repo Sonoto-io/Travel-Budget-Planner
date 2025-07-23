@@ -1,14 +1,10 @@
 import { Elysia } from "elysia";
-import { configureCategoriesRoutes } from "@routes/categoriesRoutes";
 import { swagger } from "@elysiajs/swagger";
+import { configureAllRoutes } from "@routes";
 
 const app = new Elysia()
-  .use(
-    swagger({
-      path: "/v1/swagger",
-    })
-  )
-  .use(configureCategoriesRoutes)
+  .use(swagger())
+  .use(configureAllRoutes)
   .get("/", () => "Hello from root !")
   .listen({
     port: 3000,

@@ -15,34 +15,68 @@ datasource db {
 }
 
 model User {
-  id    String     @db.Uuid @id
-  name  String?
+  id    String     @db.Uuid @id @default(uuid())
+  label  String?
   token String?
+
+  expenses  Expense[]
+}
+
+model Currency {
+  id    String      @id
+  name String       
+  label String      @unique
+  conversion Float  @default(1.00)
+
+  expenses  Expense[]
+  countries Country[]
 }
 
 model Country {
-  id    String  @id @db.Uuid
-  name  String? @unique
+  id        String  @id @db.Uuid @default(uuid())
+  label     String? @unique
   expectedBudget Float  @default(0.00)
-  expenses Expense[]
+  main_currency String
+  shortname String
+
+  currency Currency @relation(fields: [main_currency], references: [id])
+
+  expenses   Expense[]
 }
 
 model Category {
-  id    String  @id @db.Uuid
-  name  String  @unique
-  expenses Expense[]
+  id        String  @id @db.Uuid @default(uuid())
+  label     String  @unique
+
+  expenses  Expense[]
+  subcategories Subcategory[]
+}
+
+model Subcategory {
+  id        String  @id @db.Uuid @default(uuid())
+  label     String  @unique
+  categoryId String @db.Uuid
+
+  category  Category  @relation(fields: [categoryId], references: [id])
+  expenses  Expense[]
 }
 
 model Expense {
-  id    String          @id @db.Uuid
+  id    String          @id @db.Uuid @default(uuid())
   countryId   String    @db.Uuid
-  categoryId  String?   @db.Uuid
+  userId      String    @db.Uuid
+  categoryId  String    @db.Uuid
+  subcategoryId String  @db.Uuid
+  currencyId  String    
 
   country     Country   @relation(fields: [countryId], references: [id])
-  category    Category? @relation(fields: [categoryId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+  category    Category  @relation(fields: [categoryId], references: [id])
+  subcategory Subcategory @relation(fields: [subcategoryId], references: [id])
+  currency    Currency  @relation(fields: [currencyId], references: [id])
 
-  name String
-  value Float   @default(0.00)
-  date DateTime @default(now())
+  note  String?
+  price Float     @default(0.00)
+  date  DateTime  @default(now())
+  location String?
 }
-

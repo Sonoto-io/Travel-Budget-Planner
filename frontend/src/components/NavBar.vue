@@ -42,34 +42,34 @@ import { useCountryStore } from "@/stores/countryStore";
 
 const toast = useToast();
 const route = useRoute();
-const countryStore = useCountryStore()
+const countryStore = useCountryStore();
 
-const currentCountry = ref("Select a country")
+const currentCountry = ref("Select a country");
 
-const countryMenuItems = ref([])
+const countryMenuItems = ref([]);
 
 watch(
   () => route.path,
   () => {
     if (route.path.startsWith("/country/")) {
-      currentCountry.value = countryStore.currentCountry?.label ?? "Select a country"
+      currentCountry.value =
+        countryStore.currentCountry?.label ?? "Select a country";
     } else {
       return "Country Expenses";
     }
-  }
-)
+  },
+);
 
 onMounted(async () => {
-  countryStore.countryList = (await getCountries()).data
-  countryMenuItems.value = countryStore.countryList.map((country) =>  {
-    country.route = `/country/${country.shortname}`
-    return country
-  })
-  }
-)
+  countryStore.countryList = await getCountries();
 
-const updateCurrentCountry = (shortname: string) => {
-}
+  countryMenuItems.value = countryStore.countryList.map((country) => {
+    country.route = `/country/${country.shortname}`;
+    return country;
+  });
+});
+
+const updateCurrentCountry = (shortname: string) => {};
 
 const items = ref([
   {

@@ -6,22 +6,23 @@ import Aura from "@primeuix/themes/aura";
 import ToastService from "primevue/toastservice";
 import { worker } from "./mocks/worker";
 import router from "./router";
-import { createPinia } from 'pinia'
+import { createPinia } from "pinia";
 
 async function main() {
-  if (import.meta.env.DEV) {
+  console.log("ENV : ", import.meta.env);
+  if (import.meta.env.DEV && import.meta.env.VITE_MOCKS_ENABLED == "true") {
     console.log("Starting MSW worker in development mode");
     await worker.start();
   }
-  const pinia = createPinia()
+  const pinia = createPinia();
   const app = createApp(App);
   app.use(PrimeVue, {
     theme: {
       preset: Aura,
     },
   });
-  
-  app.use(pinia)
+
+  app.use(pinia);
   app.use(ToastService);
   app.use(router);
   app.mount("#app");

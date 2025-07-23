@@ -18,8 +18,15 @@ export const convertValueToCurrency = (
   }).format(value * currency.conversion);
 };
 
-
 export const calculTotal = (expenses: Expense[]) => {
-  const res = expenses.reduce((acc, expense) => acc + (expense.price * expense.currency.conversion), 0)
-  return convertValueToCurrency(res, expenses[0].currency, { label: "Euro", id: "fr-FR", name: "EUR", conversion: 1 }) // TODO: get from store
-}
+  const res = expenses.reduce(
+    (acc, expense) => acc + expense.price * expense.currency.conversion,
+    0,
+  );
+  return convertValueToCurrency(res, expenses[0].currency, {
+    label: "Euro",
+    id: "fr-FR",
+    name: "EUR",
+    conversion: 1,
+  }); // TODO: get from store
+};
