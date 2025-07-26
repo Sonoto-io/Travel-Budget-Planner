@@ -32,21 +32,29 @@ export const countries = [
           label: "France",
           main_currency: "fr-FR",
           shortname: "fr",
+          daily_expected_expenses: 55,
+          count_days: 30,
         },
         {
           label: "Etats-Unis",
           main_currency: "en-US",
           shortname: "us",
+          daily_expected_expenses: 70,
+          count_days: 3,
         },
         {
           label: "Japon",
           main_currency: "ja-JP",
           shortname: "jp",
+          daily_expected_expenses: 42,
+          count_days: 21,
         },
         {
           label: "Allemagne",
           main_currency: "de-DE",
           shortname: "de",
+          daily_expected_expenses: 33,
+          count_days: 5,
         },
       ]
 

@@ -5,6 +5,7 @@ set -e
 echo "Setting Prisma up..."
 bunx prisma generate
 bunx prisma migrate deploy
+echo "Populating database..."
 bun run /app/prisma/populate_db.ts
 
 echo "Starting backend..."
