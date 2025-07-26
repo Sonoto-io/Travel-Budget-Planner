@@ -2,6 +2,7 @@
   Warnings:
 
   - You are about to drop the column `name` on the `Category` table. All the data in the column will be lost.
+  - You are about to drop the column `expectedBudget` on the `Country` table. All the data in the column will be lost.
   - You are about to drop the column `name` on the `Country` table. All the data in the column will be lost.
   - You are about to drop the column `name` on the `Expense` table. All the data in the column will be lost.
   - You are about to drop the column `value` on the `Expense` table. All the data in the column will be lost.
@@ -9,6 +10,7 @@
   - A unique constraint covering the columns `[label]` on the table `Category` will be added. If there are existing duplicate values, this will fail.
   - A unique constraint covering the columns `[label]` on the table `Country` will be added. If there are existing duplicate values, this will fail.
   - Added the required column `label` to the `Category` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `count_days` to the `Country` table without a default value. This is not possible if the table is not empty.
   - Added the required column `main_currency` to the `Country` table without a default value. This is not possible if the table is not empty.
   - Added the required column `shortname` to the `Country` table without a default value. This is not possible if the table is not empty.
   - Added the required column `currencyId` to the `Expense` table without a default value. This is not possible if the table is not empty.
@@ -31,7 +33,10 @@ ALTER TABLE "Category" DROP COLUMN "name",
 ADD COLUMN     "label" TEXT NOT NULL;
 
 -- AlterTable
-ALTER TABLE "Country" DROP COLUMN "name",
+ALTER TABLE "Country" DROP COLUMN "expectedBudget",
+DROP COLUMN "name",
+ADD COLUMN     "count_days" INTEGER NOT NULL,
+ADD COLUMN     "daily_expected_expenses" DOUBLE PRECISION NOT NULL DEFAULT 0.00,
 ADD COLUMN     "label" TEXT,
 ADD COLUMN     "main_currency" TEXT NOT NULL,
 ADD COLUMN     "shortname" TEXT NOT NULL;

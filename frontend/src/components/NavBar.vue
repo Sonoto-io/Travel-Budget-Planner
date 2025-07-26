@@ -54,10 +54,8 @@ watch(
     if (route.path.startsWith("/country/")) {
       currentCountry.value =
         countryStore.currentCountry?.label ?? "Select a country";
-    } else {
-      return "Country Expenses";
     }
-  },
+  },{immediate:true}
 );
 
 onMounted(async () => {
@@ -86,9 +84,11 @@ const items = ref([
     label: "Management",
     icon: "pi pi-cog",
     items: [
-      { label: "Categories", route: "/management/categories" },
       { label: "Countries", route: "/management/countries" },
       { label: "Currencies", route: "/management/currencies" },
+      { label: "Categories", route: "/management/categories" },
+      { label: "Subategories", route: "/management/subcategories" },
+      { label: "Users", route: "/management/users" },
     ],
   },
 ]);

@@ -1,10 +1,10 @@
-import { getSubCategories } from "@/api/subcategories";
+import { getSubcategories } from "@/api/subcategories";
 
 export const fetchSubCategories = async (category: Category) => {
   if (!category) {
     return [];
   }
-  const res = getSubCategories(category.id).catch((error: any) => {
+  const res = getSubcategories(category.id).catch((error: any) => {
     console.error("Error fetching subcategories:", error);
     return [];
   });

@@ -131,6 +131,17 @@
       :rowEditor="true"
       style="width: 10%; min-width: 8rem"
     ></Column>
+    <Column header="Delete" style="width: 10%; min-width: 8rem">
+      <template #body="{ data }">
+        <Button
+          icon="pi pi-trash"
+          severity="danger"
+          @click="deleteRow(data)"
+          text
+          rounded
+        />
+      </template>
+    </Column>
   </DataTable>
 </template>
 
@@ -145,6 +156,7 @@ import Select from "primevue/select";
 import { formatCurrency, convertValueToCurrency } from "@/utils/CurrencyUtils";
 import { fetchSubCategories } from "@/utils/SubcategoryUtils";
 import type { FormSelectValues } from "@/models/FormSelectValues";
+import Button from "primevue/button";
 
 const props = defineProps<{
   selectValues: FormSelectValues;
@@ -167,6 +179,11 @@ const handleCategorySelect = async (category: Category) => {
 const onRowEditSave = (event: { newData: any; index: any }) => {
   let { newData, index } = event;
   expenses.value[index] = newData;
+  // TODO: edit in database
+};
+
+const deleteRow = (row: Expense) => {
+  expenses.value = expenses.value.filter((expense) => expense.id !== row.id);
 };
 
 const formatDate = (line) => {

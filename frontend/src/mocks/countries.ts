@@ -21,7 +21,7 @@ const countries = {
       shortname: "jp",
     },
     {
-      id: "3",
+      id: "4",
       label: "Allemagne",
       main_currency: "eu-DE",
       shortname: "de",
