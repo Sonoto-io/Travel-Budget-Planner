@@ -1,3 +1,0 @@
-interface ICategoryUpsert {
-  name: string;
-}

@@ -16,7 +16,7 @@ datasource db {
 
 model User {
   id    String     @db.Uuid @id @default(uuid())
-  label  String?
+  label  String?   @unique
   token String?
 
   expenses  Expense[]
@@ -37,10 +37,10 @@ model Country {
   label     String? @unique
   daily_expected_expenses Float  @default(0.00)
   count_days Int
-  main_currency String
+  currencyId String
   shortname String
 
-  currency Currency @relation(fields: [main_currency], references: [id])
+  currency Currency @relation(fields: [currencyId], references: [id])
 
   expenses   Expense[]
 }

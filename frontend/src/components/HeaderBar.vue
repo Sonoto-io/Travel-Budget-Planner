@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import logo from "@images/logo.svg";
+import logo from "@images/logo.webp";
 import { ref, onMounted, onUnmounted } from "vue";
 
 const isNavbarVisible = ref(false);

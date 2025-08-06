@@ -1,44 +1,44 @@
 <template>
   <div class="flex flex-col gap-4 overflow-x-scroll">
     <div class="">
-      <ManagementForm :item="items[0]"/>
+      <ManagementForm :item="items[0]" :itemType="itemType"
+      @addItem="handleAddItem"/>
     </div>
     <div>
-      <ManagementTable  v-model="items"/>
+      <ManagementTable  v-model="items" :itemType="itemType"/>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { getCategories } from "@/api/categories";
-import { getSubcategories } from "@/api/subcategories";
 
-import { getCurrencies } from "@/api/currencies";
-import { getUsers } from "@/api/users";
 import ManagementTable from "./ManagementTable.vue";
 import { useRoute } from "vue-router";
-import { getCountries } from "@/api/countries";
 import ManagementForm from "./ManagementForm.vue";
+import type { Item } from "@/models/Item";
+import { handleItemAction } from "@/utils/ItemsUtils";
 
 const items = ref([])
+const itemType = ref("category")
 const route = useRoute();
 
 const mappingRoutesItems = [
-  { func: getCountries, route: "countries" },
-  { func: getCurrencies, route: "currencies" },
-  { func: getCategories, route: "categories" },
-  { func: getSubcategories, route: "subcategories" },
-  { func: getUsers, route: "users" },
+  { route: "countries", type: "country" },
+  { route: "currencies", type: "currency" },
+  { route: "categories" , type: "category"}, 
+  { route: "subcategories", type: "subcategory" },
+  { route: "users", type: "user" },
 ]
 
 watch(
   () => route.path,
   async () => {
+  
     if (route.path.startsWith("/management/")) {
-      const currentItem = mappingRoutesItems.filter((routeItem) => route.path.includes(routeItem.route))[0]
-      items.value = await currentItem.func()
-      console.log("ITEMS : ", items.value)
+      const currentItem = mappingRoutesItems.filter((routeItem) => route.path.endsWith(`/${routeItem.route}`))[0]
+      items.value = await handleItemAction(currentItem.type, "get")
+      itemType.value = currentItem.type
     } else {
       items.value = []
     }
@@ -46,8 +46,7 @@ watch(
 );
 
 
-const handleAddItem = (item: Country | Category | Subcategory | Currency | User) => {
+const handleAddItem = (item: Item) => {
   items.value.unshift(item);
-  // TODO: add to db
 };
 </script>

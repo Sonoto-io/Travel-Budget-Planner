@@ -1,6 +1,6 @@
 interface Country {
   id: string;
   label: string;
-  main_currency: string;
+  currencyId: string;
   shortname: string;
 }

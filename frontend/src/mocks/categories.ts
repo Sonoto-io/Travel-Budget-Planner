@@ -15,4 +15,10 @@ export const categoriesHandlers = [
       headers: { "Content-Type": "application/json" },
     });
   }),
+  http.post("/api/categories/", () => {
+    return new HttpResponse(JSON.stringify(categories.categories[0]), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }),
 ];

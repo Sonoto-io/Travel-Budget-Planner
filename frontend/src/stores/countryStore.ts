@@ -15,7 +15,7 @@ export const useCountryStore = defineStore("countries", () => {
         (country: Country) => country.shortname == countryShortname,
       )[0];
       currentMainCurrency.value = await getCurrency(
-        currentCountry.value.main_currency,
+        currentCountry.value.currencyId,
       );
       ready.value = true;
     }
