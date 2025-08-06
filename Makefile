@@ -14,3 +14,8 @@ dev-up-mocks:
 .PHONY: dev-down
 dev-down:
 	$(COMPOSE_DEV) down -v --remove-orphans
+
+.PHONY: dev-reset
+dev-reset:
+	make dev-down
+	make dev-up

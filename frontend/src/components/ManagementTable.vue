@@ -1,7 +1,7 @@
 <template>
   <Skeleton v-if="!items"></Skeleton>
   <DataTable
-    v-if="items"
+    v-else
     :value="items"
     tableStyle="min-width: 50rem"
     v-model:editingRows="editingRows"
@@ -10,18 +10,52 @@
     @row-edit-save="onRowEditSave"
   >
     <Column
-      v-for="col of columns"
+      v-for="col in columns"
       :key="col.field"
       :field="col.field"
       :header="col.header"
+      :sortable="true"
     >
-      <template #editor="{ data, field }">
-        <InputText v-model="data[field]" class="w-30" />
+      <template #body="slotProps">
+        <span v-if="isSelectNeeded(col.field)">
+          {{
+            getRowSelectValue(col.field, slotProps.data[col.field])?.label ??
+            "error"
+          }}
+        </span>
+        <span v-else>
+          {{ slotProps.data[col.field] }}
+        </span>
+      </template>
+
+      <template #editor="slotProps">
+        <InputText
+          v-if="
+            typeof slotProps.data[col.field] === 'string' &&
+            !isSelectNeeded(col.field)
+          "
+          v-model="slotProps.data[col.field]"
+        />
+        <InputNumber
+          v-else-if="typeof slotProps.data[col.field] === 'number'"
+          v-model="slotProps.data[col.field]"
+          :maxFractionDigits="5"
+        />
+        <Select
+          v-else-if="isSelectNeeded(col.field)"
+          v-model="selectValues[slotProps.data.id][col.field]"
+          :options="selectOptionsMap[col.field]"
+          optionLabel="label"
+          class="min-w-50"
+        />
       </template>
     </Column>
-    <!-- Edit Column -->
-    <Column header="Edit" :rowEditor="true" style="width: 10%; min-width: 8rem">
-    </Column>
+
+    <Column
+      header="Edit"
+      :rowEditor="true"
+      style="width: 10%; min-width: 8rem"
+    />
     <Column header="Delete" style="width: 10%; min-width: 8rem">
       <template #body="{ data }">
         <Button
@@ -37,43 +71,108 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch, onMounted } from "vue";
 import Column from "primevue/column";
 import DataTable from "primevue/datatable";
 import { Skeleton } from "primevue";
+import InputNumber from "primevue/inputnumber";
 import InputText from "primevue/inputtext";
+import Select from "primevue/select";
 import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
-import { ref, watch } from "vue";
 
+import {
+  getSelectOptions,
+  handleItemAction,
+  isSelectNeeded,
+  ItemName,
+} from "@/utils/ItemsUtils";
 
+import type { Item } from "@/models/Item";
+
+// Props & models
 const toast = useToast();
+const items = defineModel<Array<Item>>();
+const props = defineProps<{ itemType?: ItemName }>();
 
-const items =
-  defineModel<Array<Country | Category | Subcategory | Currency | User>>();
-
-const columns = ref([]);
+// State
+const columns = ref<Array<{ field: string; header: string }>>([]);
 const editingRows = ref([]);
+const selectValues = ref<Record<string, Record<string, any>>>({});
+const selectOptionsMap = ref<Record<string, any[]>>({});
 
-watch(items, () => {
-  if (items.value?.length > 0) {
-    const tmp_columns = Object.keys(items.value[0]).map((key) => {
-      if (key != "id") {
-        return { field: key, header: key.toString().toUpperCase() };
+// Watch items to generate columns and load selects
+watch(items, async () => {
+  if (!items.value || items.value.length === 0) return;
+
+  const keys = Object.keys(items.value[0]);
+
+  // Generate columns
+  columns.value = keys
+    .filter((key) => key !== "id")
+    .map((key) => ({
+      field: key,
+      header: key.toUpperCase(),
+    }));
+
+  // Load select options for needed fields
+  for (const key of keys) {
+    if (isSelectNeeded(key)) {
+      const sampleValue = items.value[0][key];
+      selectOptionsMap.value[key] = await getSelectOptions(key, sampleValue);
+    }
+  }
+
+  // Init select values per row
+  for (const item of items.value) {
+    const rowId = item.id;
+    selectValues.value[rowId] ||= {};
+    for (const key of keys) {
+      if (isSelectNeeded(key)) {
+        selectValues.value[rowId][key] = getRowSelectValue(key, item[key]);
       }
-      return null;
-    });
-    columns.value = tmp_columns.filter((column) => column !== null);
+    }
   }
 });
 
-const onRowEditSave = (event: { newData: any; index: any }) => {
-  let { newData, index } = event;
-  items.value[index] = newData;
+// Helpers
+const getRowSelectValue = (field: string, itemId: string) => {
+  return selectOptionsMap.value[field]?.find((opt) => opt.id === itemId);
 };
 
-const deleteRow = (row) => {
+// Save edits
+const onRowEditSave = async (event: { newData: any; index: number }) => {
+  const { newData, index } = event;
+
+  // Replace select objects with selected IDs
+  const selectFields = columns.value.filter((col) => isSelectNeeded(col.field));
+  for (const col of selectFields) {
+    const selected = selectValues.value[newData.id]?.[col.field];
+    if (selected) {
+      newData[col.field] = selected.id;
+    }
+  }
+
+  const response = await handleItemAction(props.itemType, "update", newData);
+  items.value[index] = newData;
+
+  toast.add({
+    severity: "success",
+    summary: response.message,
+    life: 3000,
+  });
+};
+
+// Delete
+const deleteRow = async (row) => {
   if (items.value?.length > 1) {
-    items.value = items.value.filter((item) => item.id !== row.id);
+    const response = await handleItemAction(props.itemType, "delete", row.id);
+    if (response.status?.code !== 200) {
+      toast.add({ severity: "error", summary: response.message, life: 3000 });
+    } else {
+      items.value = items.value.filter((item) => item.id !== row.id);
+      toast.add({ severity: "success", summary: response.message, life: 3000 });
+    }
   } else {
     toast.add({
       severity: "warn",

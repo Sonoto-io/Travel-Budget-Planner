@@ -1,0 +1,1 @@
+export type Item = Country | Category | Subcategory | Currency | User;
