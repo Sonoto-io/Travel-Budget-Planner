@@ -6,6 +6,13 @@ export const subcategoryRepository = {
   getAll(): Promise<Array<Subcategory>> {
     return prisma.subcategory.findMany();
   },
+  getForCategory(categoryId: string): Promise<Array<Subcategory>> {
+    return prisma.subcategory.findMany({
+      where: {
+        categoryId: categoryId,
+      },  
+    })
+  },
   async create(category: {categoryId	: string; label: string; id?: string}) {
       return await prisma.subcategory.create({ data: category });
     },

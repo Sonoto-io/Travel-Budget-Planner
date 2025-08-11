@@ -1,6 +1,6 @@
 interface Expense {
   id: string;
-  country_id: string;
+  countrId: string;
   date: string;
   price: number;
   currency: {

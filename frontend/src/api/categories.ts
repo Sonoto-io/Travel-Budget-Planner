@@ -1,8 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 
 export const getCategories = () => {
-    console.log("FETCH CATEGORIES")
-
   return axios
     .get("/api/categories/")
     .then((response) => response.data.categories)

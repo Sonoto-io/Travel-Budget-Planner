@@ -4,7 +4,7 @@ const expenses = {
   expenses: [
     {
       id: "1",
-      country_id: "1",
+      countryId: "1",
       date: "2025-01-01",
       price: 120.0,
       currency: {
@@ -14,14 +14,14 @@ const expenses = {
         conversion: 0.88,
       },
       category: { id: "1", label: "Transport" },
-      subcategory: { id: "1", label: "Plane", category_id: "1" },
+      subcategory: { id: "1", label: "Plane", categoryId: "1" },
       user: { id: "1", label: "Sonoto" },
       note: "This is a note",
       location: "New York",
     },
     {
       id: "2",
-      country_id: "1",
+      countryId: "1",
       date: "2025-01-01",
       price: 50.0,
       currency: {
@@ -31,14 +31,14 @@ const expenses = {
         conversion: 1.19,
       },
       category: { id: "1", label: "Transport" },
-      subcategory: { id: "1", label: "Plane", category_id: "1" },
+      subcategory: { id: "1", label: "Plane", categoryId: "1" },
       user: { id: "2", label: "Jane Smith" },
       note: "This is a note",
       location: "New York",
     },
     {
       id: "3",
-      country_id: "2",
+      countryId: "2",
       date: "2025-01-01",
       price: 120.0,
       currency: {
@@ -48,7 +48,7 @@ const expenses = {
         conversion: 0.88,
       },
       category: { id: "1", label: "Transport" },
-      subcategory: { id: "1", label: "Plane", category_id: "1" },
+      subcategory: { id: "1", label: "Plane", categoryId: "1" },
       user: { id: "1", label: "Sonoto" },
       note: "This is a note",
       location: "New York",
@@ -95,12 +95,12 @@ const repartition = [
 export const expensesHandlers = [
   http.get("/api/expenses/", ({ request }) => {
     const url = new URL(request.url);
-    const countryId = url.searchParams.get("country_id");
+    const countryId = url.searchParams.get("countryId");
     let result = expenses;
     if (countryId) {
       result = {
         expenses: expenses.expenses.filter(
-          (expense) => expense.country_id === countryId,
+          (expense) => expense.countryId === countryId,
         ),
       };
     }
@@ -113,12 +113,12 @@ export const expensesHandlers = [
   /* METADATA **********************/
   http.get("/api/expenses/summary", ({ request }) => {
     const url = new URL(request.url);
-    const countryId = url.searchParams.get("country_id");
+    const countryId = url.searchParams.get("countryId");
     let result = expenses;
     if (countryId) {
       result = {
         expenses: expenses.expenses.filter(
-          (expense) => expense.country_id === countryId,
+          (expense) => expense.countryId === countryId,
         ),
       };
     }

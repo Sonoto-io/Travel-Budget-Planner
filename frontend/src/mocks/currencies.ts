@@ -26,9 +26,9 @@ const currencies = {
 };
 
 export const currenciesHandlers = [
-  http.get<{ currency_id: string }>("/api/currencies/", ({ request }) => {
+  http.get<{ currencyId: string }>("/api/currencies/", ({ request }) => {
     const url = new URL(request.url);
-    const currencyId = url.searchParams.get("currency_id");
+    const currencyId = url.searchParams.get("currencyId");
     let res = currencies;
     if (currencyId) {
       res = {

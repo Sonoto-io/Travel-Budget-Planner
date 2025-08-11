@@ -36,6 +36,7 @@ const countryStore = useCountryStore();
 
 watchEffect(async () => {
   expenses.value = await getExpenses(countryStore.currentCountry.id);
+  expenses.value.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 });
 
 onMounted(async () => {
@@ -53,6 +54,6 @@ const selectValues: ComputedRef<FormSelectValues> = computed(() => ({
 
 const handleAddExpense = (expense: Expense) => {
   expenses.value.unshift(expense);
-  // TODO: add to db
+  expenses.value.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };
 </script>

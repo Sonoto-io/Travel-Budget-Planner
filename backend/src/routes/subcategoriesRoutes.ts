@@ -5,7 +5,11 @@ export const configureSubcategoriesRoutes = (app: Elysia) => app.group(
   "/subcategories",
   (app) =>
     app
-      .get("/", () => subcategoriesController.getAll())
+      .get("/", ({ query }) => subcategoriesController.getAll(query.categoryId), {
+              query: t.Object({
+                categoryId: t.Optional(t.String()),
+              }),
+            })
       .guard(
               {
                 body: t.Object({

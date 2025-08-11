@@ -124,7 +124,10 @@
           optionLabel="label"
           class="min-w-30"
         />
-        <label for="subcategory"> Subcategory </label>
+        <label for="subcategory">
+          Subcategory
+          <span class="text-red-500">*</span>
+        </label>
       </IftaLabel>
       <Message v-if="$form.subcategory?.invalid" severity="error">{{
         $form.subcategory.error?.message
@@ -138,7 +141,7 @@
 
 <script setup lang="ts">
 import { Form } from "@primevue/forms";
-import { computed, reactive, ref, watch } from "vue";
+import { computed, reactive, ref, watch, toRaw } from "vue";
 import { useToast } from "primevue/usetoast";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import InputText from "primevue/inputtext";
@@ -153,6 +156,7 @@ import { fetchSubCategories } from "@/utils/SubcategoryUtils";
 import IftaLabel from "primevue/iftalabel";
 import { useCountryStore } from "@/stores/countryStore";
 import { useRoute } from "vue-router";
+import { createExpense } from "@/api/expenses";
 
 const props = defineProps<{
   selectValues: FormSelectValues;
@@ -188,7 +192,7 @@ const initialValues = reactive({
   subcategory: {
     id: "",
     label: "",
-    category_id: "",
+    categoryId: "",
   },
 });
 
@@ -214,7 +218,7 @@ const FormData = z.object({
   subcategory: z.object({
     id: z.string().optional(),
     label: z.string().min(1, "Subcategory is required"),
-    categoriy_id: z.string().optional(),
+    categoryId: z.string().optional(),
   }),
 });
 
@@ -252,8 +256,8 @@ watch(
         );
         initialValues.subcategory.label = selectSubcategories.value[0].label;
         initialValues.subcategory.id = selectSubcategories.value[0].id ?? "";
-        initialValues.subcategory.category_id =
-          selectSubcategories.value[0].category_id ?? "";
+        initialValues.subcategory.categoryId =
+          selectSubcategories.value[0].categoryId ?? "";
       } catch (error) {
         console.error("Error fetching subcategories:", error);
         selectSubcategories.value = [];
@@ -274,25 +278,27 @@ const handleCategorySelect = async (category: Category) => {
 
 const onFormSubmit = async ({ valid, values, reset }) => {
   if (valid) {
-    toast.add({
-      severity: "success",
-      summary: "Form is submitted.",
-      life: 3000,
-    });
-    reset();
-    selectSubcategories.value =
-      (await fetchSubCategories(initialValues.category)) ?? [];
-    emit("addExpense", {
-      date: values.date,
-      user: values.user,
-      currency: values.currency,
-      price: values.price,
-      note: values.note,
-      location: values.location,
-      category: values.category,
-      subcategory: values.subcategory,
-      country_id: countryStore.currentCountry.id,
-    });
+      values["country"] = toRaw(countryStore.currentCountry);
+      const res = await createExpense(values);
+      if (res.status.code === 201) {
+        toast.add({
+          severity: "success",
+          summary: "Expense created successfully.",
+          life: 3000,
+        });
+        reset();
+        selectSubcategories.value =
+          (await fetchSubCategories(initialValues.category)) ?? [];
+        values.id = res.data.expense.id;
+        emit("addExpense", values);
+      } else {
+        toast.add({
+          severity: "error",
+          summary: "Failed to create expense.",
+          detail: `Status: ${res.status.message}`,
+          life: 3000,
+        });
+      }
   }
 };
 </script>

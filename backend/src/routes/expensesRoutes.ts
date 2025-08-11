@@ -4,11 +4,49 @@ import { expensesController } from "@controllers/expensesController";
 export const configureExpensesRoutes = (app: Elysia) =>
   app.group("/expenses", (app) =>
     app
-      .get("/", () => expensesController.getAll())
-
-      .get("/summary", ({ query }) => expensesController.getSummary(query.country_id), {
+      .get("/", ({ query }) => expensesController.getAll(query.countryId), {
         query: t.Object({
-          country_id: t.Optional(t.String()),
+          countryId: t.Optional(t.String()),
         }),
       })
-  );
+    .get("/summary", ({ query }) => expensesController.getSummary(query.countryId), {
+      query: t.Object({
+        countryId: t.Optional(t.String()),
+      }),
+    })
+    .guard(
+      {
+        body: t.Object({
+          id: t.Optional(t.String()),
+          note: t.Optional(t.String()),
+          price: t.Number(),
+          date: t.Date(),
+          location: t.Optional(t.String()),
+          country: t.Any(),
+          user: t.Any(),
+          category: t.Any(),
+          subcategory: t.Any(),
+          currency: t.Any(),
+        }),
+      },
+      (guardApp) =>
+        guardApp
+          .post("/", ({ body }) => expensesController.create(body))
+          .post(
+            "/:id",
+            ({ body, params }) => {
+              return expensesController.update(params.id, body);
+            },
+            {
+              params: t.Object({
+                id: t.String(),
+              }),
+            }
+          )
+    )
+    .delete("/:id", ({ params }) => expensesController.delete(params.id), {
+      params: t.Object({
+        id: t.String(),
+      }),
+    })
+  )

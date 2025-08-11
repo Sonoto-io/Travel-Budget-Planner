@@ -3,11 +3,13 @@ import { subcategoryRepository } from "@repositories/subcategoriesRepository";
 import { status, t } from "elysia";
 
 export const subcategoriesController = {
-  async getAll() {
-    console.log("Fetching all subcategories");
-    console.log("Subcategories:", await subcategoryRepository.getAll());
+  async getAll(categoryId?: string) {
+    if (categoryId) {
+          return { subcategories: await subcategoryRepository.getForCategory(categoryId) };
+    }
     return { subcategories: await subcategoryRepository.getAll() };
   },
+
   async create(body: {categoryId	: string; label: string; id?: string}) {
     if (body) {
       try {
