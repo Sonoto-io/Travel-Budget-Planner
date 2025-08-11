@@ -16,7 +16,7 @@
         v-else-if="input.type === 'number'"
         :name="input.field"
         :placeholder="input.field.toUpperCase()"
-        :minFractionDigits="2"
+        :maxFractionDigits="2"
         fluid
       />
       <Select
@@ -102,7 +102,6 @@ const onFormSubmit = async ({ valid, values, reset }) => {
   }
 
   const createItemResponse = await handleItemAction(props.itemType, "create", values);
-  console.log("Response from create action: ", createItemResponse);
   reset();
 
   if (createItemResponse.status.code === 201) {

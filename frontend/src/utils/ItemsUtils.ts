@@ -84,14 +84,7 @@ export async function handleItemAction(
 
 
 // If a value needs a Select form
-
 export const isSelectNeeded = (itemField: string | number): boolean => {
-  console.log("is select needed ", itemField,(
-    itemField === "countryId" ||
-    itemField === "currencyId" ||
-    itemField === "categoryId" ||
-    itemField === "subcategoryId"
-  ) )
   return (
     itemField === "countryId" ||
     itemField === "currencyId" ||
@@ -112,7 +105,6 @@ export const getSelectOptions = async (itemField: string, itemId: string) => {
     default:
       console.warn("Unknown item field for select handling: ", itemField);
   }
-  console.log("options : ", options);
   return options 
 };
 

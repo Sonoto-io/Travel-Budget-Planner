@@ -20,7 +20,7 @@ export const getCountryByShortname = (countryShortname: string) => {
     });
 };
 
-export const createCountry = (countryData: Partial<any>) => {
+export const createCountry = (countryData: Partial<Country>) => {
   return axios
     .post("/api/countries", countryData)
     .then((response) => response.data)

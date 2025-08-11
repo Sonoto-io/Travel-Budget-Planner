@@ -20,7 +20,7 @@ export const getCurrency = (id: string) => {
     });
 };
 
-export const createCurrency = (currencyData: Partial<any>) => {
+export const createCurrency = (currencyData: Partial<Currency>) => {
   return axios
     .post("/api/currencies", currencyData)
     .then((response) => response.data)
@@ -30,9 +30,9 @@ export const createCurrency = (currencyData: Partial<any>) => {
     });
 };
 
-export const updateCurrency = (currency: any) => {
+export const updateCurrency = (currencyData: Currency) => {
   return axios
-    .post(`/api/currencies/${currency.id}`, currency)
+    .post(`/api/currencies/${currencyData.id}`, currencyData)
     .then((response) => response.data)
     .catch((error: any) => {
       console.error("Error updating a currency:", error);

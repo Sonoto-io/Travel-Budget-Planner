@@ -1,6 +1,6 @@
 PUID := $(shell id -u)
 PGID := $(shell id -g)
-COMPOSE := PUID=$(PUID) PGID=$(PGID) docker compose
+COMPOSE := PUID=$(PUID) PGID=$(PGID) docker-compose
 COMPOSE_DEV  := $(COMPOSE) -f compose.yml
 
 .PHONY: dev-up

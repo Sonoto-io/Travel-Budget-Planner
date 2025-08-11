@@ -4,23 +4,61 @@ const prisma = new PrismaClient();
 
 export const expenseRepository = {
   getAll(): Promise<Array<Expense>> {
-    return prisma.expense.findMany();
+    return prisma.expense.findMany({
+      include: {
+        category: true,
+        subcategory: true,
+        user: true,
+        currency: true,
+        country: true,
+      },
+    });
   },
-  getForCountry(countryId:  string): Promise<Array<Expense>>{
-    return prisma.expense.findMany({where: {countryId : countryId}})
+  getForCountry(countryId: string): Promise<Array<Expense>> {
+    return prisma.expense.findMany({
+      where: { countryId: countryId }, include: {
+        category: true,
+        subcategory: true,
+        user: true,
+        currency: true,
+        country: true,
+      },
+    })
   },
-    async create(expense: Prisma.ExpenseCreateInput) {
-      return await prisma.expense.create({ data: expense });
-    },
-    async update(expenseId: string, expense: Prisma.ExpenseUpdateInput) {
-      return await prisma.expense.update({
-        where: {
-          id: expenseId,
-        },
-        data: expense,
-      });
-    },
-    async delete(expenseId: string) {
-        return await prisma.expense.delete({ where: { id: expenseId } });
-    },
+  async create(expense: any) {
+    return await prisma.expense.create({
+      data: {
+        note: expense.note,
+        price: expense.price,
+        date: expense.date,
+        location: expense.location,
+        country: { connect: { id: expense.country.id } },
+        user: { connect: { id: expense.user.id } },
+        category: { connect: { id: expense.category.id } },
+        subcategory: { connect: { id: expense.subcategory.id } },
+        currency: { connect: { id: expense.currency.id } },
+      }
+    });
+  },
+  async update(expenseId: string, expense: Prisma.ExpenseUpdateInput) {
+    return await prisma.expense.update({
+      where: {
+        id: expenseId,
+      },
+      data: {
+        note: expense.note,
+        price: expense.price,
+        date: expense.date,
+        location: expense.location,
+        country: { connect: { id: expense.country.id } },
+        user: { connect: { id: expense.user.id } },
+        category: { connect: { id: expense.category.id } },
+        subcategory: { connect: { id: expense.subcategory.id } },
+        currency: { connect: { id: expense.currency.id } },
+      }
+    });
+  },
+  async delete(expenseId: string) {
+    return await prisma.expense.delete({ where: { id: expenseId } });
+  },
 }

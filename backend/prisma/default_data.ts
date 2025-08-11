@@ -60,8 +60,6 @@ export const countries = [
 
 export const categories = [
         { label: "Transport" },
-        { label: "Food" },
-        { label: "Entertainment" },
       ]
 
 export const users = [
