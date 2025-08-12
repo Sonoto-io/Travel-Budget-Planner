@@ -6,14 +6,7 @@ export class ExpensesSummaryService {
     const totalExpenses = expenses.reduce((acc, expense) => acc + expense.price * expense.currency.conversion, 0);
     const countExpenses = expenses.length;
     
-    const countriesMap = new Map<string, Country>();
-    expenses.forEach(expense => {
-      if (expense.country && !countriesMap.has(expense.country.id)) {
-        countriesMap.set(expense.country.id, expense.country);
-      }
-    });
-    const allCountries = Array.from(countriesMap.values());
-    console.log("allCountries", allCountries);
+    const allCountries = ExpensesSummaryService.getCountriesList(expenses);
     const countDays = allCountries.reduce((acc:number, country: Country) => acc + country.count_days, 0);
     const dailyExpectedExpenses = allCountries.reduce((acc:number, country: Country) => acc + country.daily_expected_expenses, 0);
     const dailyExpenses = countExpenses > 0 ? totalExpenses / countDays : 0;
@@ -28,6 +21,26 @@ export class ExpensesSummaryService {
     };
   }
 
+  static getSummaryByCountry(expenses: any[]): Record<string, ISummary> {
+    const allCountries = ExpensesSummaryService.getCountriesList(expenses);
+    const summaries: Record<string, ISummary> = {};
+    allCountries.forEach(country => {
+      const countryExpenses = expenses.filter(expense => expense.country.id === country.id);
+      const summary = ExpensesSummaryService.calculateSummary(countryExpenses);
+      summaries[country.label ?? ""] = summary;
+    });
+    return summaries;
+  }
+
+  static getCountriesList(expenses: any[]): Array<Country> {
+    const countriesMap = new Map<string, Country>();
+    expenses.forEach(expense => {
+      if (expense.country && !countriesMap.has(expense.country.id)) {
+        countriesMap.set(expense.country.id, expense.country);
+      }
+    });
+    return Array.from(countriesMap.values());
+  }
   static calculateRepartition(expenses: any[]): IRepartition[] {
     const repartitionMap = new Map<string, IRepartition>();
 

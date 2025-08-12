@@ -27,6 +27,10 @@ export const expensesController = {
       expenses_summary : summary
     }
   },
+  async getSummaryByCountry() {
+    const expenses = await expenseRepository.getAll()
+    return {summaryByCountry: ExpensesSummaryService.getSummaryByCountry(expenses)};
+  },
   async create(body: Prisma.ExpenseCreateInput) {
     if (body) {
       try {

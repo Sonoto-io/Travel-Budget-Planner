@@ -14,6 +14,11 @@ export const configureExpensesRoutes = (app: Elysia) =>
         countryId: t.Optional(t.String()),
       }),
     })
+    .get("/summary/by-country", () => expensesController.getSummaryByCountry(), {
+      query: t.Object({
+        countryId: t.Optional(t.String()),
+      }),
+    })
     .guard(
       {
         body: t.Object({
