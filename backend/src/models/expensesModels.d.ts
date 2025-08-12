@@ -2,7 +2,7 @@ interface IRepartition {
     name: string;
     totalExpenses: number;
     countExpenses: number;
-    subcategories: Array<IRepartition>
+    subcategories?: Array<IRepartition>
 }
 
 interface ISummary {

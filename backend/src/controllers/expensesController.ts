@@ -1,6 +1,7 @@
 import { expenseRepository } from "@repositories/expensesRepository";
 import { Prisma } from ".prisma/client";
 import { status, t } from "elysia";
+import { ExpensesSummaryService } from "@services/ExpensesSummaryService";
 
 export const expensesController = {
   async getAll(countryId?: string) {
@@ -13,28 +14,17 @@ export const expensesController = {
 
     let expenses
     if (countryId){
-      expenses = await expenseRepository.getForCountry(countryId)
-      if (expenses.length > 0) {
-
-      }
-      
+      expenses = await expenseRepository.getForCountry(countryId)      
     }else {
       expenses = await expenseRepository.getAll()
     }
 
-    const totalExpenses = expenses.reduce((acc, expense) => acc + expense.price, 0)
-    const countExpenses = expenses.length
-    const dailyExpenses = countExpenses > 0 ? totalExpenses / countExpenses : 0
-
+    const summary = ExpensesSummaryService.calculateSummary(expenses);
+    if (!summary) {
+      return { message: "No expenses found", status: status(404) };
+    }
     return {
-      expenses_summary : {
-        totalExpenses: totalExpenses,
-        countExpenses: countExpenses,
-        countDays: 0,
-        dailyExpenses: dailyExpenses,
-        dailyExpectedExpenses: 0,
-        repartition: []
-      }
+      expenses_summary : summary
     }
   },
   async create(body: Prisma.ExpenseCreateInput) {
