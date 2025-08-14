@@ -38,13 +38,13 @@ DROP COLUMN "name",
 ADD COLUMN     "count_days" INTEGER NOT NULL,
 ADD COLUMN     "daily_expected_expenses" DOUBLE PRECISION NOT NULL DEFAULT 0.00,
 ADD COLUMN     "label" TEXT,
-ADD COLUMN     "main_currency" TEXT NOT NULL,
+ADD COLUMN     "main_currency" UUID NOT NULL,
 ADD COLUMN     "shortname" TEXT NOT NULL;
 
 -- AlterTable
 ALTER TABLE "Expense" DROP COLUMN "name",
 DROP COLUMN "value",
-ADD COLUMN     "currencyId" TEXT NOT NULL,
+ADD COLUMN     "currencyId" UUID NOT NULL,
 ADD COLUMN     "location" TEXT,
 ADD COLUMN     "note" TEXT,
 ADD COLUMN     "price" DOUBLE PRECISION NOT NULL DEFAULT 0.00,
@@ -58,11 +58,11 @@ ADD COLUMN     "label" TEXT;
 
 -- CreateTable
 CREATE TABLE "Currency" (
-    "id" TEXT NOT NULL,
+    "id" UUID NOT NULL,
+    "signId" TEXT,
     "name" TEXT NOT NULL,
     "label" TEXT NOT NULL,
     "conversion" DOUBLE PRECISION NOT NULL DEFAULT 1.00,
-
     CONSTRAINT "Currency_pkey" PRIMARY KEY ("id")
 );
 

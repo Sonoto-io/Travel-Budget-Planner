@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import {
   categories,
-  countries,
+  country,
   currencies,
   subcategories,
   users,
@@ -16,7 +16,12 @@ async function main() {
   // await prisma.category.deleteMany();
 
   await prisma.currency.createMany({ skipDuplicates: true, data: currencies });
-  await prisma.country.createMany({ skipDuplicates: true, data: countries });
+  const createdCurrency = await prisma.currency.findFirst({where: { label: "Euro" } });
+  const countryWithCurrency = {
+    ...country,
+    currencyId: createdCurrency?.id ?? "",
+  }
+  await prisma.country.create({ data: countryWithCurrency });
   await prisma.category.createManyAndReturn({
     skipDuplicates: true,
     data: categories,

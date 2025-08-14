@@ -23,7 +23,8 @@ model User {
 }
 
 model Currency {
-  id    String      @id
+  id    String      @id @db.Uuid @default(uuid())
+  signId String?
   name String       
   label String      @unique
   conversion Float  @default(1.00)
@@ -37,7 +38,7 @@ model Country {
   label     String? @unique
   daily_expected_expenses Float  @default(0.00)
   count_days Int
-  currencyId String
+  currencyId String @db.Uuid
   shortname String
 
   currency Currency @relation(fields: [currencyId], references: [id])
@@ -68,7 +69,7 @@ model Expense {
   userId      String    @db.Uuid
   categoryId  String    @db.Uuid
   subcategoryId String  @db.Uuid
-  currencyId  String    
+  currencyId  String    @db.Uuid
 
   country     Country   @relation(fields: [countryId], references: [id])
   user        User      @relation(fields: [userId], references: [id])

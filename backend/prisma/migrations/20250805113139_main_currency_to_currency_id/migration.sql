@@ -10,7 +10,7 @@ ALTER TABLE "Country" DROP CONSTRAINT "Country_main_currency_fkey";
 
 -- AlterTable
 ALTER TABLE "Country" DROP COLUMN "main_currency",
-ADD COLUMN     "currencyId" TEXT NOT NULL;
+ADD COLUMN     "currencyId" UUID NOT NULL;
 
 -- AddForeignKey
 ALTER TABLE "Country" ADD CONSTRAINT "Country_currencyId_fkey" FOREIGN KEY ("currencyId") REFERENCES "Currency"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
