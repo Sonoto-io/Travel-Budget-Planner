@@ -16,7 +16,7 @@
         v-else-if="input.type === 'number'"
         :name="input.field"
         :placeholder="input.field.toUpperCase()"
-        :maxFractionDigits="2"
+        :maxFractionDigits="5"
         fluid
       />
       <Select

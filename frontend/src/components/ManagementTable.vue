@@ -1,21 +1,8 @@
 <template>
   <Skeleton v-if="!items"></Skeleton>
-  <DataTable
-    v-else
-    :value="items"
-    tableStyle="min-width: 50rem"
-    v-model:editingRows="editingRows"
-    dataKey="id"
-    editMode="row"
-    @row-edit-save="onRowEditSave"
-  >
-    <Column
-      v-for="col in columns"
-      :key="col.field"
-      :field="col.field"
-      :header="col.header"
-      :sortable="true"
-    >
+  <DataTable v-else :value="items" tableStyle="min-width: 50rem" v-model:editingRows="editingRows" dataKey="id"
+    editMode="row" @row-edit-save="onRowEditSave">
+    <Column v-for="col in columns" :key="col.field" :field="col.field" :header="col.header" :sortable="true">
       <template #body="slotProps">
         <span v-if="isSelectNeeded(col.field)">
           {{
@@ -29,42 +16,21 @@
       </template>
 
       <template #editor="slotProps">
-        <InputText
-          v-if="
-            typeof slotProps.data[col.field] === 'string' &&
-            !isSelectNeeded(col.field)
-          "
-          v-model="slotProps.data[col.field]"
-        />
-        <InputNumber
-          v-else-if="typeof slotProps.data[col.field] === 'number'"
-          v-model="slotProps.data[col.field]"
-          :maxFractionDigits="5"
-        />
-        <Select
-          v-else-if="isSelectNeeded(col.field)"
-          v-model="selectValues[slotProps.data.id][col.field]"
-          :options="selectOptionsMap[col.field]"
-          optionLabel="label"
-          class="min-w-50"
-        />
+        <InputText v-if="
+          typeof slotProps.data[col.field] === 'string' &&
+          !isSelectNeeded(col.field)
+        " v-model="slotProps.data[col.field]" />
+        <InputNumber v-else-if="typeof slotProps.data[col.field] === 'number'" v-model="slotProps.data[col.field]"
+          :maxFractionDigits="5" />
+        <Select v-else-if="isSelectNeeded(col.field)" v-model="selectValues[slotProps.data.id][col.field]"
+          :options="selectOptionsMap[col.field]" optionLabel="label" class="min-w-50" />
       </template>
     </Column>
 
-    <Column
-      header="Edit"
-      :rowEditor="true"
-      style="width: 10%; min-width: 8rem"
-    />
+    <Column header="Edit" :rowEditor="true" style="width: 10%; min-width: 8rem" />
     <Column header="Delete" style="width: 10%; min-width: 8rem">
       <template #body="{ data }">
-        <Button
-          icon="pi pi-trash"
-          severity="danger"
-          @click="deleteRow(data)"
-          text
-          rounded
-        />
+        <Button icon="pi pi-trash" severity="danger" @click="deleteRow(data)" text rounded />
       </template>
     </Column>
   </DataTable>
@@ -167,8 +133,14 @@ const onRowEditSave = async (event: { newData: any; index: number }) => {
 const deleteRow = async (row) => {
   if (items.value?.length > 1) {
     const response = await handleItemAction(props.itemType, "delete", row.id);
+    console.log("Delete response:", response);
+
     if (response.status?.code !== 200) {
-      toast.add({ severity: "error", summary: response.message, life: 3000 });
+      if (response.message?.code == "P2003") {
+        toast.add({ severity: "error", summary: "Either an Expense or another item needs this one. Please remove any associated Expense or item before removing this one.", life: 3000 });
+      } else {
+        toast.add({ severity: "error", summary: `Error : ${response.message}`, life: 3000 });
+      }
     } else {
       items.value = items.value.filter((item) => item.id !== row.id);
       toast.add({ severity: "success", summary: response.message, life: 3000 });
