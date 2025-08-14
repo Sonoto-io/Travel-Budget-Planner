@@ -24,7 +24,7 @@ model User {
 
 model Currency {
   id    String      @id @db.Uuid @default(uuid())
-  signId String?
+  locale String?
   name String       
   label String      @unique
   conversion Float  @default(1.00)

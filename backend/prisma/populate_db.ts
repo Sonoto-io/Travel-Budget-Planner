@@ -21,7 +21,11 @@ async function main() {
     ...country,
     currencyId: createdCurrency?.id ?? "",
   }
-  await prisma.country.create({ data: countryWithCurrency });
+  try {
+    await prisma.country.create({ data: countryWithCurrency });
+  }catch (error) {
+    console.log("Country already exists, skipping creation.");
+  }
   await prisma.category.createManyAndReturn({
     skipDuplicates: true,
     data: categories,

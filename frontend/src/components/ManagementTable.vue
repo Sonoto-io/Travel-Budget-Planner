@@ -133,7 +133,6 @@ const onRowEditSave = async (event: { newData: any; index: number }) => {
 const deleteRow = async (row) => {
   if (items.value?.length > 1) {
     const response = await handleItemAction(props.itemType, "delete", row.id);
-    console.log("Delete response:", response);
 
     if (response.status?.code !== 200) {
       if (response.message?.code == "P2003") {

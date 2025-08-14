@@ -59,7 +59,7 @@ ADD COLUMN     "label" TEXT;
 -- CreateTable
 CREATE TABLE "Currency" (
     "id" UUID NOT NULL,
-    "signId" TEXT,
+    "locale" TEXT,
     "name" TEXT NOT NULL,
     "label" TEXT NOT NULL,
     "conversion" DOUBLE PRECISION NOT NULL DEFAULT 1.00,
