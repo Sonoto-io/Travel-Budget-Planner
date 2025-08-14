@@ -1,10 +1,10 @@
 import type { Currency } from "@/models/Currency";
 
 export const formatCurrency = (value: number, currency: Currency): string => {
-  if (!currency.signId || !currency.name) {
+  if (!currency.locale || !currency.name) {
     return value.toString(); // Fallback if currency is not defined
   }
-  return new Intl.NumberFormat(currency.signId, {
+  return new Intl.NumberFormat(currency.locale, {
     style: "currency",
     currency: currency.name,
   }).format(value);
@@ -15,10 +15,10 @@ export const convertValueToCurrency = (
   currency: Currency,
   targetCurrency: Currency,
 ): string => {
-  if (!targetCurrency.signId || !targetCurrency.name) {
+  if (!targetCurrency.locale || !targetCurrency.name) {
     return (value * currency.conversion).toString(); // Fallback if currency is not defined
   }
-  return new Intl.NumberFormat(targetCurrency.signId, {
+  return new Intl.NumberFormat(targetCurrency.locale, {
     style: "currency",
     currency: targetCurrency.name,
   }).format(value * currency.conversion);
@@ -31,7 +31,7 @@ export const calculTotal = (expenses: Expense[]) => {
   );
   return convertValueToCurrency(res, expenses[0].currency, {
     label: "Euro",
-    signId: "fr-FR",
+    locale: "fr-FR",
     name: "EUR",
     conversion: 1,
   }); // TODO: get from store

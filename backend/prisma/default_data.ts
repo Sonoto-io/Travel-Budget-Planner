@@ -1,26 +1,26 @@
 export const currencies = [
   {
     label: "Dollar Américain",
-    signId: "en-US",
+    locale: "en-US",
     name: "USD",
     conversion: 0.88,
   },
-  { label: "Euro", signId: "fr-FR", name: "EUR", conversion: 1 },
+  { label: "Euro", locale: "fr-FR", name: "EUR", conversion: 1 },
   {
     label: "Livre Sterling",
-    signId: "en-GB",
+    locale: "en-GB",
     name: "GBP",
     conversion: 1.19,
   },
   {
     label: "Yen Japonais",
-    signId: "ja-JP",
+    locale: "ja-JP",
     name: "JPY",
     conversion: 0.0061,
   },
   {
   label: "Euro Allemand",
-  signId: "de-DE",
+  locale: "de-DE",
   name: "EUR",
   conversion: 1
 }
@@ -29,7 +29,6 @@ export const currencies = [
 
 export const country = {
           label: "France",
-          currencyId: "fr-FR",
           shortname: "fr",
           daily_expected_expenses: 55,
           count_days: 30,

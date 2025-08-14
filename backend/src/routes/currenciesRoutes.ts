@@ -10,6 +10,7 @@ export const configureCurrenciesRoutes = (app: Elysia) =>
         {
           body: t.Object({
             id: t.Optional(t.String()),
+            locale: t.Nullable(t.String()),
             label: t.String(),
             name: t.String(),
             conversion: t.Number(),

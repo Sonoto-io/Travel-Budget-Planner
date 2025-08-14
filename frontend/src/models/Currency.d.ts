@@ -1,7 +1,7 @@
 interface Currency {
   name: string;
   id: string;
-  signId: string;
+  locale: string;
   label: string;
   conversion: number;
 }
