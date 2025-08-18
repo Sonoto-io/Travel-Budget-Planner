@@ -1,4 +1,5 @@
 import type { Country } from "@prisma/client";
+import { countryRepository } from "@repositories/countriesRepository";
 
 export class ExpensesSummaryService {
   static calculateSummary(expenses: any[]): ISummary {
@@ -20,17 +21,25 @@ export class ExpensesSummaryService {
         repartition: ExpensesSummaryService.calculateRepartition(expenses)    
     };
   }
+  static async getSummaryByCountry(expenses: any[]): Promise<Record<string, ISummary> | {message: string, status: number}> {
+    try {
+      const countries = await countryRepository.getAll();
+      const summaries: Record<string, ISummary> = {};
 
-  static getSummaryByCountry(expenses: any[]): Record<string, ISummary> {
-    const allCountries = ExpensesSummaryService.getCountriesList(expenses);
-    const summaries: Record<string, ISummary> = {};
-    allCountries.forEach(country => {
-      const countryExpenses = expenses.filter(expense => expense.country.id === country.id);
-      const summary = ExpensesSummaryService.calculateSummary(countryExpenses);
-      summary["totalExpectedExpense"] = country.daily_expected_expenses * country.count_days;
-      summaries[country.label ?? ""] = summary;
-    });
-    return summaries;
+      countries.forEach(country => {
+        const countryExpenses = expenses.filter(expense => expense.country.id === country.id);
+        const summary = ExpensesSummaryService.calculateSummary(countryExpenses);
+        summary["totalExpectedExpense"] = country.daily_expected_expenses * country.count_days;
+        summary.countDays = country.count_days;
+        summary.dailyExpectedExpenses = country.daily_expected_expenses;
+        summaries[country.label ?? ""] = summary;
+      });
+
+      return summaries;
+    } catch (error) {
+      console.error("Error fetching countries summary:", error);
+      return { message: "Error fetching countries summary: " + error, status: 500 };
+    }
   }
 
   static getCountriesList(expenses: any[]): Array<Country> {
