@@ -30,7 +30,7 @@ export const createCountry = (countryData: Partial<Country>) => {
     });
 };
 
-export const updateCountry = (country: any) => {
+export const updateCountry = (country: Country) => {
   return axios
     .post(`/api/countries/${country.id}`, country)
     .then((response) => response.data)

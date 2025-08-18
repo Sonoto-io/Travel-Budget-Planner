@@ -1,10 +1,22 @@
 import { PrismaClient, type Country, Prisma } from ".prisma/client";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
+  .$extends({
+      result: {
+        country: {
+          total_expected_expense: {
+            needs: { count_days: true, daily_expected_expenses: true },
+            compute(country) {
+              return country.count_days * country.daily_expected_expenses;
+            },
+          },
+        },
+      },
+    })
 
 export const countryRepository = {
   getAll(): Promise<Array<Country>> {
-    return prisma.country.findMany();
+    return prisma.country.findMany({orderBy: { order: "desc" }});
   },
   async create(country: Prisma.CountryCreateInput) {
       return await prisma.country.create({ data: country });

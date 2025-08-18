@@ -5,6 +5,7 @@
     class="flex flex-wrap items-center gap-4"
   >
     <div v-for="input in inputs" :key="input.field">
+      <div v-if="input.field != 'order'">
       <InputText
         v-if="input.type === 'string' && !isSelectNeeded(input.field)"
         :name="input.field"
@@ -16,7 +17,7 @@
         v-else-if="input.type === 'number'"
         :name="input.field"
         :placeholder="input.field.toUpperCase()"
-        :maxFractionDigits="5"
+        :maxFractionDigits="10"
         fluid
       />
       <Select
@@ -27,6 +28,7 @@
         optionLabel="label"
         class="min-w-50"
       />
+    </div>
     </div>
     <Button type="submit" severity="secondary" label="Submit" />
   </Form>
@@ -46,7 +48,7 @@ import { handleItemAction, isSelectNeeded, getSelectOptions, ItemName } from "@/
 import type { Item } from "@/models/Item";
 
 const props = defineProps<{
-  item?: Item;
+  items?: Item[];
   itemType?: ItemName;
 }>();
 
@@ -62,22 +64,23 @@ const selectValues = ref<Record<string, any>>({});
 
 // Watch the incoming item shape
 watch(
-  () => props.item,
+  () => props.items,
   async () => {
-    if (!props.item) return;
+    console.log("Items changed:", props.items);
+    if (props.items.length == 0) return;
 
     // Generate inputs
-    inputs.value = Object.keys(props.item)
+    inputs.value = Object.keys(props.items[0])
       .filter((key) => key !== "id")
       .map((key) => ({
         field: key,
-        type: typeof props.item![key],
+        type: typeof props.items[0]![key],
       }));
 
     // Preload select options per field
     for (const input of inputs.value) {
       if (isSelectNeeded(input.field)) {
-        const sampleValue = props.item[input.field];
+        const sampleValue = props.items[0][input.field];
         selectOptionsMap.value[input.field] = await getSelectOptions(input.field, sampleValue);
 
         // Preselect first option if needed
@@ -101,6 +104,10 @@ const onFormSubmit = async ({ valid, values, reset }) => {
     }
   }
 
+  // increment order if needed
+  if (Object.keys(props.items[0]).includes("order")) {
+    values.order = props.items.reduce((max, item) => Math.max(max, item.order || 0), 0) + 1;
+  }
   const createItemResponse = await handleItemAction(props.itemType, "create", values);
   reset();
 

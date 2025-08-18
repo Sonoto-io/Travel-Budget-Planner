@@ -11,5 +11,6 @@ interface ISummary {
     countDays: number;
     dailyExpenses: number;
     dailyExpectedExpenses: number;
+    totalExpectedExpense?: number;
     repartition: Array<IRepartition>;
 }
