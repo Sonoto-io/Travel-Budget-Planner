@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-4 overflow-x-scroll">
     <div class="">
-      <ManagementForm :item="items[0]" :itemType="itemType"
+      <ManagementForm :items="items" :itemType="itemType"
       @addItem="handleAddItem"/>
     </div>
     <div>

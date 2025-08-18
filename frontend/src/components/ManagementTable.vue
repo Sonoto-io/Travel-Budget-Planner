@@ -1,7 +1,8 @@
 <template>
   <Skeleton v-if="!items"></Skeleton>
   <DataTable v-else :value="items" tableStyle="min-width: 50rem" v-model:editingRows="editingRows" dataKey="id"
-    editMode="row" @row-edit-save="onRowEditSave">
+    editMode="row" @row-edit-save="onRowEditSave" :reordableRows="true" @rowReorder="onReorder">
+    <Column v-if="Object.keys(items[0] ?? {}).some((itemName) => itemName === 'order')" rowReorder headerStyle="width: 3rem" />
     <Column v-for="col in columns" :key="col.field" :field="col.field" :header="col.header" :sortable="true">
       <template #body="slotProps">
         <span v-if="isSelectNeeded(col.field)">
@@ -21,7 +22,7 @@
           !isSelectNeeded(col.field)
         " v-model="slotProps.data[col.field]" />
         <InputNumber v-else-if="typeof slotProps.data[col.field] === 'number'" v-model="slotProps.data[col.field]"
-          :maxFractionDigits="5" />
+          :maxFractionDigits="10" />
         <Select v-else-if="isSelectNeeded(col.field)" v-model="selectValues[slotProps.data.id][col.field]"
           :options="selectOptionsMap[col.field]" optionLabel="label" class="min-w-50" />
       </template>
@@ -75,7 +76,7 @@ watch(items, async () => {
 
   // Generate columns
   columns.value = keys
-    .filter((key) => key !== "id")
+    .filter((key) => key !== "id" && key !== "order")
     .map((key) => ({
       field: key,
       header: key.toUpperCase(),
@@ -104,6 +105,19 @@ watch(items, async () => {
 // Helpers
 const getRowSelectValue = (field: string, itemId: string) => {
   return selectOptionsMap.value[field]?.find((opt) => opt.id === itemId);
+};
+
+const onReorder = async (event) => {
+  if (!event.value || event.value.length === 0) return;
+    let orderCount = event.value.length
+    event.value.forEach(async (element: Item) => {
+        element.order = orderCount;
+        orderCount -=1;
+        await handleItemAction(props.itemType, "update", element);
+    });
+    items.value = event.value;
+
+    toast.add({severity:'success', summary: 'Rows Reordered', life: 3000});
 };
 
 // Save edits

@@ -40,6 +40,7 @@ model Country {
   count_days Int
   currencyId String @db.Uuid
   shortname String
+  order      Int?
 
   currency Currency @relation(fields: [currencyId], references: [id])
 

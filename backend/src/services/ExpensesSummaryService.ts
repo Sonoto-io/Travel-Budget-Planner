@@ -27,6 +27,7 @@ export class ExpensesSummaryService {
     allCountries.forEach(country => {
       const countryExpenses = expenses.filter(expense => expense.country.id === country.id);
       const summary = ExpensesSummaryService.calculateSummary(countryExpenses);
+      summary["totalExpectedExpense"] = country.daily_expected_expenses * country.count_days;
       summaries[country.label ?? ""] = summary;
     });
     return summaries;

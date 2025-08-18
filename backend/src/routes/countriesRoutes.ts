@@ -14,6 +14,7 @@ export const configureCountriesRoutes = (app: Elysia) =>
             count_days: t.Number(),
             shortname: t.String(),
             currencyId: t.String(),
+            order: t.Optional(t.Number()),
           }),
         },
         (guardApp) =>
