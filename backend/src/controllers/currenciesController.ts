@@ -19,7 +19,6 @@ export const currenciesController = {
           status: status(201),
         };
       } catch (error) {
-        console.log("error", error);
         return {
           status: status(400),
           message: `A currency with label "${body.label}" already exists.: ${error}`,
