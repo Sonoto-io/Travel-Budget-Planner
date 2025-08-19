@@ -16,7 +16,7 @@ const prisma = new PrismaClient()
 
 export const countryRepository = {
   getAll(): Promise<Array<Country>> {
-    return prisma.country.findMany({orderBy: { order: "desc" }});
+    return prisma.country.findMany({orderBy: { order: "asc" }});
   },
   async create(country: Prisma.CountryCreateInput) {
       return await prisma.country.create({ data: country });

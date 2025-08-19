@@ -67,8 +67,6 @@ onMounted(async () => {
   });
 });
 
-const updateCurrentCountry = (shortname: string) => {};
-
 const items = ref([
   {
     label: "Dashboard",

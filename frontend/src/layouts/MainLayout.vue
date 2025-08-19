@@ -3,19 +3,17 @@
     <header>
       <HeaderBar @toggle-navbar="handleNavbar" />
     </header>
-    <div class="flex h-full w-screen">
+    <div class="flex h-full">
       <nav
         :class="[
           'transition-all duration-300',
-          navbarVisible ? 'w-[70%] min-w-60 sm:w-[50%] md:w-[15%]' : 'w-0',
+          navbarVisible ? 'w-[70%] min-w-60 sm:w-[50%] md:w-[10%]' : 'w-0',
           'overflow-x-hidden',
-          'md:w-[15%]',
-          'grow',
         ]"
       >
         <NavBar />
       </nav>
-      <main class="w-full shrink px-4"><slot /></main>
+      <main class="flex-1 w-0 px-4 overflow-x-auto"><slot /></main>
     </div>
   </div>
 </template>
@@ -25,7 +23,7 @@ import { ref } from "vue";
 import HeaderBar from "@/components/HeaderBar.vue";
 import NavBar from "@/components/NavBar.vue";
 
-const navbarVisible = ref(false);
+const navbarVisible = ref(true);
 const handleNavbar = () => {
   navbarVisible.value = !navbarVisible.value;
 };

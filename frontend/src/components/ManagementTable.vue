@@ -16,7 +16,7 @@
         </span>
       </template>
 
-      <template #editor="slotProps">
+      <template #editor="slotProps" v-if="! forbiddenFields.includes(col.field)">
         <InputText v-if="
           typeof slotProps.data[col.field] === 'string' &&
           !isSelectNeeded(col.field)
@@ -63,6 +63,7 @@ const items = defineModel<Array<Item>>();
 const props = defineProps<{ itemType?: ItemName }>();
 
 // State
+const forbiddenFields = ["total_expected_expense", "order", "token"];
 const columns = ref<Array<{ field: string; header: string }>>([]);
 const editingRows = ref([]);
 const selectValues = ref<Record<string, Record<string, any>>>({});
@@ -109,10 +110,10 @@ const getRowSelectValue = (field: string, itemId: string) => {
 
 const onReorder = async (event) => {
   if (!event.value || event.value.length === 0) return;
-    let orderCount = event.value.length
+    let orderCount = 0
     event.value.forEach(async (element: Item) => {
         element.order = orderCount;
-        orderCount -=1;
+        orderCount++;
         await handleItemAction(props.itemType, "update", element);
     });
     items.value = event.value;
