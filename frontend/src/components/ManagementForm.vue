@@ -5,7 +5,7 @@
     class="flex flex-wrap items-center gap-4"
   >
     <div v-for="input in inputs" :key="input.field">
-      <div v-if="input.field != 'order'">
+      <div v-if="! forbiddenFields.includes(input.field)">
       <InputText
         v-if="input.type === 'string' && !isSelectNeeded(input.field)"
         :name="input.field"
@@ -46,7 +46,7 @@ import { useToast } from "primevue/usetoast";
 
 import { handleItemAction, isSelectNeeded, getSelectOptions, ItemName } from "@/utils/ItemsUtils";
 import type { Item } from "@/models/Item";
-
+const forbiddenFields = ["total_expected_expense", "order", "token"];
 const props = defineProps<{
   items?: Item[];
   itemType?: ItemName;
@@ -66,7 +66,6 @@ const selectValues = ref<Record<string, any>>({});
 watch(
   () => props.items,
   async () => {
-    console.log("Items changed:", props.items);
     if (props.items.length == 0) return;
 
     // Generate inputs

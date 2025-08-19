@@ -1,6 +1,5 @@
-<template>Management
+<template>
     <ManagementMain/>
-
 </template>
 
 <script setup lang="ts">

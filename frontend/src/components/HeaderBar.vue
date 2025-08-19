@@ -26,7 +26,7 @@
 import logo from "@images/logo.webp";
 import { ref, onMounted, onUnmounted } from "vue";
 
-const isNavbarVisible = ref(false);
+const isNavbarVisible = ref(true);
 
 const toggleNavbar = () => {
   isNavbarVisible.value = !isNavbarVisible.value;
