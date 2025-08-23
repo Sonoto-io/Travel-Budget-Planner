@@ -1,6 +1,8 @@
 <template>
   <Form v-slot="$form" :initialValues :resolver="resolver" @submit="onFormSubmit"
     class="flex flex-wrap items-center gap-4">
+  <Form v-slot="$form" :initialValues :resolver="resolver" @submit="onFormSubmit"
+    class="flex flex-wrap items-center gap-4">
     <!-- Date -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
@@ -20,6 +22,8 @@
       <IftaLabel>
         <MultiSelect inputId="user" name="user" :options="props.selectValues.users" optionLabel="label" filter
           placeholder="Select User(s)" class="min-w-30" />
+        <MultiSelect inputId="user" name="user" :options="props.selectValues.users" optionLabel="label" filter
+          placeholder="Select User(s)" class="min-w-30" />
         <label for="user">
           User
           <span class="text-red-500">*</span>
@@ -33,6 +37,7 @@
     <!-- Currency -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
+        <Select name="currency" :options="props.selectValues.currencies" optionLabel="label" class="min-w-30" />
         <Select name="currency" :options="props.selectValues.currencies" optionLabel="label" class="min-w-30" />
         <label for="currency">
           Currency
@@ -85,6 +90,8 @@
       <IftaLabel>
         <Select name="category" :options="categories" optionLabel="label" class="min-w-30"
           @change="handleCategorySelect($event.value)" />
+        <Select name="category" :options="categories" optionLabel="label" class="min-w-30"
+          @change="handleCategorySelect($event.value)" />
         <label for="category">
           Category
           <span class="text-red-500">*</span>
@@ -98,6 +105,7 @@
     <!-- Subcategory -->
     <div>
       <IftaLabel>
+        <Select name="subcategory" :options="selectSubcategories" optionLabel="label" class="min-w-30" />
         <Select name="subcategory" :options="selectSubcategories" optionLabel="label" class="min-w-30" />
         <label for="subcategory">
           Subcategory
@@ -122,6 +130,7 @@ import { zodResolver } from "@primevue/forms/resolvers/zod";
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
 import Message from "primevue/message";
+import MultiSelect from 'primevue/multiselect';
 import MultiSelect from 'primevue/multiselect';
 import Textarea from "primevue/textarea";
 import { z } from "zod";
@@ -149,6 +158,7 @@ const countryStore = useCountryStore();
 const initialValues = reactive({
   date: new Date(),
   user: [],
+  user: [],
   currency: {
     label: "",
     id: "",
@@ -172,8 +182,10 @@ const initialValues = reactive({
 const FormData = z.object({
   date: z.coerce.date({ required_error: "Date is required" }),
   user: z.array(z.object({
+  user: z.array(z.object({
     id: z.string(),
     label: z.string().min(1, "User is required"),
+  })).min(1, "At least one user must be selected"),
   })).min(1, "At least one user must be selected"),
   currency: z.object({
     id: z.string(),
@@ -210,6 +222,8 @@ watch(
   () => props.selectValues,
   async (newValues) => {
     if (newValues.users.length > 0 && initialValues.user.label == "") {
+      initialValues.user[0].id = newValues.users[0].id;
+      initialValues.user[0].label = newValues.users[0].label;
       initialValues.user[0].id = newValues.users[0].id;
       initialValues.user[0].label = newValues.users[0].label;
     }
@@ -255,7 +269,7 @@ const onFormSubmit = async ({ valid, values, reset }) => {
     values["price"] = Number(values["price"]) / values.user.length;
     const users = values.user.slice();
     users.forEach(async (user: any) => {
-      const expenseData = { ...values, user }; // create a fresh object for each user
+      const expenseData = { ...values, user };
       const res = await createExpense(expenseData);
       if (res.status.code === 201) {
         toast.add({
@@ -265,8 +279,7 @@ const onFormSubmit = async ({ valid, values, reset }) => {
         });
         selectSubcategories.value =
           (await fetchSubCategories(initialValues.category)) ?? [];
-        values.id = res.data.expense.id;
-        emit("addExpense", expenseData);
+        emit("addExpense", { ...expenseData, id: res.data.expense.id });
         reset();
 
       } else {
@@ -277,6 +290,10 @@ const onFormSubmit = async ({ valid, values, reset }) => {
           life: 3000,
         });
       }
+    }
+    )
+  }
+}
     }
     )
   }
