@@ -1,5 +1,6 @@
 import type { Country } from "@prisma/client";
 import { countryRepository } from "@repositories/countriesRepository";
+import { userRepository } from "@repositories/usersRepository";
 
 export class ExpensesSummaryService {
   static calculateSummary(expenses: any[]): ISummary {
@@ -81,5 +82,23 @@ export class ExpensesSummaryService {
     });
 
     return Array.from(repartitionMap.values());
+  }
+
+  static async getSummaryByUser(expenses: any[]): Promise<Record<string, ISummary> | {message: string, status: number}> {
+    try {
+      const users = await userRepository.getAll();
+      const summaries: Record<string, ISummary> = {};
+
+      users.forEach(user => {
+        const userExpenses = expenses.filter(expense => expense.country.id === user.id);
+        const summary = ExpensesSummaryService.calculateSummary(userExpenses);
+        summaries[user.label ?? ""] = summary;
+      });
+
+      return summaries;
+    } catch (error) {
+      console.error("Error fetching users summary:", error);
+      return { message: "Error fetching users summary: " + error, status: 500 };
+    }
   }
 }
