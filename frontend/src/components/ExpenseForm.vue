@@ -145,9 +145,11 @@ const categories = computed(() => props.selectValues["categories"] ?? []);
 const toast = useToast();
 const selectSubcategories = ref([]);
 const countryStore = useCountryStore();
+const defaultDate = new Date()
+defaultDate.setHours(12)
 
 const initialValues = reactive({
-  date: new Date(),
+  date: defaultDate,
   user: [],
   currency: {
     label: "",
@@ -255,6 +257,7 @@ const onFormSubmit = async ({ valid, values, reset }) => {
   if (valid) {
     values["country"] = toRaw(countryStore.currentCountry);
     values["price"] = Number(values["price"]) / values.user.length;
+    values["date"].setHours(12)
     const users = values.user
     users.forEach(async (user: any) => {
       const expenseData = { ...values, user };

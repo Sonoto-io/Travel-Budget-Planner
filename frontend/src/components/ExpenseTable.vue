@@ -138,6 +138,7 @@ const handleCategorySelect = async (category: Category) => {
 
 const onRowEditSave = async (event: { newData: any; index: any }) => {
   let { newData, index } = event;
+  newData["date"].setHours(12)
   const res = await updateExpense(newData);
   if (res.status.code !== 200) {
     toast.add({

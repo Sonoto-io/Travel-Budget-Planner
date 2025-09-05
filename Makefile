@@ -3,6 +3,14 @@ PGID := $(shell id -g)
 COMPOSE := PUID=$(PUID) PGID=$(PGID) docker-compose
 COMPOSE_DEV  := $(COMPOSE) -f compose.yml
 
+# PROD
+
+.PHONY: prod-up
+prod-up:
+	MOCKS_ENABLED=false $(COMPOSE) up --build -d
+
+# DEV
+
 .PHONY: dev-up
 dev-up:
 	MOCKS_ENABLED=false $(COMPOSE_DEV) watch
