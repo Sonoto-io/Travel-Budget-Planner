@@ -90,7 +90,7 @@ export class ExpensesSummaryService {
       const summaries: Record<string, ISummary> = {};
 
       users.forEach(user => {
-        const userExpenses = expenses.filter(expense => expense.country.id === user.id);
+        const userExpenses = expenses.filter(expense => expense.user.id === user.id);
         const summary = ExpensesSummaryService.calculateSummary(userExpenses);
         summaries[user.label ?? ""] = summary;
       });
