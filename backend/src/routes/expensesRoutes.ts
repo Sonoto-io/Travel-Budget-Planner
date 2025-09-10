@@ -9,54 +9,52 @@ export const configureExpensesRoutes = (app: Elysia) =>
           countryId: t.Optional(t.String()),
         }),
       })
-    .get("/summary", ({ query }) => expensesController.getSummary(query.countryId), {
-      query: t.Object({
-        countryId: t.Optional(t.String()),
-      }),
-    })
-    .get("/summary/by-country", () => expensesController.getSummaryByCountry(), {
-      query: t.Object({
-        countryId: t.Optional(t.String()),
-      }),
-    })
-    .get("/summary/by-user", () => expensesController.getSummaryByUser(), {
-      query: t.Object({
-        countryId: t.Optional(t.String()),
-      }),
-    })
-    .guard(
-      {
-        body: t.Object({
-          id: t.Optional(t.String()),
-          note: t.Optional(t.String()),
-          price: t.Number(),
-          date: t.Date(),
-          location: t.Optional(t.String()),
-          country: t.Any(),
-          user: t.Any(),
-          category: t.Any(),
-          subcategory: t.Any(),
-          currency: t.Any(),
+      .get("/summary", ({ query }) => expensesController.getSummary(query.countryId), {
+        query: t.Object({
+          countryId: t.Optional(t.String()),
         }),
-      },
-      (guardApp) =>
-        guardApp
-          .post("/", ({ body }) => expensesController.create(body))
-          .post(
-            "/:id",
-            ({ body, params }) => {
-              return expensesController.update(params.id, body);
-            },
-            {
-              params: t.Object({
-                id: t.String(),
-              }),
-            }
-          )
-    )
-    .delete("/:id", ({ params }) => expensesController.delete(params.id), {
-      params: t.Object({
-        id: t.String(),
-      }),
-    })
+      })
+      .get("/summary/by-country", () => expensesController.getSummaryByCountry())
+      .get("/summary/by-user", ({ query }) => expensesController.getSummaryByUser(query), {
+          query: t.Object({
+            year: t.Optional(t.Number()),
+            month: t.Optional(t.Number()),
+            day: t.Optional(t.Number()),
+          }),
+        })
+      .guard(
+        {
+          body: t.Object({
+            id: t.Optional(t.String()),
+            note: t.Optional(t.String()),
+            price: t.Number(),
+            date: t.Date(),
+            location: t.Optional(t.String()),
+            country: t.Any(),
+            user: t.Any(),
+            category: t.Any(),
+            subcategory: t.Any(),
+            currency: t.Any(),
+          }),
+        },
+        (guardApp) =>
+          guardApp
+            .post("/", ({ body }) => expensesController.create(body))
+            .post(
+              "/:id",
+              ({ body, params }) => {
+                return expensesController.update(params.id, body);
+              },
+              {
+                params: t.Object({
+                  id: t.String(),
+                }),
+              }
+            )
+      )
+      .delete("/:id", ({ params }) => expensesController.delete(params.id), {
+        params: t.Object({
+          id: t.String(),
+        }),
+      })
   )

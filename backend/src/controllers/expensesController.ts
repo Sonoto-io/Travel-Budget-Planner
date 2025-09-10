@@ -11,7 +11,6 @@ export const expensesController = {
     return {expenses: await expenseRepository.getAll()};
   },
   async getSummary(countryId: string | undefined): Promise<{ expenses_summary: ISummary; }> {
-
     let expenses
     if (countryId){
       expenses = await expenseRepository.getForCountry(countryId)      
@@ -31,8 +30,39 @@ export const expensesController = {
     const expenses = await expenseRepository.getAll()
     return {summaryByCountry: await ExpensesSummaryService.getSummaryByCountry(expenses)};
   },
-  async getSummaryByUser() {
-    const expenses = await expenseRepository.getAll()
+  async getSummaryByUser(query: {year?: number, month?: number, day?: number}) {
+    const sinceDate = new Date(0, 0, 1, 0, 0, 1);
+    const endDate = new Date("9999-01-01");
+
+    // Set start and ending dates if needed
+    // TODO: clean conditions for dates : year or year + month or year + month + day
+    if (query.year) {
+      sinceDate.setFullYear(query.year)
+      endDate.setFullYear(query.year + 1)
+    }
+    if (query.month) {
+      sinceDate.setMonth(query.month - 1) // Months are 0-indexed
+      endDate.setMonth(query.month) // Next month
+      endDate.setFullYear(query.year? query.year : sinceDate.getFullYear())
+    }
+    if (query.day) {
+      sinceDate.setDate(query.day)
+      endDate.setDate(query.day + 1)
+      endDate.setFullYear(query.year ?? sinceDate.getFullYear())
+      endDate.setMonth(query.month ?? sinceDate.getMonth())
+
+    }
+    console.log("LIMIT DATES FOR SUMMARY BY USER:")
+    console.log(sinceDate, endDate)
+
+    const expenses = await expenseRepository.getAll({
+      where: {
+        date: {
+          gte: sinceDate,
+          lte: endDate,
+        },
+      },
+    });
     return {summaryByUser: await ExpensesSummaryService.getSummaryByUser(expenses)};
   },
   async create(body: Prisma.ExpenseCreateInput) {

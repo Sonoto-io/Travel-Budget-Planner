@@ -3,7 +3,7 @@ import { PrismaClient, type Expense, Prisma } from ".prisma/client";
 const prisma = new PrismaClient();
 
 export const expenseRepository = {
-  getAll(): Promise<Array<Expense>> {
+  getAll(options?: Prisma.ExpenseFindManyArgs): Promise<Array<Expense>> {
     return prisma.expense.findMany({
       include: {
         category: true,
@@ -12,6 +12,7 @@ export const expenseRepository = {
         currency: true,
         country: true,
       },
+      ...(options ?? {})
     });
   },
   getForCountry(countryId: string): Promise<Array<Expense>> {
