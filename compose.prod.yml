@@ -180,10 +180,6 @@ services:
     build:
       context: frontend
       dockerfile: docker/Dockerfile.prod
-    environment:
-      VITE_MOCKS_ENABLED : ${MOCKS_ENABLED:-false}
-    ports:
-      - "5173:5173"
     labels:
       traefik.enable: true
       traefik.http.routers.frontend.rule: PathPrefix(`/`)
