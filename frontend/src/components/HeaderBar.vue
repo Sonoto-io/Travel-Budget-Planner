@@ -12,7 +12,7 @@
       <span
         :class="[
           'pi',
-          isNavbarVisible ? 'pi-minus' : 'pi-bars',
+          isNavbarVisible ? 'pi-bars' : 'pi-minus',
           'cursor-pointer',
         ]"
       />

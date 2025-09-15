@@ -23,7 +23,7 @@ import { ref } from "vue";
 import HeaderBar from "@/components/HeaderBar.vue";
 import NavBar from "@/components/NavBar.vue";
 
-const navbarVisible = ref(true);
+const navbarVisible = ref(false);
 const handleNavbar = () => {
   navbarVisible.value = !navbarVisible.value;
 };
