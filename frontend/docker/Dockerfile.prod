@@ -5,14 +5,14 @@ WORKDIR /app
 # ENV PATH /app/node_modules/.bin:$PATH
 
 COPY package.json package-lock.json .
-RUN npm ci
+RUN npm install --frozen-lockfile
 
 COPY . .
 
 RUN npm run build
 
 # ---- Production stage ----
-FROM nginx:alpine
+FROM nginx:alpine as production
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 

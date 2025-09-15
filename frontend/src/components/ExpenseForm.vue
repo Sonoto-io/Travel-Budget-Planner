@@ -4,7 +4,7 @@
     <!-- Date -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <DatePicker name="date" class="min-w-30" />
+        <DatePicker name="date" class="min-w-30" @date-select="saveFormData($form)"/>
         <label for="date">
           Date
           <span class="text-red-500">*</span>
@@ -18,7 +18,7 @@
     <!-- User -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <MultiSelect inputId="user" name="user" :options="props.selectValues.users" optionLabel="label" filter
+        <MultiSelect inputId="user" name="user" :options="props.selectValues.users" optionLabel="label" filter @change="saveFormData($form)"
           placeholder="Select User(s)" class="min-w-30" />
         <label for="user">
           User
@@ -33,7 +33,7 @@
     <!-- Currency -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <Select name="currency" :options="props.selectValues.currencies" optionLabel="label" class="min-w-30" />
+        <Select name="currency" :options="props.selectValues.currencies" optionLabel="label" class="min-w-30" @change="saveFormData($form)"/>
         <label for="currency">
           Currency
           <span class="text-red-500">*</span>
@@ -47,7 +47,7 @@
     <!-- Price -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <InputText name="price" class="min-w-30" />
+        <InputText name="price" class="min-w-30" @change="saveFormData($form)" />
         <label for="price">
           Price
           <span class="text-red-500">*</span>
@@ -61,7 +61,7 @@
     <!-- Note -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <Textarea name="note" rows="1" cols="20" />
+        <Textarea name="note" rows="1" cols="20" @change="saveFormData($form)"/>
         <label for="note"> Note </label>
       </IftaLabel>
       <Message v-if="$form.note?.invalid" severity="error">{{
@@ -72,7 +72,7 @@
     <!-- Location -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <InputText name="location" />
+        <InputText name="location" @change="saveFormData($form)"/>
         <label for="location"> Location </label>
       </IftaLabel>
       <Message v-if="$form.location?.invalid" severity="error">{{
@@ -84,7 +84,7 @@
     <div class="flex flex-col gap-2">
       <IftaLabel>
         <Select name="category" :options="categories" optionLabel="label" class="min-w-30"
-          @change="handleCategorySelect($event.value)" />
+          @change="handleCategorySelect($event.value);saveFormData($form)" />
         <label for="category">
           Category
           <span class="text-red-500">*</span>
@@ -98,7 +98,7 @@
     <!-- Subcategory -->
     <div>
       <IftaLabel>
-        <Select name="subcategory" :options="selectSubcategories" optionLabel="label" class="min-w-30" />
+        <Select name="subcategory" :options="selectSubcategories" optionLabel="label" class="min-w-30" @change="saveFormData($form)"/>
         <label for="subcategory">
           Subcategory
           <span class="text-red-500">*</span>
@@ -111,12 +111,17 @@
 
     <!-- Submit Button -->
     <Button type="submit" severity="secondary" label="Submit" />
+    <template v-if="$form">
+      <div v-for="key in Object.keys($form)" :key="key">
+        <!-- empty div just to trigger reactivity watcher -->
+      </div>
+    </template>
   </Form>
 </template>
 
 <script setup lang="ts">
 import { Form } from "@primevue/forms";
-import { computed, reactive, ref, watch, toRaw } from "vue";
+import { computed, reactive, ref, watch, toRaw, onMounted, onUpdated } from "vue";
 import { useToast } from "primevue/usetoast";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import InputText from "primevue/inputtext";
@@ -131,7 +136,6 @@ import type { FormSelectValues } from "@/models/FormSelectValues";
 import { fetchSubCategories } from "@/utils/SubcategoryUtils";
 import IftaLabel from "primevue/iftalabel";
 import { useCountryStore } from "@/stores/countryStore";
-import { useRoute } from "vue-router";
 import { createExpense } from "@/api/expenses";
 
 const props = defineProps<{
@@ -148,7 +152,23 @@ const countryStore = useCountryStore();
 const defaultDate = new Date()
 defaultDate.setHours(12)
 
-const initialValues = reactive({
+
+const savedForm = sessionStorage.getItem('formData') !== "undefined" ? JSON.parse(sessionStorage.getItem('formData')) : null;
+if (savedForm) {
+  if (savedForm.date) {
+    savedForm.date = new Date(savedForm.date);
+    savedForm.date.setHours(12)
+  }
+}
+
+if (savedForm) {
+  toast.add({
+    severity: "info",
+    summary: "Restored unsaved form data.",
+    life: 3000,
+  });
+}
+const initialValues = savedForm ? ref(savedForm) : ref({
   date: defaultDate,
   user: [],
   currency: {
@@ -171,7 +191,8 @@ const initialValues = reactive({
   },
 });
 
-const FormData = z.object({
+
+const formData = z.object({
   date: z.coerce.date({ required_error: "Date is required" }),
   user: z.array(z.object({
     id: z.string(),
@@ -197,52 +218,22 @@ const FormData = z.object({
   }),
 });
 
-const resolver = zodResolver(FormData);
-const route = useRoute();
+const resolver = zodResolver(formData);
 
-watch(route, () => {
-  initialValues.currency.id = countryStore.currentMainCurrency.id;
-  initialValues.currency.label = countryStore.currentMainCurrency.label;
-  initialValues.currency.name = countryStore.currentMainCurrency.name;
-  initialValues.currency.conversion =
-    countryStore.currentMainCurrency.conversion;
-});
 
-watch(
-  () => props.selectValues,
-  async (newValues) => {
-    if (newValues.users.length > 0 && initialValues.user.label == "") {
-      initialValues.user[0].id = newValues.users[0].id;
-      initialValues.user[0].label = newValues.users[0].label;
-      initialValues.user[0].id = newValues.users[0].id;
-      initialValues.user[0].label = newValues.users[0].label;
-    }
-    if (newValues.currencies.length > 0 && initialValues.currency.label == "") {
-      // didn't find better way to make the form react to currency change
-      initialValues.currency.id = newValues.currencies[0].id;
-      initialValues.currency.name = newValues.currencies[0].name;
-      initialValues.currency.label = newValues.currencies[0].label;
-      initialValues.currency.conversion = newValues.currencies[0].conversion;
-    }
-    if (newValues.categories.length > 0 && initialValues.category.label == "") {
-      initialValues.category.label = newValues.categories[0].label;
-      initialValues.category.id = newValues.categories[0].id ?? "";
-      try {
-        selectSubcategories.value = await fetchSubCategories(
-          newValues.categories[0],
-        );
-        initialValues.subcategory.label = selectSubcategories.value[0].label;
-        initialValues.subcategory.id = selectSubcategories.value[0].id ?? "";
-        initialValues.subcategory.categoryId =
-          selectSubcategories.value[0].categoryId ?? "";
-      } catch (error) {
-        console.error("Error fetching subcategories:", error);
-        selectSubcategories.value = [];
-      }
-    }
-  },
-  { deep: true, immediate: true },
-);
+const getFormValues = (form: Record<string, any>) => {
+  const result: Record<string, any> = {};
+  for (const key in form) {
+    result[key] = form[key]?.value;
+  }
+  return result;
+}
+
+const saveFormData = (form: any) => {
+  const dataToSave = getFormValues(form);
+  dataToSave.date.setHours(12)  // avoid timezone issues when saving date only
+  sessionStorage.setItem('formData', JSON.stringify(dataToSave));
+}
 
 const handleCategorySelect = async (category: Category) => {
   try {
@@ -252,6 +243,40 @@ const handleCategorySelect = async (category: Category) => {
     selectSubcategories.value = [];
   }
 };
+
+watch(
+  () => props.selectValues,
+  async (newValues) => {
+    if (newValues.users.length > 0 && initialValues.value.user.length == 0) {
+      initialValues.value.user.push(newValues.users[0]);
+    }
+    
+
+    if (newValues.categories.length > 0 && initialValues.value.category.label == "") {
+      initialValues.value.category.label = newValues.categories[0].label;
+      initialValues.value.category.id = newValues.categories[0].id ?? "";
+      try {
+        selectSubcategories.value = await fetchSubCategories(
+          newValues.categories[0],
+        );
+        initialValues.value.subcategory.label = selectSubcategories.value[0].label;
+        initialValues.value.subcategory.id = selectSubcategories.value[0].id ?? "";
+        initialValues.value.subcategory.categoryId =
+          selectSubcategories.value[0].categoryId ?? "";
+      } catch (error) {
+        console.error("Error fetching subcategories:", error);
+        selectSubcategories.value = [];
+      }
+    }
+    if (!savedForm) {
+          initialValues.value.currency = countryStore.currentMainCurrency
+    }
+    handleCategorySelect(initialValues.value.category);
+
+  },
+  { deep: true, immediate: true },
+);
+
 
 const onFormSubmit = async ({ valid, values, reset }) => {
   if (valid) {
@@ -272,6 +297,7 @@ const onFormSubmit = async ({ valid, values, reset }) => {
           (await fetchSubCategories(initialValues.category)) ?? [];
         emit("addExpense", { ...expenseData, id: res.data.expense.id });
         reset();
+        sessionStorage.removeItem('formData');
 
       } else {
         toast.add({
@@ -285,4 +311,6 @@ const onFormSubmit = async ({ valid, values, reset }) => {
     )
   }
 }
+
+
 </script>
