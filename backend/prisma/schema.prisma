@@ -82,4 +82,5 @@ model Expense {
   price Float     @default(0.00)
   date  DateTime  @default(now())
   location String?
+  exception Boolean @default(false)
 }

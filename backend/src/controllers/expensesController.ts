@@ -10,13 +10,24 @@ export const expensesController = {
     }
     return {expenses: await expenseRepository.getAll()};
   },
-  async getSummary(countryId: string | undefined): Promise<{ expenses_summary: ISummary; }> {
+  async getSummary(query : {countryId: string | undefined, withoutExceptions: boolean | undefined}): Promise<{ expenses_summary: ISummary; }> {
     let expenses
-    if (countryId){
-      expenses = await expenseRepository.getForCountry(countryId)      
-    }else {
-      expenses = await expenseRepository.getAll()
+    let options = query.withoutExceptions ? {
+      where: {
+        exception: false
+      }
+    } : {}
+    if (query.countryId){
+      options = {
+        ...options,
+        where: {
+          ...options.where,
+          countryId: query.countryId
+        }
+      }
     }
+    expenses = await expenseRepository.getAll(options)      
+
 
     const summary = ExpensesSummaryService.calculateSummary(expenses);
     if (!summary) {
@@ -26,11 +37,16 @@ export const expensesController = {
       expenses_summary : summary
     }
   },
-  async getSummaryByCountry() {
-    const expenses = await expenseRepository.getAll()
+  async getSummaryByCountry(query: {withoutExceptions?: boolean}) {
+    let options = query.withoutExceptions ? {
+      where: {
+        exception: false
+      }
+    } : {}
+    const expenses = await expenseRepository.getAll(options)
     return {summaryByCountry: await ExpensesSummaryService.getSummaryByCountry(expenses)};
   },
-  async getSummaryByUser(query: {year?: number, month?: number, day?: number}) {
+  async getSummaryByUser(query: {year?: number, month?: number, day?: number, withoutExceptions?: boolean}) {
     const sinceDate = new Date(0, 0, 1, 0, 0, 1);
     const endDate = new Date("9999-01-01");
 
@@ -61,6 +77,7 @@ export const expensesController = {
           gte: sinceDate,
           lte: endDate,
         },
+        ...(query.withoutExceptions ? { exception: false } : {})
       },
     });
     return {summaryByUser: await ExpensesSummaryService.getSummaryByUser(expenses)};
