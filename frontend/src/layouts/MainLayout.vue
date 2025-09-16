@@ -7,7 +7,8 @@
       <nav
         :class="[
           'transition-all duration-300',
-          navbarVisible ? 'w-[70%] min-w-60 sm:w-[50%] md:w-[10%]' : 'w-0',
+          'md:w-[20%]',
+          navbarVisible ? 'w-[70%] min-w-60 sm:w-[50%] ' : 'w-0',
           'overflow-x-hidden',
         ]"
       >

@@ -1,5 +1,5 @@
 <template>
-  <Panel header="Dashboard" toggleable>
+  <Panel header="Dashboard" toggleable collapsed>
     <div>
       <div>Expenses : {{ summary.countExpenses }}</div>
       <div>Total : {{ summary.totalExpenses }}</div>

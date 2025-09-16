@@ -12,7 +12,7 @@
       <span
         :class="[
           'pi',
-          isNavbarVisible ? 'pi-bars' : 'pi-minus',
+          isNavbarVisible ? 'pi-minus' : 'pi-bars',
           'cursor-pointer',
         ]"
       />
@@ -26,7 +26,7 @@
 import logo from "@images/logo.webp";
 import { ref, onMounted, onUnmounted } from "vue";
 
-const isNavbarVisible = ref(true);
+const isNavbarVisible = ref(false);
 
 const toggleNavbar = () => {
   isNavbarVisible.value = !isNavbarVisible.value;
