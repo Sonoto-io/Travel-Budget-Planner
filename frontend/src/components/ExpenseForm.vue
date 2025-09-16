@@ -4,7 +4,7 @@
     <!-- Date -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <DatePicker name="date" class="min-w-30" @date-select="saveFormData($form)"/>
+        <DatePicker name="date" class="min-w-30" @date-select="saveFormData($form)" />
         <label for="date">
           Date
           <span class="text-red-500">*</span>
@@ -18,8 +18,8 @@
     <!-- User -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <MultiSelect inputId="user" name="user" :options="props.selectValues.users" optionLabel="label" filter @change="saveFormData($form)"
-          placeholder="Select User(s)" class="min-w-30" />
+        <MultiSelect inputId="user" name="user" :options="props.selectValues.users" optionLabel="label" filter
+          @change="saveFormData($form)" placeholder="Select User(s)" class="min-w-30" />
         <label for="user">
           User
           <span class="text-red-500">*</span>
@@ -33,7 +33,8 @@
     <!-- Currency -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <Select name="currency" :options="props.selectValues.currencies" optionLabel="label" class="min-w-30" @change="saveFormData($form)"/>
+        <Select name="currency" :options="props.selectValues.currencies" optionLabel="label" class="min-w-30"
+          @change="saveFormData($form)" />
         <label for="currency">
           Currency
           <span class="text-red-500">*</span>
@@ -61,7 +62,7 @@
     <!-- Note -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <Textarea name="note" rows="1" cols="20" @change="saveFormData($form)"/>
+        <Textarea name="note" rows="1" cols="20" @change="saveFormData($form)" />
         <label for="note"> Note </label>
       </IftaLabel>
       <Message v-if="$form.note?.invalid" severity="error">{{
@@ -72,7 +73,7 @@
     <!-- Location -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <InputText name="location" @change="saveFormData($form)"/>
+        <InputText name="location" @change="saveFormData($form)" />
         <label for="location"> Location </label>
       </IftaLabel>
       <Message v-if="$form.location?.invalid" severity="error">{{
@@ -84,7 +85,7 @@
     <div class="flex flex-col gap-2">
       <IftaLabel>
         <Select name="category" :options="categories" optionLabel="label" class="min-w-30"
-          @change="handleCategorySelect($event.value);saveFormData($form)" />
+          @change="handleCategorySelect($event.value); saveFormData($form)" />
         <label for="category">
           Category
           <span class="text-red-500">*</span>
@@ -98,7 +99,8 @@
     <!-- Subcategory -->
     <div>
       <IftaLabel>
-        <Select name="subcategory" :options="selectSubcategories" optionLabel="label" class="min-w-30" @change="saveFormData($form)"/>
+        <Select name="subcategory" :options="selectSubcategories" optionLabel="label" class="min-w-30"
+          @change="saveFormData($form)" />
         <label for="subcategory">
           Subcategory
           <span class="text-red-500">*</span>
@@ -109,13 +111,19 @@
       }}</Message>
     </div>
 
+    <!-- Exception -->
+    <div>
+      <Checkbox name="exception" input-id="exception" binary @change="saveFormData($form)" />
+      <label for="exception">
+        Exceptionnal expense
+      </label>
+      <Message v-if="$form.subcategory?.invalid" severity="error">{{
+        $form.subcategory.error?.message
+      }}</Message>
+    </div>
+
     <!-- Submit Button -->
     <Button type="submit" severity="secondary" label="Submit" />
-    <template v-if="$form">
-      <div v-for="key in Object.keys($form)" :key="key">
-        <!-- empty div just to trigger reactivity watcher -->
-      </div>
-    </template>
   </Form>
 </template>
 
@@ -137,6 +145,7 @@ import { fetchSubCategories } from "@/utils/SubcategoryUtils";
 import IftaLabel from "primevue/iftalabel";
 import { useCountryStore } from "@/stores/countryStore";
 import { createExpense } from "@/api/expenses";
+import Checkbox from "primevue/checkbox";
 
 const props = defineProps<{
   selectValues: FormSelectValues;
@@ -216,6 +225,7 @@ const formData = z.object({
     label: z.string().min(1, "Subcategory is required"),
     categoryId: z.string().optional(),
   }),
+  exception: z.boolean(),
 });
 
 const resolver = zodResolver(formData);
@@ -250,7 +260,7 @@ watch(
     if (newValues.users.length > 0 && initialValues.value.user.length == 0) {
       initialValues.value.user.push(newValues.users[0]);
     }
-    
+
 
     if (newValues.categories.length > 0 && initialValues.value.category.label == "") {
       initialValues.value.category.label = newValues.categories[0].label;
@@ -269,7 +279,7 @@ watch(
       }
     }
     if (!savedForm) {
-          initialValues.value.currency = countryStore.currentMainCurrency
+      initialValues.value.currency = countryStore.currentMainCurrency
     }
     handleCategorySelect(initialValues.value.category);
 
@@ -279,6 +289,7 @@ watch(
 
 
 const onFormSubmit = async ({ valid, values, reset }) => {
+  console.log("Submitting form with values:", values);
   if (valid) {
     values["country"] = toRaw(countryStore.currentCountry);
     values["price"] = Number(values["price"]) / values.user.length;

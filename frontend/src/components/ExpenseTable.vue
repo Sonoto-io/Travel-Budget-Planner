@@ -1,7 +1,7 @@
 <template>
   <DataTable v-model:editingRows="editingRows" :value="expenses" editMode="row" dataKey="id"
     @row-edit-save="onRowEditSave" @row-edit-init="handleCategorySelect($event.data['category'])" sortField="date"
-     sortMode="single" tableStyle="min-width: 50rem">
+    sortMode="single" tableStyle="min-width: 50rem">
     <!-- Date Column -->
     <Column field="date" header="Date" sortable :sortField="formatDate">
       <template #body="{ data, field }">
@@ -38,7 +38,7 @@
         {{ formatCurrency(data[field], data["currency"]) }}
       </template>
       <template #editor="{ data, field }">
-        <InputNumber v-model="data[field]" class="w-30"  :maxFractionDigits="2"/>
+        <InputNumber v-model="data[field]" class="w-30" :maxFractionDigits="2" />
       </template>
     </Column>
 
@@ -90,6 +90,17 @@
           @show="handleCategorySelect(data.category)" /> </template>
     </Column>
 
+    <!-- Exception Column -->
+    <Column field="exception" header="Exceptionnal" sortable>
+      <template #body="{ data, field }">
+        {{ data[field] ? "Yes" : "No" }}
+      </template>
+      <template #editor="{ data, field }">
+        <Checkbox v-model="data[field]" binary />
+      </template>
+    </Column>
+
+
     <!-- Edit Column -->
     <Column header="Edit" :rowEditor="true" style="width: 10%; min-width: 8rem"></Column>
     <Column header="Delete" style="width: 10%; min-width: 8rem">
@@ -115,6 +126,7 @@ import type { FormSelectValues } from "@/models/FormSelectValues";
 import Button from "primevue/button";
 import { deleteExpense, updateExpense } from "@/api/expenses";
 import { useToast } from "primevue/usetoast";
+import Checkbox from "primevue/checkbox";
 
 const toast = useToast();
 
@@ -138,7 +150,9 @@ const handleCategorySelect = async (category: Category) => {
 
 const onRowEditSave = async (event: { newData: any; index: any }) => {
   let { newData, index } = event;
-  newData["date"].setHours(12)
+  const date = new Date(newData["date"]);
+  date.setHours(12); // To avoid timezone issues
+  newData["date"] = date;
   const res = await updateExpense(newData);
   if (res.status.code !== 200) {
     toast.add({
@@ -165,7 +179,7 @@ const deleteRow = async (row: Expense) => {
       summary: "Expense deleted successfully.",
       life: 3000,
     });
-      expenses.value = expenses.value.filter((expense) => expense.id !== row.id);
+    expenses.value = expenses.value.filter((expense) => expense.id !== row.id);
 
   } else {
     toast.add({

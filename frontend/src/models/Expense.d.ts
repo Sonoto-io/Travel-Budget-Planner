@@ -14,4 +14,5 @@ interface Expense {
   user: { label: string };
   note: string;
   location: string;
+  exception: boolean;
 }

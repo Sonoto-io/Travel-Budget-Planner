@@ -41,6 +41,7 @@ export const configureExpensesRoutes = (app: Elysia) =>
             category: t.Any(),
             subcategory: t.Any(),
             currency: t.Any(),
+            exception: t.Optional(t.Boolean()),
           }),
         },
         (guardApp) =>

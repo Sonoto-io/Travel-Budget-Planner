@@ -38,6 +38,7 @@ export const expenseRepository = {
         category: { connect: { id: expense.category.id } },
         subcategory: { connect: { id: expense.subcategory.id } },
         currency: { connect: { id: expense.currency.id } },
+        exception: expense.exception ?? false,
       }
     });
   },
@@ -56,6 +57,7 @@ export const expenseRepository = {
         category: { connect: { id: expense.category.id } },
         subcategory: { connect: { id: expense.subcategory.id } },
         currency: { connect: { id: expense.currency.id } },
+        exception: expense.exception,
       }
     });
   },
