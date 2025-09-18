@@ -9,6 +9,7 @@ export class ExpensesSummaryService {
     const countExpenses = expenses.length;
     
     const allCountries = ExpensesSummaryService.getCountriesList(expenses);
+    const expectedCountDays = allCountries.reduce((acc:number, country: Country) => acc + country.expected_count_days, 0);
     const countDays = allCountries.reduce((acc:number, country: Country) => acc + country.expected_count_days, 0);
     const dailyExpectedExpenses = allCountries.reduce((acc:number, country: Country) => acc + country.expected_daily_expenses, 0);
     const dailyExpenses = countExpenses > 0 ? totalExpenses / countDays : 0;
