@@ -70,6 +70,9 @@ services:
     build:
       context: frontend
       dockerfile: docker/Dockerfile.prod
+    ports:
+      - "80:80"
+    restart: unless-stopped
     labels:
       traefik.enable: true
       traefik.http.routers.frontend.rule: PathPrefix(`/`)
