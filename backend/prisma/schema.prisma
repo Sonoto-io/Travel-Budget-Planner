@@ -36,8 +36,8 @@ model Currency {
 model Country {
   id        String  @id @db.Uuid @default(uuid())
   label     String? @unique
-  daily_expected_expenses Float  @default(0.00)
-  count_days Int
+  expected_daily_expenses Float  @default(0.00)
+  expected_count_days Int
   currencyId String @db.Uuid
   shortname String
   order      Int?
