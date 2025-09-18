@@ -3,6 +3,7 @@ import { countryRepository } from "@repositories/countriesRepository";
 import { userRepository } from "@repositories/usersRepository";
 
 export class ExpensesSummaryService {
+
   static calculateSummary(expenses: any[]): ISummary {
 
     const totalExpenses = expenses.reduce((acc, expense) => acc + expense.price * expense.currency.conversion, 0);
@@ -22,6 +23,26 @@ export class ExpensesSummaryService {
         repartition: ExpensesSummaryService.calculateRepartition(expenses)    
     };
   }
+
+  static getCountDays(expenses: any[]) : number{
+    const startDate = expenses.reduce((earliest, expense) => {
+      const expenseDate = new Date(expense.date);
+      return expenseDate < earliest ? expenseDate : earliest;
+    }, new Date());
+
+    const lastDate = expenses.reduce((latest, expense) => {
+      const expenseDate = new Date(expense.date);
+      return expenseDate > latest ? expenseDate : latest;
+    }, new Date(0));
+
+    if (startDate.getTime() === new Date().getTime() || lastDate.getTime() === new Date(0).getTime()) {
+      return 0; // No valid dates found
+    }
+    const date1 = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).getTime();
+    const date2 = new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate()).getTime();
+    return Math.abs(date1 - date2) / (1000 * 60 * 60 * 24) + 1;
+  }
+
   static async getSummaryByCountry(expenses: any[]): Promise<Record<string, ISummary> | {message: string, status: number}> {
     try {
       const countries = await countryRepository.getAll();
