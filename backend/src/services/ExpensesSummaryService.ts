@@ -9,19 +9,37 @@ export class ExpensesSummaryService {
     const countExpenses = expenses.length;
     
     const allCountries = ExpensesSummaryService.getCountriesList(expenses);
-    const countDays = allCountries.reduce((acc:number, country: Country) => acc + country.count_days, 0);
-    const dailyExpectedExpenses = allCountries.reduce((acc:number, country: Country) => acc + country.daily_expected_expenses, 0);
+    const expectedCountDays = allCountries.reduce((acc:number, country: Country) => acc + country.expected_count_days, 0);
+    const countDays = ExpensesSummaryService.getCountDays(expenses) ?? expectedCountDays;
+    const expectedDailyExpenses = allCountries.reduce((acc:number, country: Country) => acc + country.expected_daily_expenses, 0);
     const dailyExpenses = countExpenses > 0 ? totalExpenses / countDays : 0;
 
     return {
         totalExpenses,
         countExpenses,
+        expectedCountDays,
         countDays,
         dailyExpenses,
-        dailyExpectedExpenses,
+        expectedDailyExpenses,
         repartition: ExpensesSummaryService.calculateRepartition(expenses)    
     };
   }
+
+  static getCountDays(expenses: any[]) : number{
+    const startDate = expenses.reduce((earliest, expense) => {
+      const expenseDate = new Date(expense.date);
+      return expenseDate < earliest ? expenseDate : earliest;
+    }, new Date());
+
+    const lastDate = expenses.reduce((latest, expense) => {
+      const expenseDate = new Date(expense.date);
+      return expenseDate > latest ? expenseDate : latest;
+    }, new Date(0));
+    
+    if (expenses.length === 0) return 0;
+    return Math.ceil((lastDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
   static async getSummaryByCountry(expenses: any[]): Promise<Record<string, ISummary> | {message: string, status: number}> {
     try {
       const countries = await countryRepository.getAll();
@@ -30,9 +48,9 @@ export class ExpensesSummaryService {
       countries.forEach(country => {
         const countryExpenses = expenses.filter(expense => expense.country.id === country.id);
         const summary = ExpensesSummaryService.calculateSummary(countryExpenses);
-        summary["totalExpectedExpense"] = country.daily_expected_expenses * country.count_days;
-        summary.countDays = country.count_days;
-        summary.dailyExpectedExpenses = country.daily_expected_expenses;
+        summary["totalExpectedExpense"] = country.expected_daily_expenses * country.expected_count_days;
+        summary.countDays = country.expected_count_days;
+        summary.dailyExpectedExpenses = country.expected_daily_expenses;
         summaries[country.label ?? ""] = summary;
       });
 

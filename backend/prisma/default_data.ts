@@ -30,8 +30,8 @@ export const currencies = [
 export const country = {
           label: "France",
           shortname: "fr",
-          daily_expected_expenses: 55,
-          count_days: 30,
+          expected_daily_expenses: 55,
+          expected_count_days: 30,
         }
 
 export const categories = [

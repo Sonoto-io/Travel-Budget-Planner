@@ -225,7 +225,7 @@ const formData = z.object({
     label: z.string().min(1, "Subcategory is required"),
     categoryId: z.string().optional(),
   }),
-  exception: z.boolean(),
+  exception: z.boolean().optional(),
 });
 
 const resolver = zodResolver(formData);

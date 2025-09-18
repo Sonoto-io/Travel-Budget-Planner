@@ -5,9 +5,9 @@ const prisma = new PrismaClient()
       result: {
         country: {
           total_expected_expense: {
-            needs: { count_days: true, daily_expected_expenses: true },
+            needs: { expected_count_days: true, expected_daily_expenses: true },
             compute(country) {
-              return country.count_days * country.daily_expected_expenses;
+              return country.expected_count_days * country.expected_daily_expenses;
             },
           },
         },
