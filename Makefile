@@ -1,13 +1,14 @@
 PUID := $(shell id -u)
 PGID := $(shell id -g)
 COMPOSE := PUID=$(PUID) PGID=$(PGID) docker-compose
+COMPOSE_PROD := $(COMPOSE) -f compose.prod.yml
 COMPOSE_DEV  := $(COMPOSE) -f compose.yml
 
 # PROD
 
 .PHONY: prod-up
 prod-up:
-	MOCKS_ENABLED=false $(COMPOSE) up --build -d
+	MOCKS_ENABLED=false $(COMPOSE_PROD) up --build -d
 
 # DEV
 
