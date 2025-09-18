@@ -8,9 +8,10 @@ interface IRepartition {
 interface ISummary {
     totalExpenses: number;
     countExpenses: number;
+    expectedCountDays: number;
     countDays: number;
     dailyExpenses: number;
-    dailyExpectedExpenses: number;
+    expectedDailyExpenses: number;
     totalExpectedExpense?: number;
     repartition: Array<IRepartition>;
 }
