@@ -54,8 +54,8 @@ export class ExpensesSummaryService {
         const countryExpenses = expenses.filter(expense => expense.country.id === country.id);
         const summary = ExpensesSummaryService.calculateSummary(countryExpenses);
         summary["totalExpectedExpense"] = country.expected_daily_expenses * country.expected_count_days;
-        summary.countDays = country.expected_count_days;
-        summary.dailyExpectedExpenses = country.expected_daily_expenses;
+        summary.expectedCountDays = country.expected_count_days;
+        summary.expectedDailyExpenses = country.expected_daily_expenses;
         summaries[country.label ?? ""] = summary;
       });
 
