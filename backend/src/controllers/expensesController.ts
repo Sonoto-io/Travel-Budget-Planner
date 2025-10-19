@@ -68,8 +68,7 @@ export const expensesController = {
       endDate.setMonth(query.month ?? sinceDate.getMonth())
 
     }
-    console.log("LIMIT DATES FOR SUMMARY BY USER:")
-    console.log(sinceDate, endDate)
+
 
     const expenses = await expenseRepository.getAll({
       where: {

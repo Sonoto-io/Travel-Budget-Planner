@@ -289,7 +289,6 @@ watch(
 
 
 const onFormSubmit = async ({ valid, values, reset }) => {
-  console.log("Submitting form with values:", values);
   if (valid) {
     values["country"] = toRaw(countryStore.currentCountry);
     values["price"] = Number(values["price"]) / values.user.length;

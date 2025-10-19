@@ -1,8 +1,8 @@
-import axios from "axios";
+import api from "@/api/apiClient";
 
 export const getCountries = () => {
-  return axios
-    .get("/api/countries/")
+  return api
+    .get("/countries/")
     .then((response) => response.data.countries)
     .catch((error: any) => {
       console.error("Error fetching countries :", error);
@@ -11,8 +11,8 @@ export const getCountries = () => {
 };
 
 export const getCountryByShortname = (countryShortname: string) => {
-  return axios
-    .get(`/api/countries/?country_shortname=${countryShortname}`)
+  return api
+    .get(`/countries/?country_shortname=${countryShortname}`)
     .then((response) => response.data.country)
     .catch((error: any) => {
       console.error("Error fetching countries :", error);
@@ -21,8 +21,8 @@ export const getCountryByShortname = (countryShortname: string) => {
 };
 
 export const createCountry = (countryData: Partial<Country>) => {
-  return axios
-    .post("/api/countries", countryData)
+  return api
+    .post("/countries", countryData)
     .then((response) => response.data)
     .catch((error: any) => {
       console.error("Error creating a country:", error);
@@ -31,8 +31,8 @@ export const createCountry = (countryData: Partial<Country>) => {
 };
 
 export const updateCountry = (country: Country) => {
-  return axios
-    .post(`/api/countries/${country.id}`, country)
+  return api
+    .post(`/countries/${country.id}`, country)
     .then((response) => response.data)
     .catch((error: any) => {
       console.error("Error updating a country:", error);
@@ -41,8 +41,8 @@ export const updateCountry = (country: Country) => {
 };
 
 export const deleteCountry = (countryId: string) => {
-  return axios
-    .delete(`/api/countries/${countryId}`)
+  return api
+    .delete(`/countries/${countryId}`)
     .then((response) => response.data)
     .catch((error: any) => {
       console.error("Error deleting a country:", error);
