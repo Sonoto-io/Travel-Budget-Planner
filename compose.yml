@@ -53,9 +53,12 @@ services:
       AUTHORIZE_URL: ${AUTHORIZE_URL}
       TOKEN_URL: ${TOKEN_URL}
       REDIRECT_URI: ${REDIRECT_URI}
-      JWK_URL: ${JWK_URL}
+      JWKS_URL: ${JWKS_URL}
       ALGORITHM: ${ALGORITHM}
       DATABASE_URL: ${DATABASE_URL}
+      FRONTEND_URL: ${FRONTEND_URL}
+      ISSUER: ${ISSUER}
+      API_KEY: ${API_KEY}
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:3000/"]
       interval: 40s
@@ -68,15 +71,16 @@ services:
     ports:
       - "3000:3000"
     labels:
-      traefik.enable: true
-      traefik.http.routers.backend-router.rule: PathPrefix(`/api`)
-      traefik.http.routers.backend-router.service: backend_service
-      traefik.http.services.backend_service.loadbalancer.server.port: 3000
-      traefik.http.middlewares.strip-api.stripprefix.prefixes: /api
-      traefik.http.routers.backend-router.middlewares: strip-api
-      traefik.http.routers.backend-router.priority: "10"
-      # traefik.http.routers.backend-router.tls: true
-
+      - "traefik.enable=true"
+      # Router
+      - "traefik.http.routers.backend.rule=Host(`app.localhost`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.priority=10"
+      - "traefik.http.routers.backend.middlewares=strip-api"
+      - "traefik.http.routers.backend.service=backend_service"
+      # Middleware: strip /api
+      - "traefik.http.middlewares.strip-api.stripprefix.prefixes=/api"
+      # Service: points to container port
+      - "traefik.http.services.backend_service.loadbalancer.server.port=3000"
     develop:
       watch:
         - path: ./backend
@@ -93,12 +97,16 @@ services:
     ports:
       - "5173:5173"
     labels:
-      traefik.enable: true
-      traefik.http.routers.frontend.rule: PathPrefix(`/`)
-      traefik.http.routers.frontend.priority: "1"
-      traefik.http.routers.frontend.service: frontend_service
-      traefik.http.services.frontend_service.loadbalancer.server.port: 5173
-      # traefik.http.routers.frontend.tls: true
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`app.localhost`) && PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.priority=1"
+      - "traefik.http.routers.frontend.service=frontend_service"
+      - "traefik.http.services.frontend_service.loadbalancer.server.port=5173"
+      - "traefik.http.routers.frontend.middlewares=frontend-errors"
+      - "traefik.http.middlewares.frontend-errors.errors.status=400-599"
+      - "traefik.http.middlewares.frontend-errors.errors.service=frontend_service"
+      - "traefik.http.middlewares.frontend-errors.errors.query=/index.html"
+
     develop:
       watch:
         - path: ./frontend

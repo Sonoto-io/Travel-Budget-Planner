@@ -1,17 +1,17 @@
-import axios from "axios";
+import api from "@/api/apiClient";
 
 export const getSubcategories = (categoryId?: string) => {
   if (!categoryId) {
-    return axios
-      .get("/api/subcategories/")
+    return api
+      .get("/subcategories/")
       .then((response) => response.data.subcategories)
       .catch((error: any) => {
         console.error("Error fetching subcategories :", error);
         return error;
       });
   }
-  return axios
-    .get(`/api/subcategories/?categoryId=${categoryId}`)
+  return api
+    .get(`/subcategories/?categoryId=${categoryId}`)
     .then((response) => response.data.subcategories)
     .catch((error: any) => {
       console.error("Error fetching subcategories :", error);
@@ -20,8 +20,8 @@ export const getSubcategories = (categoryId?: string) => {
 };
 
 export const createSubcategory = (subcategoryData: Partial<any>) => {
-  return axios
-    .post("/api/subcategories", subcategoryData)
+  return api
+    .post("/subcategories", subcategoryData)
     .then((response) => response.data)
     .catch((error: any) => {
       console.error("Error creating a subcategory:", error);
@@ -30,8 +30,8 @@ export const createSubcategory = (subcategoryData: Partial<any>) => {
 };
 
 export const updateSubcategory = (subcategory: any) => {
-  return axios
-    .post(`/api/subcategories/${subcategory.id}`, subcategory)
+  return api
+    .post(`/subcategories/${subcategory.id}`, subcategory)
     .then((response) => response.data)
     .catch((error: any) => {
       console.error("Error updating a subcategory:", error);
@@ -40,8 +40,8 @@ export const updateSubcategory = (subcategory: any) => {
 };
 
 export const deleteSubcategory = (subcategoryId: string) => {
-  return axios
-    .delete(`/api/subcategories/${subcategoryId}`)
+  return api
+    .delete(`/subcategories/${subcategoryId}`)
     .then((response) => response.data)
     .catch((error: any) => {
       console.error("Error deleting a subcategory:", error);

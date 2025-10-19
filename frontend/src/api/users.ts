@@ -1,8 +1,8 @@
-import axios from "axios";
+import api from "@/api/apiClient";
 
 export const getUsers = () => {
-  return axios
-    .get("/api/users/")
+  return api
+    .get("/users/")
     .then((response) => response.data.users)
     .catch((error: any) => {
       console.error("Error fetching users :", error);
@@ -11,8 +11,8 @@ export const getUsers = () => {
 };
 
 export const createUser = (userData: Partial<any>) => {
-  return axios
-    .post("/api/users", userData)
+  return api
+    .post("/users", userData)
     .then((response) => response.data)
     .catch((error: any) => {
       console.error("Error creating a user:", error);
@@ -21,8 +21,8 @@ export const createUser = (userData: Partial<any>) => {
 };
 
 export const updateUser = (user: any) => {
-  return axios
-    .post(`/api/users/${user.id}`, user)
+  return api
+    .post(`/users/${user.id}`, user)
     .then((response) => response.data)
     .catch((error: any) => {
       console.error("Error updating a user:", error);
@@ -31,8 +31,8 @@ export const updateUser = (user: any) => {
 };
 
 export const deleteUser = (userId: string) => {
-  return axios
-    .delete(`/api/users/${userId}`)
+  return api
+    .delete(`/users/${userId}`)
     .then((response) => response.data)
     .catch((error: any) => {
       console.error("Error deleting a user:", error);

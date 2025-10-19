@@ -42,9 +42,12 @@ services:
       AUTHORIZE_URL: ${AUTHORIZE_URL}
       TOKEN_URL: ${TOKEN_URL}
       REDIRECT_URI: ${REDIRECT_URI}
-      JWK_URL: ${JWK_URL}
+      JWKS_URL: ${JWKS_URL}
       ALGORITHM: ${ALGORITHM}
       DATABASE_URL: ${DATABASE_URL}
+      FRONTEND_URL: ${FRONTEND_URL}
+      ISSUER: ${ISSUER}
+      API_KEY: ${API_KEY}
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:3000/"]
       interval: 40s

@@ -1,8 +1,8 @@
-import axios from "axios";
+import api from "@/api/apiClient";
 
 export const getCurrencies = () => {
-  return axios
-    .get("/api/currencies/")
+  return api
+    .get("/currencies/")
     .then((response) => response.data.currencies)
     .catch((error: any) => {
       console.error("Error fetching currencies :", error);
@@ -11,8 +11,8 @@ export const getCurrencies = () => {
 };
 
 export const getCurrency = (id: string) => {
-  return axios
-    .get(`/api/currencies/${id}/`)
+  return api
+    .get(`/currencies/${id}/`)
     .then((response) => response.data.currency)
     .catch((error: any) => {
       console.error("Error fetching currency :", error);
@@ -21,8 +21,8 @@ export const getCurrency = (id: string) => {
 };
 
 export const createCurrency = (currencyData: Partial<Currency>) => {
-  return axios
-    .post("/api/currencies", currencyData)
+  return api
+    .post("/currencies", currencyData)
     .then((response) => response.data)
     .catch((error: any) => {
       console.error("Error creating a currency:", error);
@@ -31,8 +31,8 @@ export const createCurrency = (currencyData: Partial<Currency>) => {
 };
 
 export const updateCurrency = (currencyData: Currency) => {
-  return axios
-    .post(`/api/currencies/${currencyData.id}`, currencyData)
+  return api
+    .post(`/currencies/${currencyData.id}`, currencyData)
     .then((response) => response.data)
     .catch((error: any) => {
       console.error("Error updating a currency:", error);
@@ -41,8 +41,8 @@ export const updateCurrency = (currencyData: Currency) => {
 };
 
 export const deleteCurrency = (currencyId: string) => {
-  return axios
-    .delete(`/api/currencies/${currencyId}`)
+  return api
+    .delete(`/currencies/${currencyId}`)
     .then((response) => response.data)
     .catch((error: any) => {
       console.error("Error deleting a currency:", error);

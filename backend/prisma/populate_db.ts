@@ -11,7 +11,6 @@ const prisma = new PrismaClient();
 
 async function main() {
   const countryExists = await prisma.country.findFirst({where: {label: country.label}});
-  console.log("COUNTRY exists ? ", countryExists);
 
   if (countryExists === null) {
     await prisma.currency.createMany({ skipDuplicates: true, data: currencies });
