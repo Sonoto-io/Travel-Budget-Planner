@@ -44,7 +44,7 @@ backend-unit-tests:
     DOCKER_DRIVER: overlay2
     DATABASE_URL: "postgresql://tbpuser:tbppassword@db:5432/travel_budget_planner"
   before_script:
-    - apk add --no-cache make npm
+    - apk add --no-cache make npm curl bash
   script:
     - docker-compose up -d db backend
     - cd backend && npm ci
