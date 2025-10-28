@@ -48,6 +48,7 @@ backend-unit-tests:
   script:
     - docker-compose up -d db backend
     - cd backend && npm ci
+    - curl -fsSL https://bun.sh/install | bash
     - make tests
     - docker-compose down -v --remove-orphans
 
