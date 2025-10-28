@@ -23,7 +23,7 @@ stages:
 #     - docker build --pull -t "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG" -f backend/docker/Dockerfile backend/
 #     - docker push "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG"
 
-frontend-unit-tests:
+frontend-tests:
   stage: test
   image: node:20-bullseye
   before_script:
@@ -34,7 +34,8 @@ frontend-unit-tests:
 
 backend-tests:
     build: ./backend
-    command: make tests
+    script: 
+      - make tests
     environment:
       DATABASE_URL: postgresql://tbpuser:tbppassword@db:5432/travel_budget_planner
     depends_on:
