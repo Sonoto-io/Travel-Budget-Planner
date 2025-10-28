@@ -23,20 +23,22 @@ stages:
 #     - docker build --pull -t "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG" -f backend/docker/Dockerfile backend/
 #     - docker push "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG"
 
-unit-tests:
+frontend-unit-tests:
   stage: test
   image: node:20-bullseye
-  variables:
-    DATABASE_URL: "postgresql://tbpuser:tbppassword@localhost:5432/travel_budget_planner"
   before_script:
-    - apt-get update && apt-get install -y make curl
+    - apt-get update && apt-get install -y make
   script:
-    - cd $APP && npm ci
+    - cd frontend && npm ci
     - make tests
-  coverage: "/All files[^|]*|[^|]*\\s+([\\d\\.]+)/"
-  parallel:
-    matrix:
-      - APP: [frontend, backend]
+
+backend-tests:
+    build: ./backend
+    command: make tests
+    environment:
+      DATABASE_URL: postgresql://tbpuser:tbppassword@db:5432/travel_budget_planner
+    depends_on:
+      - db
 
 backend-lint:
   stage: test
