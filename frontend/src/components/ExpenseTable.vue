@@ -91,7 +91,7 @@
     </Column>
 
     <!-- Exception Column -->
-    <Column field="exception" header="Exceptionnal" sortable>
+    <Column field="exception" header="Exceptional" sortable>
       <template #body="{ data, field }">
         {{ data[field] ? "Yes" : "No" }}
       </template>

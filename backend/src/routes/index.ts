@@ -7,8 +7,6 @@ import { configureCurrenciesRoutes } from "./currenciesRoutes";
 import { configureSubcategoriesRoutes } from "./subcategoriesRoutes";
 import { configureUsersRoutes } from "./usersRoutes";
 import { configureAuthRoutes } from "./authRoutes";
-import { cookie } from "@elysiajs/cookie";
-import { authService } from "@controllers/authController";
 
 const routeModules = [
         configureCategoriesRoutes,

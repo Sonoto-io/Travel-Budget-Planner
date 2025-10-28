@@ -26,7 +26,7 @@ export const expenseRepository = {
       },
     })
   },
-  async create(expense: any) {
+  async create(expense: Prisma.ExpenseCreateInput): Promise<Expense> {
     return await prisma.expense.create({
       data: {
         note: expense.note,

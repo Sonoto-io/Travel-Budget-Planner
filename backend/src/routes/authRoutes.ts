@@ -1,6 +1,5 @@
 import { Elysia, t } from "elysia";
 import { authController } from "@controllers/authController";
-import { Prisma } from "@prisma/client";
 
 export const cookieSchema = t.Cookie({
   refresh_token: t.Optional(t.String()),

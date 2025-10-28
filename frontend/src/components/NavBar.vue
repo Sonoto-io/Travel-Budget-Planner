@@ -59,7 +59,7 @@ watch(
 );
 
 onMounted(async () => {
-  countryStore.countryList = await getCountries();
+  countryStore.countryList = await getCountries() ?? [];
 
   countryMenuItems.value = countryStore.countryList.map((country) => {
     country.route = `/country/${country.shortname}`;

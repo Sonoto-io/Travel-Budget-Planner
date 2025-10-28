@@ -1,6 +1,5 @@
 import { Elysia, t } from "elysia";
 import { categoriesController } from "@controllers/categoriesController";
-import { Prisma } from "@prisma/client";
 
 export const configureCategoriesRoutes = (app: Elysia) => app.group(
   "/categories",

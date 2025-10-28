@@ -1,63 +1,11 @@
 import { http, HttpResponse } from "msw";
+import * as expensesData from './fixtures/expenses.json';
 
-const expenses = {
-  expenses: [
-    {
-      id: "1",
-      countryId: "1",
-      date: "2025-01-01",
-      price: 120.0,
-      currency: {
-        label: "Dollar Américain",
-        id: "en-US",
-        name: "USD",
-        conversion: 0.88,
-      },
-      category: { id: "1", label: "Transport" },
-      subcategory: { id: "1", label: "Plane", categoryId: "1" },
-      user: { id: "1", label: "Sonoto" },
-      note: "This is a note",
-      location: "New York",
-    },
-    {
-      id: "2",
-      countryId: "1",
-      date: "2025-01-01",
-      price: 50.0,
-      currency: {
-        label: "Livre Sterling",
-        id: "en-GB",
-        name: "GBP",
-        conversion: 1.19,
-      },
-      category: { id: "1", label: "Transport" },
-      subcategory: { id: "1", label: "Plane", categoryId: "1" },
-      user: { id: "2", label: "Jane Smith" },
-      note: "This is a note",
-      location: "New York",
-    },
-    {
-      id: "3",
-      countryId: "2",
-      date: "2025-01-01",
-      price: 120.0,
-      currency: {
-        label: "Dollar Américain",
-        id: "en-US",
-        name: "USD",
-        conversion: 0.88,
-      },
-      category: { id: "1", label: "Transport" },
-      subcategory: { id: "1", label: "Plane", categoryId: "1" },
-      user: { id: "1", label: "Sonoto" },
-      note: "This is a note",
-      location: "New York",
-    },
-  ],
-};
+export const expenses: { expenses: Array<any> } = { expenses: expensesData.expenses }
 
 const repartition = [
-  { name: "Transport",
+  {
+    name: "Transport",
     totalExpenses: 300,
     countExpenses: 3,
     subcategories: [
@@ -90,7 +38,7 @@ const repartition = [
       },
     ],
   },
-  ]
+]
 
 export const expensesHandlers = [
   http.get("/api/expenses/", ({ request }) => {
@@ -129,13 +77,15 @@ export const expensesHandlers = [
     );
     const nbExpenses = result.expenses.length;
 
-    const summary = { expenses_summary: {
-      totalExpenses: total,
-      countExpenses: nbExpenses,
-      dailyExpenses: 0,
-      dailyExpectedExpenses: 0,
-      repartition,
-    }}
+    const summary = {
+      expenses_summary: {
+        totalExpenses: total,
+        countExpenses: nbExpenses,
+        dailyExpenses: 0,
+        dailyExpectedExpenses: 0,
+        repartition,
+      }
+    }
     return new HttpResponse(JSON.stringify(summary), {
       status: 200,
       headers: { "Content-Type": "application/json" },

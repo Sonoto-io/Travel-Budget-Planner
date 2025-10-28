@@ -1,10 +1,10 @@
-import type { Country } from "@prisma/client";
+import type { Country, Expense } from "@prisma/client";
 import { countryRepository } from "@repositories/countriesRepository";
 import { userRepository } from "@repositories/usersRepository";
 
 export class ExpensesSummaryService {
 
-  static calculateSummary(expenses: any[]): ISummary {
+  static calculateSummary(expenses: Expense[]): ISummary {
 
     const totalExpenses = expenses.reduce((acc, expense) => acc + expense.price * expense.currency.conversion, 0);
     const countExpenses = expenses.length;
@@ -26,7 +26,7 @@ export class ExpensesSummaryService {
     };
   }
 
-  static getCountDays(expenses: any[]) : number{
+  static getCountDays(expenses: Expense[]) : number{
     const startDate = expenses.reduce((earliest, expense) => {
       const expenseDate = new Date(expense.date);
       return expenseDate < earliest ? expenseDate : earliest;
@@ -45,7 +45,7 @@ export class ExpensesSummaryService {
     return Math.abs(date1 - date2) / (1000 * 60 * 60 * 24) + 1;
   }
 
-  static async getSummaryByCountry(expenses: any[]): Promise<Record<string, ISummary> | {message: string, status: number}> {
+  static async getSummaryByCountry(expenses: Expense[]): Promise<Record<string, ISummary> | {message: string, status: number}> {
     try {
       const countries = await countryRepository.getAll();
       const summaries: Record<string, ISummary> = {};
@@ -66,7 +66,7 @@ export class ExpensesSummaryService {
     }
   }
 
-  static getCountriesList(expenses: any[]): Array<Country> {
+  static getCountriesList(expenses: Expense[]): Array<Country> {
     const countriesMap = new Map<string, Country>();
     expenses.forEach(expense => {
       if (expense.country && !countriesMap.has(expense.country.id)) {
@@ -75,7 +75,7 @@ export class ExpensesSummaryService {
     });
     return Array.from(countriesMap.values());
   }
-  static calculateRepartition(expenses: any[]): IRepartition[] {
+  static calculateRepartition(expenses: Expense[]): IRepartition[] {
     const repartitionMap = new Map<string, IRepartition>();
 
     expenses.forEach(expense => {
@@ -107,7 +107,7 @@ export class ExpensesSummaryService {
     return Array.from(repartitionMap.values());
   }
 
-  static async getSummaryByUser(expenses: any[]): Promise<Record<string, ISummary> | {message: string, status: number}> {
+  static async getSummaryByUser(expenses: Expense[]): Promise<Record<string, ISummary> | {message: string, status: number}> {
     try {
       const users = await userRepository.getAll();
       const summaries: Record<string, ISummary> = {};

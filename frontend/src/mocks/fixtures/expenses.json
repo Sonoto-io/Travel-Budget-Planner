@@ -1,0 +1,58 @@
+{
+  "expenses": [
+    {
+      "id": "1",
+      "countryId": "1",
+      "date": "2025-01-01",
+      "price": 120.0,
+      "currency": {
+        "label": "Dollar Américain",
+        "id": "en-US",
+        "name": "USD",
+        "conversion": 0.88
+      },
+      "category": {"label": "Transport" },
+      "subcategory": {"label": "Plane", "categoryId": "1" },
+      "user": { "label": "Sonoto" },
+      "note": "This is a note",
+      "location": "New York",
+      "exception": false
+    },
+    {
+      "id": "2",
+      "countryId": "1",
+      "date": "2025-01-01",
+      "price": 50.0,
+      "currency": {
+        "label": "Livre Sterling",
+        "id": "en-GB",
+        "name": "GBP",
+        "conversion": 1.19
+      },
+      "category": {"label": "Transport" },
+      "subcategory": {"label": "Plane", "categoryId": "1" },
+      "user": {"label": "Jane Smith" },
+      "note": "This is a note",
+      "location": "New York",
+      "exception": false
+    },
+    {
+      "id": "3",
+      "countryId": "2",
+      "date": "2025-01-01",
+      "price": 120.0,
+      "currency": {
+        "label": "Dollar Américain",
+        "id": "en-US",
+        "name": "USD",
+        "conversion": 0.88
+      },
+      "category": { "label": "Transport" },
+      "subcategory": { "label": "Plane", "categoryId": "1" },
+      "user": { "label": "Sonoto" },
+      "note": "This is a note",
+      "location": "New York",
+      "exception": true
+    }
+  ]
+}

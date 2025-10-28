@@ -1,37 +1,38 @@
 stages:
-  - build
+  # - build
   - test
   - deploy
 
-docker-build-frontend:
-  stage: build
-  image: docker:cli
-  services: [docker:dind]
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-  script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_SLUG" -f frontend/docker/Dockerfile frontend/
-    - docker push "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_SLUG"
+# docker-build-frontend:
+#   stage: build
+#   image: docker:cli
+#   services: [docker:dind]
+#   before_script:
+#     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+#   script:
+#     - docker build --pull -t "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_SLUG" -f frontend/docker/Dockerfile frontend/
+#     - docker push "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_SLUG"
 
-docker-build-backend:
-  stage: build
-  image: docker:cli
-  services: [docker:dind]
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-  script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG" -f backend/docker/Dockerfile backend/
-    - docker push "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG"
+# docker-build-backend:
+#   stage: build
+#   image: docker:cli
+#   services: [docker:dind]
+#   before_script:
+#     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+#   script:
+#     - docker build --pull -t "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG" -f backend/docker/Dockerfile backend/
+#     - docker push "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG"
 
 unit-tests:
   stage: test
-  image: $CI_REGISTRY_IMAGE/$APP:$CI_COMMIT_REF_SLUG
+  image: node:20-bullseye
   variables:
     DATABASE_URL: "postgresql://tbpuser:tbppassword@localhost:5432/travel_budget_planner"
   before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - apt-get update && apt-get install -y make curl
   script:
-    - cd $APP && make tests
+    - cd $APP && npm ci
+    - make tests
   coverage: "/All files[^|]*|[^|]*\\s+([\\d\\.]+)/"
   parallel:
     matrix:

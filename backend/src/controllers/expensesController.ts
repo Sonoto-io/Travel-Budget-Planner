@@ -1,6 +1,6 @@
 import { expenseRepository } from "@repositories/expensesRepository";
 import { Prisma } from ".prisma/client";
-import { status, t } from "elysia";
+import { status } from "elysia";
 import { ExpensesSummaryService } from "@services/ExpensesSummaryService";
 
 export const expensesController = {

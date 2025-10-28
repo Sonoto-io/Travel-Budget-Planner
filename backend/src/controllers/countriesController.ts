@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { countryRepository } from "@repositories/countriesRepository";
-import { status, t } from "elysia";
+import { status } from "elysia";
 
 export const countriesController = {
   async getAll() {
@@ -15,7 +15,7 @@ export const countriesController = {
           data: res,
           status: status(201),
         };
-      } catch (error) {
+      } catch {
         return {
           status: status(400),
           message: `A country with label "${body.label}" already exists.`,
