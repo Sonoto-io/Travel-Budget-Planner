@@ -46,8 +46,9 @@ backend-unit-tests:
   before_script:
     - apk add --no-cache make npm
   script:
-    - docker-compose up -d db
-    - docker-compose run --rm backend make test
+    - docker-compose up -d db backend
+    - cd backend && npm ci
+    - make tests
     - docker-compose down -v --remove-orphans
 
 backend-lint:
