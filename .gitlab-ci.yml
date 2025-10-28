@@ -23,7 +23,7 @@ stages:
 #     - docker build --pull -t "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG" -f backend/docker/Dockerfile backend/
 #     - docker push "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG"
 services:
-  backend-tests:
+  - backend-tests:
     build: ./backend
     command: bun test
     environment:
@@ -31,7 +31,7 @@ services:
     depends_on:
       - db
 
-  frontend-tests:
+  - frontend-tests:
     stage: test
     image: node:20-bullseye
     before_script:
@@ -40,7 +40,7 @@ services:
       - cd frontend && npm ci
       - make tests
 
-  backend-tests:
+  - backend-tests:
     build: ./backend
     command: make tests
     environment:
@@ -48,7 +48,7 @@ services:
     depends_on:
       - db
 
-  backend-lint:
+  - backend-lint:
     stage: test
     image: oven/bun:1
     before_script:
@@ -58,7 +58,7 @@ services:
       - bun install --dev
       - make lint
 
-  frontend-lint:
+  - frontend-lint:
     stage: test
     image: node:current-bullseye
     before_script:
