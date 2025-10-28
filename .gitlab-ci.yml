@@ -42,7 +42,7 @@ backend-unit-tests:
     DOCKER_TLS_CERTDIR: ""
     DOCKER_BUILDKIT: 1
     DOCKER_DRIVER: overlay2
-    DATABASE_URL: "postgresql://tbpuser:tbppassword@localhost:5432/travel_budget_planner"
+    DATABASE_URL: "postgresql://tbpuser:tbppassword@db:5432/travel_budget_planner"
   before_script:
     - apk add --no-cache make npm
   script:
