@@ -1,5 +1,5 @@
 import ManagementView from "@/views/ManagementView.vue";
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { describe, test, expect } from "vitest";
 import { mount } from "@vue/test-utils";
 
 describe.concurrent("ManagementView", () => {

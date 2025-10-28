@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { subcategoryRepository } from "@repositories/subcategoriesRepository";
-import { status, t } from "elysia";
+import { status } from "elysia";
 
 export const subcategoriesController = {
   async getAll(categoryId?: string) {
@@ -19,7 +19,7 @@ export const subcategoriesController = {
           data: res,
           status: status(201),
         };
-      } catch (error) {
+      } catch {
         return {
           status: status(400),
           message: `A subcategory with label "${body.label}" already exists.`,

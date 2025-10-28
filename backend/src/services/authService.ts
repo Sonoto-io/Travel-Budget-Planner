@@ -1,6 +1,6 @@
 import type { cookieSchema } from "@routes/authRoutes";
 import type { Context } from "elysia";
-import { jwtVerify, createRemoteJWKSet } from "jose";
+import { jwtVerify } from "jose";
 
 interface TokenResponse {
     access_token: string;
@@ -138,7 +138,7 @@ export class AuthService {
             }).then(r => r.payload);
             return { user: payload };
             
-        } catch (e) {
+        } catch {
             if (!cookie) throw new Error("Missing token, please log in");
             const refresh = cookie.refresh_token?.value ?? null;
             console.log("cookies", cookie)

@@ -15,7 +15,7 @@ export const categoriesController = {
           data: res,
           status: status(201),
         };
-      } catch (error) {
+      } catch {
         return {
           status: status(400),
           message: `A category with label "${body.label}" already exists.`,

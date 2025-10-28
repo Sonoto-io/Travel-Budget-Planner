@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { userRepository } from "@repositories/usersRepository";
-import { status, t } from "elysia";
+import { status } from "elysia";
 
 export const usersController = {
   async getAll() {
@@ -15,7 +15,7 @@ export const usersController = {
           data: res,
           status: status(201),
         };
-      } catch (error) {
+      } catch {
         return {
           status: status(400),
           message: `A user with label "${body.label}" already exists.`,

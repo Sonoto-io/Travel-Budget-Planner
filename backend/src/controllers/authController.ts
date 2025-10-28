@@ -1,5 +1,3 @@
-import type { Prisma } from "@prisma/client";
-import { t } from "elysia";
 import { AuthService } from "@services/authService";
 import { cookieSchema } from "@routes/authRoutes";
 

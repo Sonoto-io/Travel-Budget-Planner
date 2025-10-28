@@ -115,7 +115,7 @@
     <div>
       <Checkbox name="exception" input-id="exception" binary @change="saveFormData($form)" />
       <label for="exception">
-        Exceptionnal expense
+        Exceptional expense
       </label>
       <Message v-if="$form.subcategory?.invalid" severity="error">{{
         $form.subcategory.error?.message
@@ -168,15 +168,14 @@ if (savedForm) {
     savedForm.date = new Date(savedForm.date);
     savedForm.date.setHours(12)
   }
-}
-
-if (savedForm) {
   toast.add({
     severity: "info",
     summary: "Restored unsaved form data.",
     life: 3000,
   });
 }
+
+
 const initialValues = savedForm ? ref(savedForm) : ref({
   date: defaultDate,
   user: [],
@@ -290,6 +289,7 @@ watch(
 
 const onFormSubmit = async ({ valid, values, reset }) => {
   if (valid) {
+    console.log("values : ", values)
     values["country"] = toRaw(countryStore.currentCountry);
     values["price"] = Number(values["price"]) / values.user.length;
     values["date"].setHours(12)
