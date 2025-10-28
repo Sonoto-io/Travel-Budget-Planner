@@ -33,13 +33,12 @@ frontend-tests:
     - make tests
 
 backend-tests:
-    build: ./backend
-    script: 
-      - make tests
-    environment:
-      DATABASE_URL: postgresql://tbpuser:tbppassword@db:5432/travel_budget_planner
-    depends_on:
-      - db
+  build: ./backend
+  command: make tests
+  environment:
+    DATABASE_URL: postgresql://tbpuser:tbppassword@db:5432/travel_budget_planner
+  depends_on:
+    - db
 
 backend-lint:
   stage: test
