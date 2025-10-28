@@ -46,7 +46,6 @@ services:
     build:
       context: backend
       dockerfile: docker/Dockerfile
-    env_file: ".env.development.local"
     environment:
       CLIENT_ID: ${CLIENT_ID}
       CLIENT_SECRET: ${CLIENT_SECRET}
@@ -91,7 +90,6 @@ services:
     build:
       context: frontend
       dockerfile: docker/Dockerfile
-    env_file: ".env.development.local"
     environment:
       VITE_MOCKS_ENABLED : ${MOCKS_ENABLED:-false}
     ports:
