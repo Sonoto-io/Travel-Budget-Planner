@@ -49,7 +49,7 @@ backend-unit-tests:
     - export BUN_INSTALL="$HOME/.bun" 
     - export PATH="$BUN_INSTALL/bin:$PATH" 
   script:
-    - docker-compose up -d db backend
+    - docker-compose up -d db backend --wait
     - cd backend && npm ci
     - make tests
     - docker-compose down -v --remove-orphans
