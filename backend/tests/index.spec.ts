@@ -1,8 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import { treaty } from "@elysiajs/eden";
-import type { App } from "@index";
-const api = treaty<App>("localhost:3000");
+import { api } from "./setup";
 
 describe("Elysia", () => {
   it("return a response", async () => {
