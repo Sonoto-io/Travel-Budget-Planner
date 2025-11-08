@@ -1,7 +1,7 @@
 <template>
   <div class="flex-column flex h-full w-full">
     <PanelMenu :model="items" class="w-full cursor-pointer">
-      <template #item="{ item, props }">
+      <template #item="{ item, props }" >
         <router-link
           v-if="item.route"
           v-slot="{ href, navigate }"
@@ -11,7 +11,8 @@
             :href="href"
             class="flex h-10 items-center gap-2"
             v-bind="props.action"
-            @click="navigate"
+            @click="navigate;
+            $emit('countrySelected');"
           >
             <span :class="item.icon" />
             <span>{{ item.label }}</span>
@@ -43,6 +44,8 @@ import { useCountryStore } from "@/stores/countryStore";
 const toast = useToast();
 const route = useRoute();
 const countryStore = useCountryStore();
+
+defineEmits(["countrySelected"]);
 
 const currentCountry = ref("Select a country");
 
@@ -91,3 +94,10 @@ const items = ref([
   },
 ]);
 </script>
+
+<style lang="css">
+
+.p-panelmenu-header-content:hover , .p-panelmenu-item-content:hover{
+  background-color: rgb(255, 252, 252, 0.15) !important;
+}
+</style>

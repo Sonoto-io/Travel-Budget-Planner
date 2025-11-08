@@ -30,7 +30,7 @@ describe.concurrent("ExpenseForm.vue", () => {
     expect(wrapper.text()).toContain("Location");
     expect(wrapper.text()).toContain("Category");
     expect(wrapper.text()).toContain("Subcategory");
-    expect(wrapper.text()).toContain("Exceptional expense");
+    expect(wrapper.text()).toContain("Exception");
   });
 
 });

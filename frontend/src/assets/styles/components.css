@@ -1,0 +1,46 @@
+.glass-panel, .p-panelmenu-panel, .p-panel, .p-form, .p-button,
+.p-datatable-row-toggle-button {
+    background: rgba(0, 0, 0, 0.5)!important;
+    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.37)!important;
+    backdrop-filter: blur( 4px );
+    -webkit-backdrop-filter: blur( 4px );
+    border-radius: 10px;
+    border: 1px solid rgba( 255, 255, 255, 0.18 )!important;
+}
+
+.p-select, 
+.p-datepicker, .p-datepicker .p-component .p-dropdown, .p-inputtext, 
+.p-inputnumber, .p-multiselect, .p-textarea, .p-dropdown {
+    background: rgb(21, 35, 32)!important;
+    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.37)!important;
+    border-radius: 10px;
+}
+
+.p-toast-message{
+    background: rgba(0, 0, 0, 0.5)!important;
+    border: none !important;
+}
+
+.p-datatable-header-cell, .p-row-even, .p-datatable-row-expansion, .p-datatable-header, .p-datatable-footer{
+    background: rgba(0, 0, 0, 0.5)!important;
+    box-shadow: 0 0px 10px 0 rgba(14, 133, 181, 0.37)!important;
+    backdrop-filter: blur( 4px );
+    -webkit-backdrop-filter: blur( 4px );
+}
+
+.p-row-odd{
+    background: rgba(59, 118, 102, 0.5)!important;
+    box-shadow: 0 0px 10px 0 rgba(14, 133, 181, 0.37)!important;
+    backdrop-filter: blur( 4px );
+    -webkit-backdrop-filter: blur( 4px );
+}
+.p-row-even{
+    background: rgba(70, 92, 149, 0.5)!important;
+    box-shadow: 0 0px 10px 0 rgba(14, 133, 181, 0.37)!important;
+    backdrop-filter: blur( 4px );
+    -webkit-backdrop-filter: blur( 4px );
+}
+
+.p-form {
+    padding: 1rem;
+}
