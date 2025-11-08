@@ -5,9 +5,11 @@ import { currenciesHandlers } from "./currencies";
 import { usersHandlers } from "./users";
 import { subcategoriesHandlers } from "./subcategories";
 import { countriesHandlers } from "./countries";
+import { authHandlers } from "./auth";
 
 export const server = setupServer(
   ...[
+    authHandlers,
     categoriesHandlers,
     expensesHandlers,
     currenciesHandlers,

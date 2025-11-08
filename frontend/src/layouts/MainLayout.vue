@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen">
     <header>
-      <HeaderBar @toggle-navbar="handleNavbar" />
+      <HeaderBar v-model:is-navbar-visible="navbarVisible" @update:model-value="console.log('triggered', navbarVisible)" />
     </header>
     <div class="flex h-full">
       <nav
@@ -12,7 +12,7 @@
           'overflow-x-hidden',
         ]"
       >
-        <NavBar />
+        <NavBar @country-selected="navbarVisible = false" />
       </nav>
       <main class="flex-1 w-0 px-4 overflow-x-auto"><slot /></main>
     </div>
@@ -25,7 +25,5 @@ import HeaderBar from "@/components/HeaderBar.vue";
 import NavBar from "@/components/NavBar.vue";
 
 const navbarVisible = ref(false);
-const handleNavbar = () => {
-  navbarVisible.value = !navbarVisible.value;
-};
+
 </script>

@@ -8,7 +8,7 @@
         {{ formatDate(data[field]) }}
       </template>
       <template #editor="{ data, field }">
-        <DatePicker v-model="data[field]" class="min-w-30" />
+        <DatePicker v-model="data[field]" />
       </template>
     </Column>
 
@@ -18,7 +18,7 @@
         {{ data[field].label }}
       </template>
       <template #editor="{ data, field }">
-        <Select v-model="data[field]" :options="selectValues.users" optionLabel="label" class="min-w-30" />
+        <Select v-model="data[field]" :options="selectValues.users" optionLabel="label" />
       </template>
     </Column>
 
@@ -28,7 +28,7 @@
         {{ data[field].name }}
       </template>
       <template #editor="{ data, field }">
-        <Select v-model="data[field]" :options="selectValues.currencies" optionLabel="label" class="min-w-50" />
+        <Select v-model="data[field]" :options="selectValues.currencies" optionLabel="label"  />
       </template>
     </Column>
 
@@ -76,7 +76,7 @@
         {{ data[field].label }}
       </template>
       <template #editor="{ data, field }">
-        <Select v-model="data[field]" :options="selectValues.categories" class="min-w-50" optionLabel="label"
+        <Select v-model="data[field]" :options="selectValues.categories"  optionLabel="label"
           @change="handleCategorySelect($event.value)" /> </template>
     </Column>
 
@@ -86,7 +86,7 @@
         {{ data[field].label }}
       </template>
       <template #editor="{ data, field }">
-        <Select v-model="data[field]" :options="selectSubcategories" optionLabel="label" class="min-w-50"
+        <Select v-model="data[field]" :options="selectSubcategories" optionLabel="label" 
           @show="handleCategorySelect(data.category)" /> </template>
     </Column>
 
@@ -105,7 +105,8 @@
     <Column header="Edit" :rowEditor="true" style="width: 10%; min-width: 8rem"></Column>
     <Column header="Delete" style="width: 10%; min-width: 8rem">
       <template #body="{ data }">
-        <Button icon="pi pi-trash" severity="danger" @click="deleteRow(data)" text rounded />
+        <ConfirmPopup></ConfirmPopup>
+        <Button icon="pi pi-trash" severity="danger" @click="showDeleteDialog($event, data)" text rounded />
       </template>
     </Column>
   </DataTable>
@@ -127,8 +128,11 @@ import Button from "primevue/button";
 import { deleteExpense, updateExpense } from "@/api/expenses";
 import { useToast } from "primevue/usetoast";
 import Checkbox from "primevue/checkbox";
+import {useConfirm} from "primevue/useconfirm";
+import ConfirmPopup from 'primevue/confirmpopup';
 
 const toast = useToast();
+const confirm = useConfirm();
 
 const props = defineProps<{
   selectValues: FormSelectValues;
@@ -170,6 +174,30 @@ const onRowEditSave = async (event: { newData: any; index: any }) => {
   }
   expenses.value[index] = newData;
 };
+
+const showDeleteDialog = (event, rowData) => {
+    confirm.require({
+        target: event.currentTarget,
+        message: 'Do you want to delete this expense ?',
+        icon: 'pi pi-info-circle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            console.log("event", event)
+            deleteRow(rowData);
+        },
+        reject: () => {
+            toast.add({ severity: 'info', summary: 'Rejected', detail: "You didn't delete the expense", life: 3000 });
+        }
+    });
+}
 
 const deleteRow = async (row: Expense) => {
   const res = await deleteExpense(row.id);

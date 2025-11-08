@@ -8,6 +8,6 @@ describe("Elysia", () => {
   it("return a response", async () => {
     const { data } = await api.index.get();
 
-    expect(data).toBe("Hello from root!");
+    expect(data).toBe("Hello from root !");
   });
 });

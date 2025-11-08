@@ -4,10 +4,7 @@
   >
     <div
       class="block md:hidden"
-      @click.stop="
-        $emit('toggleNavbar');
-        toggleNavbar();
-      "
+      @click="toggleNavbar"
     >
       <span
         :class="[
@@ -24,11 +21,14 @@
 
 <script setup lang="ts">
 import logo from "@images/logo.webp";
-import { ref, onMounted, onUnmounted } from "vue";
 
-const isNavbarVisible = ref(false);
+const isNavbarVisible = defineModel(
+  "isNavbarVisible", { default: false }
+);
+
 
 const toggleNavbar = () => {
   isNavbarVisible.value = !isNavbarVisible.value;
+  console.log("Toggled navbar visibility:", isNavbarVisible.value);
 };
 </script>
