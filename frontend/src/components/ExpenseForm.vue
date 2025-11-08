@@ -115,7 +115,7 @@
     <div>
       <Checkbox name="exception" input-id="exception" binary @change="saveFormData($form)" />
       <label for="exception">
-        Exceptional expense
+        Exception
       </label>
       <Message v-if="$form.subcategory?.invalid" severity="error">{{
         $form.subcategory.error?.message

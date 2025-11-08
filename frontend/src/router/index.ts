@@ -39,6 +39,8 @@ const router = createRouter({
 router.beforeEach(async (to, _from, next) => {
   const isAuthenticated = await getToken()
 
+  console.log("isAuthenticated :", isAuthenticated);  
+
   if (!isAuthenticated &&
       to.name !== 'login'
       && !to.fullPath.includes("/api")
