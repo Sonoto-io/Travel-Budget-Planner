@@ -9,7 +9,7 @@ mock.module("@/repositories/categoriesRepository.ts", () => ({
     async getAll(): Promise<Category[]> {
       return [categoriesFactory()];
     },
-    async create(category: Prisma.CategoryCreateInput) {
+    async create() {
       return categoriesFactory();
     },
     async update(categoryId: string, category: Prisma.CategoryUpdateInput) {

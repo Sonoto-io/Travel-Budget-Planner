@@ -1,11 +1,12 @@
 // tests/setup.ts
 import { mock } from "bun:test";
 import { treaty } from "@elysiajs/eden";
+import type { Context } from "elysia";
 
 // 1️⃣ Mock AuthService globally for all tests
 mock.module("@/services/authService.ts", () => ({
   AuthService: class {
-    async authMiddleware(ctx: any) {
+    async authMiddleware(ctx: Context) {
       ctx.request.user = { id: "test-user", name: "TestUser" };
     }
   },
