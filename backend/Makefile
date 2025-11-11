@@ -3,7 +3,11 @@ dev-up:
 
 .PHONY: tests
 tests:
-    bun test --coverage || true
+    bun test
+
+.PHONY: coverage
+coverage:
+    bun coverage
 
 .PHONY: lint
 lint:
