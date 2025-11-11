@@ -5,7 +5,6 @@ import baseViteConfig from "./vite.config";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default mergeConfig(baseViteConfig, {
-  plugins: [vue(), tailwindcss(), tsconfigPaths()],
   test: {
     globals: true,
     environment: "jsdom",

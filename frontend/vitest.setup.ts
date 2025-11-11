@@ -5,6 +5,8 @@ import { vi } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
 import { config } from "@vue/test-utils";
 import { ref } from "vue";
+import PrimeVue from "primevue/config";
+import ConfirmationService from "primevue/confirmationservice";
 
 config.global.stubs = {
   RouterLink: { template: '<a><slot /></a>', props: ['to'] }
@@ -32,6 +34,7 @@ vi.mock("@/stores/authStore", () => ({
 
 beforeAll(() => {
   setActivePinia(createPinia())
+  config.global.plugins = [PrimeVue, ConfirmationService];
   server.listen({ onUnhandledRequest: "error" })
 })
 
