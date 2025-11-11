@@ -36,10 +36,11 @@ backend-unit-tests:
   stage: test
   image: ubuntu:22.04
   before_script:
-    - apt-get update && apt-get install -y curl bash build-essential unzip
+    - apt-get update && apt-get install -y curl bash build-essential
     - curl -fsSL https://bun.sh/install | bash
-    - export BUN_INSTALL="$HOME/.bun" 
-    - export PATH="$BUN_INSTALL/bin:$PATH" 
+    - export BUN_INSTALL="$HOME/.bun"
+    - export PATH="$BUN_INSTALL/bin:$PATH"
+    - bun install
   script:
     - cd backend
     - make tests
