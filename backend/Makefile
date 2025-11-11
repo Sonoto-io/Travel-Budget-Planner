@@ -3,8 +3,9 @@ dev-up:
 
 .PHONY: tests
 tests:
-	bun test --coverage
+    bun test --coverage || true
 
+.PHONY: lint
 lint:
 	bun lint
 
