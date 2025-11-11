@@ -40,9 +40,8 @@ backend-unit-tests:
     - curl -fsSL https://bun.sh/install | bash
     - export BUN_INSTALL="$HOME/.bun"
     - export PATH="$BUN_INSTALL/bin:$PATH"
-    - bun install
+    - cd backend && bun install
   script:
-    - cd backend
     - make tests
 
 backend-lint:
