@@ -12,7 +12,7 @@ mock.module("@/services/authService.ts", () => ({
 }));
 
 // 2️⃣ Import the factory *after* the mock
-import { createApp } from "@index";
+const { createApp } = await import("../app.ts");
 
 // 3️⃣ Create an Elysia instance with the mock
 export const app = createApp();

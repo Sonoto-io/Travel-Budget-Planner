@@ -1,4 +1,8 @@
-
+import { Elysia } from "elysia";
+import { swagger } from "@elysiajs/swagger";
+import { configureAllRoutes } from "@routes";
+import { cookie } from "@elysiajs/cookie";
+import { authService } from "@controllers/authController";
 
 export const createApp = () => {
   return new Elysia()
