@@ -59,5 +59,5 @@ describe("Expense", () => {
 
   // Summaries
 
-  
+  // TODO: after summary refacto, do tests
 });
