@@ -1,5 +1,6 @@
 import type { Country, Expense } from "@prisma/client";
 import { countryRepository } from "@repositories/countriesRepository";
+import { expenseRepository } from "@repositories/expensesRepository";
 import { userRepository } from "@repositories/usersRepository";
 
 export class ExpensesSummaryService {
@@ -8,25 +9,25 @@ export class ExpensesSummaryService {
 
     const totalExpenses = expenses.reduce((acc, expense) => acc + expense.price * expense.currency.conversion, 0);
     const countExpenses = expenses.length;
-    
+
     const allCountries = ExpensesSummaryService.getCountriesList(expenses);
-    const expectedCountDays = allCountries.reduce((acc:number, country: Country) => acc + country.expected_count_days, 0);
+    const expectedCountDays = allCountries.reduce((acc: number, country: Country) => acc + country.expected_count_days, 0);
     const countDays = ExpensesSummaryService.getCountDays(expenses) ?? expectedCountDays;
-    const expectedDailyExpenses = allCountries.reduce((acc:number, country: Country) => acc + country.expected_daily_expenses, 0);
+    const expectedDailyExpenses = allCountries.reduce((acc: number, country: Country) => acc + country.expected_daily_expenses, 0);
     const dailyExpenses = countExpenses > 0 ? totalExpenses / countDays : 0;
 
     return {
-        totalExpenses,
-        countExpenses,
-        expectedCountDays,
-        countDays,
-        dailyExpenses,
-        expectedDailyExpenses,
-        repartition: ExpensesSummaryService.calculateRepartition(expenses)    
+      totalExpenses,
+      countExpenses,
+      expectedCountDays,
+      countDays,
+      dailyExpenses,
+      expectedDailyExpenses,
+      repartition: ExpensesSummaryService.calculateRepartition(expenses)
     };
   }
 
-  static getCountDays(expenses: Expense[]) : number{
+  static getCountDays(expenses: Expense[]): number {
     const startDate = expenses.reduce((earliest, expense) => {
       const expenseDate = new Date(expense.date);
       return expenseDate < earliest ? expenseDate : earliest;
@@ -45,7 +46,7 @@ export class ExpensesSummaryService {
     return Math.abs(date1 - date2) / (1000 * 60 * 60 * 24) + 1;
   }
 
-  static async getSummaryByCountry(expenses: Expense[]): Promise<Record<string, ISummary> | {message: string, status: number}> {
+  static async getSummaryByCountry(expenses: Expense[]): Promise<Record<string, ISummary> | { message: string, status: number }> {
     try {
       const countries = await countryRepository.getAll();
       const summaries: Record<string, ISummary> = {};
@@ -79,7 +80,7 @@ export class ExpensesSummaryService {
     const repartitionMap = new Map<string, IRepartition>();
 
     expenses.forEach(expense => {
-      const categoryLabel= expense.category.label;
+      const categoryLabel = expense.category.label;
       const subcategoryLabel = expense.subcategory ? expense.subcategory.label : "Uncategorized";
 
       if (!repartitionMap.has(categoryLabel)) {
@@ -107,7 +108,7 @@ export class ExpensesSummaryService {
     return Array.from(repartitionMap.values());
   }
 
-  static async getSummaryByUser(expenses: Expense[]): Promise<Record<string, ISummary> | {message: string, status: number}> {
+  static async getSummaryByUser(expenses: Expense[]): Promise<Record<string, ISummary> | { message: string, status: number }> {
     try {
       const users = await userRepository.getAll();
       const summaries: Record<string, ISummary> = {};
@@ -123,5 +124,60 @@ export class ExpensesSummaryService {
       console.error("Error fetching users summary:", error);
       return { message: "Error fetching users summary: " + error, status: 500 };
     }
+  }
+
+  static async getExpensesWithFilters(query: SummaryQuery): Promise<Expense[]> {
+    let options = query.withoutExceptions ? {
+      where: {
+        exception: false
+      }
+    } : {}
+    
+    if (query.countryId) {
+      options = {
+        ...options,
+        where: {
+          ...options.where,
+          countryId: query.countryId,
+        }
+      }
+    }
+
+    if (query.day || query.month || query.year) {
+      const sinceDate = new Date(0, 0, 1, 0, 0, 1);
+      const endDate = new Date("9999-01-01");
+
+      // Set start and ending dates if needed
+      if (query.year) {
+        sinceDate.setFullYear(query.year)
+        endDate.setFullYear(query.year + 1)
+      }
+      if (query.month) {
+        sinceDate.setMonth(query.month - 1) // Months are 0-indexed
+        endDate.setMonth(query.month) // Next month
+        endDate.setFullYear(query.year ? query.year : sinceDate.getFullYear())
+      }
+      if (query.day) {
+        sinceDate.setDate(query.day)
+        endDate.setDate(query.day + 1)
+        endDate.setFullYear(query.year ?? sinceDate.getFullYear())
+        endDate.setMonth(query.month ? query.month -1 : sinceDate.getMonth() - 1)
+      }
+
+      options = {
+        ...options,
+        where: {
+          ...options.where,
+          date: {
+            gte: sinceDate,
+            lte: endDate,
+          },
+        },
+      };
+    }
+
+    console.log("Fetching expenses with options:", options);
+
+    return await expenseRepository.getAll(options)
   }
 }

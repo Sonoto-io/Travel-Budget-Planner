@@ -1,5 +1,5 @@
 
-import { createApp } from "./app";
+import { createApp } from "./app.ts";
 
 const app = createApp().listen({
     port: 3000,
