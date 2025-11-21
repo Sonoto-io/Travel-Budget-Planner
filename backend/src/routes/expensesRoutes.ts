@@ -9,25 +9,22 @@ export const configureExpensesRoutes = (app: Elysia) =>
           countryId: t.Optional(t.String()),
         }),
       })
-      .get("/summary", ({ query }) => expensesController.getSummary(query), {
-        query: t.Object({
-          countryId: t.Optional(t.String()),
-          withoutExceptions: t.Optional(t.Boolean()),
-        }),
-      })
-      .get("/summary/by-country", ({ query }) => expensesController.getSummaryByCountry(query), {
-        query: t.Object({
-          withoutExceptions: t.Optional(t.Boolean()),
-        }
-      )})
-      .get("/summary/by-user", ({ query }) => expensesController.getSummaryByUser(query), {
+      .guard(
+        {
           query: t.Object({
+            countryId: t.Optional(t.String()),
             year: t.Optional(t.Number()),
             month: t.Optional(t.Number()),
             day: t.Optional(t.Number()),
             withoutExceptions: t.Optional(t.Boolean()),
           }),
-        })
+        },
+        (guardApp) =>
+          guardApp
+        .get("/summary", ({ query }) => expensesController.getSummary(query))
+        .get("/summary/by-country", ({ query }) => expensesController.getSummaryByCountry(query))
+        .get("/summary/by-user", ({ query }) => expensesController.getSummaryByUser(query))
+      )
       .guard(
         {
           body: t.Object({

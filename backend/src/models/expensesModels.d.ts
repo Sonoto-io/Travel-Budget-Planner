@@ -15,3 +15,11 @@ interface ISummary {
     totalExpectedExpense?: number;
     repartition: Array<IRepartition>;
 }
+
+interface SummaryQuery {
+  countryId?: string,
+  year?: number,
+  month?: number, 
+  day?: number,
+  withoutExceptions?: boolean
+}

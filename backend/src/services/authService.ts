@@ -141,8 +141,7 @@ export class AuthService {
         } catch {
             if (!cookie) throw new Error("Missing token, please log in");
             const refresh = cookie.refresh_token?.value ?? null;
-            console.log("cookies", cookie)
-            console.log("Access token invalid, attempting refresh with cookie", { refresh });
+           
             if (!refresh) throw new Error("Session expired, please log in again");
             const newTokens = await this.refreshToken(refresh, cookie);
             if (!newTokens) throw new Error("Missing access token and invalid refresh token");
