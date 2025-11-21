@@ -175,9 +175,7 @@ export class ExpensesSummaryService {
         },
       };
     }
-
-    console.log("Fetching expenses with options:", options);
-
+    
     return await expenseRepository.getAll(options)
   }
 }
