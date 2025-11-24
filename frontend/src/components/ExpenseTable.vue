@@ -1,115 +1,92 @@
 <template>
-  <DataTable v-model:editingRows="editingRows" :value="expenses" editMode="row" dataKey="id"
+  <DataTable class="expenses-table" v-model:editingRows="editingRows" :value="expenses" editMode="row" dataKey="id"
     @row-edit-save="onRowEditSave" @row-edit-init="handleCategorySelect($event.data['category'])" sortField="date"
     sortMode="single" tableStyle="min-width: 50rem">
-    <!-- Date Column -->
-    <Column field="date" header="Date" sortable :sortField="formatDate">
-      <template #body="{ data, field }">
-        {{ formatDate(data[field]) }}
-      </template>
+    <Column field="date" header="Date" sortable :sortField="formatDate" style="min-width: 8rem; width: 10%">
+      <template #body="{ data, field }">{{ formatDate(data[field]) }}</template>
       <template #editor="{ data, field }">
         <DatePicker v-model="data[field]" />
       </template>
     </Column>
 
-    <!-- User Column -->
-    <Column field="user" header="User">
-      <template #body="{ data, field }">
-        {{ data[field].label }}
-      </template>
+    <Column field="user" header="User" style="min-width: 8rem; width: 10%">
+      <template #body="{ data, field }">{{ data[field].label }}</template>
       <template #editor="{ data, field }">
         <Select v-model="data[field]" :options="selectValues.users" optionLabel="label" />
       </template>
     </Column>
 
-    <!-- Currency Column -->
-    <Column field="currency" header="Currency" sortable sortField="currency.name">
-      <template #body="{ data, field }">
-        {{ data[field].name }}
-      </template>
+    <Column field="currency" header="Currency" sortable sortField="currency.name" style="min-width: 8rem; width: 8%">
+      <template #body="{ data, field }">{{ data[field].name }}</template>
       <template #editor="{ data, field }">
-        <Select v-model="data[field]" :options="selectValues.currencies" optionLabel="label"  />
+        <Select v-model="data[field]" :options="selectValues.currencies" optionLabel="label" />
       </template>
     </Column>
 
-    <!-- Price Column -->
-    <Column field="price" header="Price" sortable>
-      <template #body="{ data, field }">
-        {{ formatCurrency(data[field], data["currency"]) }}
-      </template>
+    <Column field="price" header="Price" style="min-width: 6rem; width: 6%">
+      <template #body="{ data, field }">{{ formatCurrency(data[field], data["currency"]) }}</template>
       <template #editor="{ data, field }">
-        <InputNumber v-model="data[field]" class="w-30" :maxFractionDigits="2" />
+        <InputNumber v-model="data[field]" :maxFractionDigits="2" />
       </template>
     </Column>
 
-    <!-- Price in my currency Column -->
-    <Column field="price" header="Price in my currency" sortable>
+    <Column field="price" header="Price in my currency" style="min-width: 6rem; width: 6%" sortable
+      :sortField="(row) => convertValueToCurrency(row.price, row.currency, mainCurrency).value">
       <template #body="{ data, field }">
         {{
-          convertValueToCurrency(data[field], data["currency"], mainCurrency)
+          convertValueToCurrency(data[field], data["currency"], mainCurrency).label
         }}
       </template>
     </Column>
 
-    <!-- Note Column -->
-    <Column field="note" header="Note">
+    <Column field="note" header="Note" style="min-width: 12rem; width: 10%">
       <template #body="{ data, field }">
-        <div class="max-w-50 truncate">{{ data[field] }}</div>
+        <div class="truncate">{{ data[field] }}</div>
       </template>
-      <template #editor="{ data, field }">
-        <Textarea v-model="data[field]" rows="1" cols="10" /></template>
+      <template #editor="{ data, field }"><Textarea v-model="data[field]" rows="1" /></template>
     </Column>
 
-    <!-- Location Column -->
-    <Column field="location" header="Location" sortable>
+    <Column field="location" header="Location" style="min-width: 10rem; width: 8%">
       <template #body="{ data, field }">
-        <div class="max-w-50 truncate">{{ data[field] }}</div>
+        <div class="truncate">{{ data[field] }}</div>
       </template>
       <template #editor="{ data, field }">
-        <InputText v-model="data[field]" rows="1" cols="10" />
+        <InputText v-model="data[field]" />
       </template>
     </Column>
 
-    <!-- Category Column -->
-    <Column field="category" header="Category" sortable>
-      <template #body="{ data, field }">
-        {{ data[field].label }}
-      </template>
+    <Column field="category" header="Category" sortable style="min-width: 8rem; width: 10%">
+      <template #body="{ data, field }">{{ data[field].label }}</template>
       <template #editor="{ data, field }">
-        <Select v-model="data[field]" :options="selectValues.categories"  optionLabel="label"
-          @change="handleCategorySelect($event.value)" /> </template>
+        <Select v-model="data[field]" :options="selectValues.categories" optionLabel="label"
+          @change="handleCategorySelect($event.value)" />
+      </template>
     </Column>
 
-    <!-- Sub Category Column -->
-    <Column field="subcategory" header="Sub Category" sortable>
-      <template #body="{ data, field }">
-        {{ data[field].label }}
-      </template>
+    <Column field="subcategory" header="Sub Category" sortable style="min-width: 8rem; width: 10%">
+      <template #body="{ data, field }">{{ data[field].label }}</template>
       <template #editor="{ data, field }">
-        <Select v-model="data[field]" :options="selectSubcategories" optionLabel="label" 
-          @show="handleCategorySelect(data.category)" /> </template>
+        <Select v-model="data[field]" :options="selectSubcategories" optionLabel="label"
+          @show="handleCategorySelect(data.category)" />
+      </template>
     </Column>
 
-    <!-- Exception Column -->
-    <Column field="exception" header="Exceptional" sortable>
-      <template #body="{ data, field }">
-        {{ data[field] ? "Yes" : "No" }}
-      </template>
+    <Column field="exception" header="Exceptional" sortable style="min-width: 6rem; width: 5%">
+      <template #body="{ data, field }">{{ data[field] ? "Yes" : "No" }}</template>
       <template #editor="{ data, field }">
         <Checkbox v-model="data[field]" binary />
       </template>
     </Column>
 
-
-    <!-- Edit Column -->
-    <Column header="Edit" :rowEditor="true" style="width: 10%; min-width: 8rem"></Column>
-    <Column header="Delete" style="width: 10%; min-width: 8rem">
+    <Column header="Edit" :rowEditor="true" style="width: 8%; min-width: 6rem"></Column>
+    <Column header="Delete" style="width: 8%; min-width: 6rem">
       <template #body="{ data }">
         <ConfirmPopup></ConfirmPopup>
         <Button icon="pi pi-trash" severity="danger" @click="showDeleteDialog($event, data)" text rounded />
       </template>
     </Column>
   </DataTable>
+
 </template>
 
 <script setup lang="ts">
@@ -128,7 +105,7 @@ import Button from "primevue/button";
 import { deleteExpense, updateExpense } from "@/api/expenses";
 import { useToast } from "primevue/usetoast";
 import Checkbox from "primevue/checkbox";
-import {useConfirm} from "primevue/useconfirm";
+import { useConfirm } from "primevue/useconfirm";
 import ConfirmPopup from 'primevue/confirmpopup';
 
 const toast = useToast();
@@ -176,27 +153,26 @@ const onRowEditSave = async (event: { newData: any; index: any }) => {
 };
 
 const showDeleteDialog = (event, rowData) => {
-    confirm.require({
-        target: event.currentTarget,
-        message: 'Do you want to delete this expense ?',
-        icon: 'pi pi-info-circle',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Delete',
-            severity: 'danger'
-        },
-        accept: () => {
-            console.log("event", event)
-            deleteRow(rowData);
-        },
-        reject: () => {
-            toast.add({ severity: 'info', summary: 'Rejected', detail: "You didn't delete the expense", life: 3000 });
-        }
-    });
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Do you want to delete this expense ?',
+    icon: 'pi pi-info-circle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Delete',
+      severity: 'danger'
+    },
+    accept: () => {
+      deleteRow(rowData);
+    },
+    reject: () => {
+      toast.add({ severity: 'info', summary: 'Rejected', detail: "You didn't delete the expense", life: 3000 });
+    }
+  });
 }
 
 const deleteRow = async (row: Expense) => {
@@ -236,3 +212,76 @@ const formatDate = (line) => {
   return "";
 };
 </script>
+
+<style>
+/* Table fixed layout for balanced columns */
+.expenses-table .p-datatable-tablescroll {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* Align all table cells top */
+.expenses-table .p-datatable-tbody>tr>td,
+.expenses-table .p-datatable-thead th {
+  vertical-align: top !important;
+  padding: 0.5rem 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Truncate long text in body */
+.expenses-table .truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Inputs, Selects, DatePickers, Textareas full width */
+.expenses-table .p-inputtext,
+.expenses-table .p-inputnumber,
+.expenses-table .p-select,
+.expenses-table .p-dropdown,
+.expenses-table .p-multiselect,
+.expenses-table .p-datepicker,
+.expenses-table .p-textarea,
+.expenses-table .p-select-label,
+.expenses-table .p-multiselect-label,
+.expenses-table .p-dropdown-label {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* Row editor buttons aligned top */
+.expenses-table .p-row-editor-init,
+.expenses-table .p-row-editor-save,
+.expenses-table .p-row-editor-cancel {
+  vertical-align: top !important;
+}
+
+/* Textarea resize vertical only */
+.expenses-table .p-textarea textarea {
+  width: 100% !important;
+  resize: vertical;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+
+  .expenses-table .p-datatable-tbody td,
+  .expenses-table .p-datatable-thead th {
+    white-space: normal;
+  }
+
+  /* Stack inputs in editors */
+  .expenses-table .p-inputtext,
+  .expenses-table .p-inputnumber,
+  .expenses-table .p-select,
+  .expenses-table .p-dropdown,
+  .expenses-table .p-multiselect,
+  .expenses-table .p-datepicker,
+  .expenses-table .p-textarea {
+    width: 100% !important;
+  }
+}
+</style>

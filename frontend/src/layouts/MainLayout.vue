@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen">
     <header>
-      <HeaderBar v-model:is-navbar-visible="navbarVisible" @update:model-value="console.log('triggered', navbarVisible)" />
+      <HeaderBar v-model:is-navbar-visible="navbarVisible" />
     </header>
     <div class="flex h-full">
       <nav

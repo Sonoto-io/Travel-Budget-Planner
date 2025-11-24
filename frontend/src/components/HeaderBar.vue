@@ -29,6 +29,5 @@ const isNavbarVisible = defineModel(
 
 const toggleNavbar = () => {
   isNavbarVisible.value = !isNavbarVisible.value;
-  console.log("Toggled navbar visibility:", isNavbarVisible.value);
 };
 </script>

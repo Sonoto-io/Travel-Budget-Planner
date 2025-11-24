@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useAuthStore } from "@/stores/authStore"; // or wherever your Pinia store is
+import { refreshAccessToken } from "@/services/login";
 
 // Create an axios instance
 const api = axios.create({
@@ -24,27 +25,30 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const auth = useAuthStore();
+    const authStore = useAuthStore();
 
     if (error.response?.status === 401 && !error.config._retry) {
       error.config._retry = true;
 
       try {
         // Ask backend to refresh access token using refresh cookie
-        const { data } = await axios.post(
-          "/api/auth/refresh",
-          {},
-          { withCredentials: true }
-        );
-
-        auth.setAccessToken(data.access_token);
-        error.config.headers.Authorization = `Bearer ${data.access_token}`;
+        await refreshAccessToken()
+          .then((newTokenData) => {
+            authStore.setAccessToken(newTokenData.access_token);
+            return newTokenData.access_token;
+          })
+          .catch((err) => {
+            console.error("Failed to refresh token:", err);
+            return null;
+          }
+          )
+        error.config.headers.Authorization = `Bearer ${authStore.accessToken}`;
 
         // Retry the original request
         return api.request(error.config);
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);
-        auth.clearAccessToken();
+        // authStore.clearAccessToken();
       }
     }
 

@@ -1,10 +1,10 @@
 <template>
-  <Form v-slot="$form" :initialValues :resolver="resolver" @submit="onFormSubmit"
-    class="flex flex-wrap items-center gap-4">
+  <Form :key="formKey" v-slot="$form" :initialValues :resolver="resolver" @submit="onFormSubmit"
+    class="flex flex-wrap items-start gap-4">
     <!-- Date -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <DatePicker name="date" class="min-w-30" @date-select="saveFormData($form)" />
+        <DatePicker name="date" @date-select="saveFormData($form)" />
         <label for="date">
           Date
           <span class="text-red-500">*</span>
@@ -12,14 +12,14 @@
       </IftaLabel>
       <Message v-if="$form.date?.invalid" severity="error">{{
         $form.date.error?.message
-      }}</Message>
+        }}</Message>
     </div>
 
     <!-- User -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
         <MultiSelect inputId="user" name="user" :options="props.selectValues.users" optionLabel="label" filter
-          @change="saveFormData($form)" placeholder="Select User(s)" class="min-w-30" />
+          @change="saveFormData($form)" placeholder="Select User(s)" />
         <label for="user">
           User
           <span class="text-red-500">*</span>
@@ -27,13 +27,13 @@
       </IftaLabel>
       <Message v-if="$form.user?.invalid" severity="error">{{
         $form.user.error?.message
-      }}</Message>
+        }}</Message>
     </div>
 
     <!-- Currency -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <Select name="currency" :options="props.selectValues.currencies" optionLabel="label" class="min-w-30"
+        <Select name="currency" :options="props.selectValues.currencies" optionLabel="label"
           @change="saveFormData($form)" />
         <label for="currency">
           Currency
@@ -42,13 +42,13 @@
       </IftaLabel>
       <Message v-if="$form.currency?.invalid" severity="error">{{
         $form.currency.error?.message
-      }}</Message>
+        }}</Message>
     </div>
 
     <!-- Price -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <InputText name="price" class="min-w-30" @change="saveFormData($form)" />
+        <InputText name="price" @change="saveFormData($form)" />
         <label for="price">
           Price
           <span class="text-red-500">*</span>
@@ -56,7 +56,7 @@
       </IftaLabel>
       <Message v-if="$form.price?.invalid" severity="error">{{
         $form.price.error?.message
-      }}</Message>
+        }}</Message>
     </div>
 
     <!-- Note -->
@@ -67,7 +67,7 @@
       </IftaLabel>
       <Message v-if="$form.note?.invalid" severity="error">{{
         $form.note.error?.message
-      }}</Message>
+        }}</Message>
     </div>
 
     <!-- Location -->
@@ -78,13 +78,13 @@
       </IftaLabel>
       <Message v-if="$form.location?.invalid" severity="error">{{
         $form.location.error?.message
-      }}</Message>
+        }}</Message>
     </div>
 
     <!-- Category -->
     <div class="flex flex-col gap-2">
       <IftaLabel>
-        <Select name="category" :options="categories" optionLabel="label" class="min-w-30"
+        <Select name="category" :options="categories" optionLabel="label"
           @change="handleCategorySelect($event.value); saveFormData($form)" />
         <label for="category">
           Category
@@ -93,14 +93,13 @@
       </IftaLabel>
       <Message v-if="$form.category?.invalid" severity="error">{{
         $form.category.error?.message
-      }}</Message>
+        }}</Message>
     </div>
 
     <!-- Subcategory -->
     <div>
       <IftaLabel>
-        <Select name="subcategory" :options="selectSubcategories" optionLabel="label" class="min-w-30"
-          @change="saveFormData($form)" />
+        <Select name="subcategory" :options="selectSubcategories" optionLabel="label" @change="saveFormData($form)" />
         <label for="subcategory">
           Subcategory
           <span class="text-red-500">*</span>
@@ -108,18 +107,20 @@
       </IftaLabel>
       <Message v-if="$form.subcategory?.invalid" severity="error">{{
         $form.subcategory.error?.message
-      }}</Message>
+        }}</Message>
     </div>
 
     <!-- Exception -->
     <div>
+      <div>
       <Checkbox name="exception" input-id="exception" binary @change="saveFormData($form)" />
       <label for="exception">
         Exception
       </label>
+      </div>
       <Message v-if="$form.subcategory?.invalid" severity="error">{{
         $form.subcategory.error?.message
-      }}</Message>
+        }}</Message>
     </div>
 
     <!-- Submit Button -->
@@ -160,7 +161,9 @@ const selectSubcategories = ref([]);
 const countryStore = useCountryStore();
 const defaultDate = new Date()
 defaultDate.setHours(12)
+const formKey = ref(0);
 
+console.log("stored formdata : ", sessionStorage.getItem('formData'));
 
 const savedForm = sessionStorage.getItem('formData') !== "undefined" ? JSON.parse(sessionStorage.getItem('formData')) : null;
 if (savedForm) {
@@ -289,7 +292,6 @@ watch(
 
 const onFormSubmit = async ({ valid, values, reset }) => {
   if (valid) {
-    console.log("values : ", values)
     values["country"] = toRaw(countryStore.currentCountry);
     values["price"] = Number(values["price"]) / values.user.length;
     values["date"].setHours(12)
@@ -308,6 +310,9 @@ const onFormSubmit = async ({ valid, values, reset }) => {
         emit("addExpense", { ...expenseData, id: res.data.expense.id });
         reset();
         sessionStorage.removeItem('formData');
+        // keep the old date in the form after reset
+        initialValues.value.date = values.date;
+        formKey.value++; // reset the form component
 
       } else {
         toast.add({
@@ -324,3 +329,81 @@ const onFormSubmit = async ({ valid, values, reset }) => {
 
 
 </script>
+
+<style>
+/* --- GENERAL FORM BEHAVIOR --- */
+form {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* each field container */
+form > div {
+  flex: 1 1 280px;  /* grows, shrinks, but keeps a nice min width */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* --- MAKE ALL PRIMEVUE INPUTS THE SAME WIDTH --- */
+
+/* force all PrimeVue inputs to fill the parent container */
+form .p-inputtext,
+form .p-select,
+form .p-multiselect,
+form .p-datepicker,
+form .p-textarea {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* Make Select and MultiSelect caret/buttons not shrink the box */
+form .p-select .p-select-trigger,
+form .p-multiselect .p-multiselect-trigger {
+  flex-shrink: 0;
+}
+
+/* Textarea full width (PrimeVue sometimes restricts it) */
+form .p-textarea textarea {
+  width: 100% !important;
+}
+
+/* Checkbox stays compact */
+form .p-checkbox {
+  width: auto !important;
+}
+
+/* Submit button should stretch nicely */
+form button {
+  width: 100%;
+}
+
+/* --- RESPONSIVE IMPROVEMENTS --- */
+
+/* On small phones */
+@media (max-width: 640px) {
+  form > div {
+    flex-basis: 100%;
+  }
+
+  form button {
+    margin-top: 0.5rem;
+  }
+}
+
+/* On wider desktop screens */
+@media (min-width: 900px) {
+  form > div {
+    flex-basis: calc(50% - 1rem); /* 2 columns layout */
+  }
+
+  /* But long fields can override if needed */
+  form > div.full {
+    flex-basis: 100%;
+  }
+}
+
+
+</style>

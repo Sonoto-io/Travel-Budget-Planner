@@ -14,14 +14,18 @@ export const convertValueToCurrency = (
   value: number,
   currency: Currency,
   targetCurrency: Currency,
-): string => {
+): { label: string, value: number } => {
+  const convertedValue = value * currency.conversion
   if (!targetCurrency.locale || !targetCurrency.name) {
-    return (value * currency.conversion).toString(); // Fallback if currency is not defined
+    return { label: convertedValue.toString(), value: convertedValue }; // Fallback if currency is not defined
   }
-  return new Intl.NumberFormat(targetCurrency.locale, {
-    style: "currency",
-    currency: targetCurrency.name,
-  }).format(value * currency.conversion);
+  return {
+    label: new Intl.NumberFormat(targetCurrency.locale, {
+      style: "currency",
+      currency: targetCurrency.name,
+    }).format(convertedValue),
+    value: convertedValue
+  }
 };
 
 export const calculTotal = (expenses: Expense[]) => {

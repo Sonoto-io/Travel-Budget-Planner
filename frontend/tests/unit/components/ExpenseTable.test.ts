@@ -23,7 +23,6 @@ describe.concurrent("ExpenseTable.vue", () => {
         },
       },
     });
-    console.log("wrapper text:", wrapper.text());
     expect(wrapper.text()).toContain("Date");
     expect(wrapper.text()).toContain("User");
     expect(wrapper.text()).toContain("Currency");
