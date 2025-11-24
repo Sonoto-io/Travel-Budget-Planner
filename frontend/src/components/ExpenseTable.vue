@@ -190,7 +190,6 @@ const showDeleteDialog = (event, rowData) => {
             severity: 'danger'
         },
         accept: () => {
-            console.log("event", event)
             deleteRow(rowData);
         },
         reject: () => {

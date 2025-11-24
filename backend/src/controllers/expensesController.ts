@@ -58,7 +58,6 @@ export const expensesController = {
     return { expenses_summary : ExpensesSummaryService.calculateSummary(expenses) }
   },
   async getSummaryByCountry(query: SummaryQuery) {
-    console.log("Fetching expenses with filters for summary by country:", query);
     const expenses = await ExpensesSummaryService.getExpensesWithFilters(query)
 
     return {summaryByCountry: await ExpensesSummaryService.getSummaryByCountry(expenses)};

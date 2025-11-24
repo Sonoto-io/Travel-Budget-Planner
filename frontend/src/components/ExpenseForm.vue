@@ -289,7 +289,6 @@ watch(
 
 const onFormSubmit = async ({ valid, values, reset }) => {
   if (valid) {
-    console.log("values : ", values)
     values["country"] = toRaw(countryStore.currentCountry);
     values["price"] = Number(values["price"]) / values.user.length;
     values["date"].setHours(12)

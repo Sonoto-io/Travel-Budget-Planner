@@ -5,7 +5,7 @@ import ManagementView from "@/views/ManagementView.vue";
 import { useCountryStore } from "@/stores/countryStore";
 import { getCountries } from "@/api/countries";
 import LoginView from "@/views/LoginView.vue";
-import { getToken } from "@/router/login";
+import { getToken } from "@/services/login";
 
 const routes = [
   {
@@ -39,8 +39,6 @@ const router = createRouter({
 router.beforeEach(async (to, _from, next) => {
   const isAuthenticated = await getToken()
 
-  console.log("isAuthenticated :", isAuthenticated);  
-
   if (!isAuthenticated &&
       to.name !== 'login'
       && !to.fullPath.includes("/api")
@@ -59,7 +57,6 @@ router.beforeEach(async (to, _from, next) => {
     }
   }
   
-
   next();
 });
 
