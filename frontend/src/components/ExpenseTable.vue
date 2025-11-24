@@ -2,7 +2,6 @@
   <DataTable class="expenses-table" v-model:editingRows="editingRows" :value="expenses" editMode="row" dataKey="id"
     @row-edit-save="onRowEditSave" @row-edit-init="handleCategorySelect($event.data['category'])" sortField="date"
     sortMode="single" tableStyle="min-width: 50rem">
-    <!-- Example columns with widths -->
     <Column field="date" header="Date" sortable :sortField="formatDate" style="min-width: 8rem; width: 10%">
       <template #body="{ data, field }">{{ formatDate(data[field]) }}</template>
       <template #editor="{ data, field }">
@@ -40,14 +39,14 @@
       </template>
     </Column>
 
-    <Column field="note" header="Note" style="min-width: 12rem; width: 20%">
+    <Column field="note" header="Note" style="min-width: 12rem; width: 10%">
       <template #body="{ data, field }">
         <div class="truncate">{{ data[field] }}</div>
       </template>
       <template #editor="{ data, field }"><Textarea v-model="data[field]" rows="1" /></template>
     </Column>
 
-    <Column field="location" header="Location" style="min-width: 10rem; width: 15%">
+    <Column field="location" header="Location" style="min-width: 10rem; width: 8%">
       <template #body="{ data, field }">
         <div class="truncate">{{ data[field] }}</div>
       </template>
