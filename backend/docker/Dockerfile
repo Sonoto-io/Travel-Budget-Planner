@@ -23,8 +23,10 @@ RUN cd /temp/prod && bun install --production --frozen-lockfile
 FROM base AS prerelease
 COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
+RUN cat prisma/schema.prisma
 
-
+# # generate prisma client during build
+# RUN bunx prisma generate
 
 # [optional] tests & build
 # ENV NODE_ENV=production
@@ -33,7 +35,7 @@ COPY . .
 
 # copy production dependencies and source code into final image
 FROM base AS release
-COPY --from=install /temp/prod/node_modules node_modules
+COPY --from=prerelease /app/node_modules node_modules
 COPY --from=prerelease /app/index.ts .
 COPY --from=prerelease /app/app.ts .
 COPY --from=prerelease /app/package.json .
@@ -43,7 +45,7 @@ COPY --from=prerelease /app/prisma/ ./prisma/
 COPY --from=prerelease /app/docker/entrypoint.sh .
 
 RUN chown -R bun:bun node_modules
-RUN mkdir -p /app/node_modules/.prisma
+RUN mkdir -p /app/node_modules/.prisma/
 # run the app
 USER bun
 EXPOSE 3000/tcp

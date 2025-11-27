@@ -1,6 +1,6 @@
 <template>
   <MainLayout>
-    <Dashboard v-model="expenses" />
+    <Dashboard v-model="expenses" :collapsed="false" :is-global-dashboard="true" />
   </MainLayout>
 </template>
 
