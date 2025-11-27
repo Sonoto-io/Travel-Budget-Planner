@@ -60,7 +60,12 @@ export class ExpensesSummaryService {
         summaries[country.label ?? ""] = summary;
       });
 
-      return summaries;
+      // sort by most expenses
+      const sortedSummaries = Object.fromEntries(
+        Object.entries(summaries).sort(([, a], [, b]) => b.totalExpenses - a.totalExpenses)
+      );
+
+      return sortedSummaries;
     } catch (error) {
       console.error("Error fetching countries summary:", error);
       return { message: "Error fetching countries summary: " + error, status: 500 };
@@ -119,7 +124,12 @@ export class ExpensesSummaryService {
         summaries[user.label ?? ""] = summary;
       });
 
-      return summaries;
+      // sort by most expenses
+      const sortedSummaries = Object.fromEntries(
+        Object.entries(summaries).sort(([, a], [, b]) => b.totalExpenses - a.totalExpenses)
+      );
+
+      return sortedSummaries;
     } catch (error) {
       console.error("Error fetching users summary:", error);
       return { message: "Error fetching users summary: " + error, status: 500 };

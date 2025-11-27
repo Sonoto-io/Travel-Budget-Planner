@@ -16,3 +16,22 @@ interface Expense {
   location: string;
   exception: boolean;
 }
+
+
+interface Repartition {
+    name: string;
+    totalExpenses: number;
+    countExpenses: number;
+    subcategories?: Array<IRepartition>
+}
+
+interface Summary {
+    totalExpenses: number;
+    countExpenses: number;
+    expectedCountDays: number;
+    countDays: number;
+    dailyExpenses: number;
+    expectedDailyExpenses: number;
+    totalExpectedExpense?: number;
+    repartition: Array<IRepartition>;
+}
