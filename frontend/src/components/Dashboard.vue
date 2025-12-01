@@ -1,7 +1,7 @@
 <template>
   <Panel header="Dashboard" toggleable :collapsed="props.collapsed" class="w-full">
     <div class=" mb-4 flex flex-wrap lg:flex-nowrap flex-row justify-between">
-      <SummaryMetadata v-model="globalSummary" />
+      <SummaryMetadata :summary="globalSummary" />
       <div class="w-full flex flex-wrap gap-4">
         <SummaryChart :summary="byUserSummary" title="Summary by User" />
         <SummaryChart v-if="isGlobalDashboard" :summary="byCountrySummary" title="Summary by country" />
