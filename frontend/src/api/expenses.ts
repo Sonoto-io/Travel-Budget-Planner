@@ -52,12 +52,28 @@ export const deleteExpense = (expenseId: string) => {
 
 };
 
+interface SummaryParams {
+  countryId?: string;
+  withExceptions?: boolean;
+  startDate?: string;
+  endDate?: string;
+}
 
-export const getExpensesSummary = (countryId?: string) => {
-  const queryParam = countryId ? `?countryId=${countryId}` : "";
+const createQueryParam = (params: SummaryParams): string => {
+  let queryParam = "";
+  if (params) {
+    queryParam = Object.entries(params)
+      .filter(([_, value]) => value !== undefined)
+      .map(([key, value]) => `${key}=${value}`)
+      .join("&");
+    queryParam = queryParam ? `?${queryParam}` : "";
+  }
+  return queryParam;
+}
 
+export const getExpensesSummary = (params: SummaryParams) => {
   return api
-    .get(`/expenses/summary/` + queryParam)
+    .get(`/expenses/summary/` + createQueryParam(params))
     .then((response) => response.data.expenses_summary)
     .catch((error: any) => {
       console.error("Error fetching expenses summary :", error);
@@ -67,10 +83,10 @@ export const getExpensesSummary = (countryId?: string) => {
 
 
 
-export const getExpensesByUserSummary = (countryId?: string) => {
-  const queryParam = countryId ? `?countryId=${countryId}` : "";
+export const getExpensesByUserSummary = (params: SummaryParams) => {
+  
     return api
-      .get("/expenses/summary/by-user" + queryParam)
+      .get("/expenses/summary/by-user" + createQueryParam(params))
       .then((response) => response.data.summaryByUser)
       .catch((error: any) => {
         console.error("Error fetching expenses summary by user:", error);
@@ -78,10 +94,9 @@ export const getExpensesByUserSummary = (countryId?: string) => {
       });
 };
 
-export const getExpensesByCountrySummary = (countryId?: string) => {
-  const queryParam = countryId ? `?countryId=${countryId}` : "";
+export const getExpensesByCountrySummary = (params: SummaryParams) => {
     return api
-      .get("/expenses/summary/by-country" + queryParam)
+      .get("/expenses/summary/by-country" + createQueryParam(params))
       .then((response) => response.data.summaryByCountry)
       .catch((error: any) => {
         console.error("Error fetching expenses summary by country:", error);

@@ -53,7 +53,6 @@ export const expensesController = {
 
   // SUMMARIES ---------------------
   async getSummary(query : SummaryQuery): Promise<{ expenses_summary: ISummary; } > {
-    console.log("Getting summary with query:", query);
     const expenses = await ExpensesSummaryService.getExpensesWithFilters(query)
         
     return { expenses_summary : ExpensesSummaryService.calculateSummary(expenses) }

@@ -163,8 +163,6 @@ const defaultDate = new Date()
 defaultDate.setHours(12)
 const formKey = ref(0);
 
-console.log("stored formdata : ", sessionStorage.getItem('formData'));
-
 const savedForm = sessionStorage.getItem('formData') !== "undefined" ? JSON.parse(sessionStorage.getItem('formData')) : null;
 if (savedForm) {
   if (savedForm.date) {
