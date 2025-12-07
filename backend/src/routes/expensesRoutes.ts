@@ -13,14 +13,20 @@ export const configureExpensesRoutes = (app: Elysia) =>
         {
           query: t.Object({
             countryId: t.Optional(t.String()),
-            year: t.Optional(t.Number()),
-            month: t.Optional(t.Number()),
-            day: t.Optional(t.Number()),
+            startDate: t.Optional(t.Date()),
+            endDate: t.Optional(t.Date()),
             withoutExceptions: t.Optional(t.Boolean()),
           }),
         },
         (guardApp) =>
           guardApp
+        .onBeforeHandle(({query}) => {
+            // Convert startDate and endDate strings to Date objects
+            const startDate = query.startDate ? new Date(query.startDate) : undefined;
+            const endDate = query.endDate ? new Date(query.endDate) : undefined;
+            query.startDate = startDate;
+            query.endDate = endDate;
+          })
         .get("/summary", ({ query }) => expensesController.getSummary(query))
         .get("/summary/by-country", ({ query }) => expensesController.getSummaryByCountry(query))
         .get("/summary/by-user", ({ query }) => expensesController.getSummaryByUser(query))
