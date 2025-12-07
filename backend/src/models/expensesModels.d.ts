@@ -18,8 +18,7 @@ interface ISummary {
 
 interface SummaryQuery {
   countryId?: string,
-  year?: number,
-  month?: number, 
-  day?: number,
+  startDate?: Date,
+  endDate?: Date,
   withoutExceptions?: boolean
 }

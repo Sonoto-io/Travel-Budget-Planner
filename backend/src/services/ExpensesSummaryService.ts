@@ -153,25 +153,14 @@ export class ExpensesSummaryService {
       }
     }
 
-    if (query.day || query.month || query.year) {
+    if (query.startDate || query.endDate) {
       const sinceDate = new Date(0, 0, 1, 0, 0, 1);
       const endDate = new Date("9999-01-01");
-
-      // Set start and ending dates if needed
-      if (query.year) {
-        sinceDate.setFullYear(query.year)
-        endDate.setFullYear(query.year + 1)
+      if (query.startDate) {
+        sinceDate.setTime(query.startDate.getTime());
       }
-      if (query.month) {
-        sinceDate.setMonth(query.month - 1) // Months are 0-indexed
-        endDate.setMonth(query.month) // Next month
-        endDate.setFullYear(query.year ? query.year : sinceDate.getFullYear())
-      }
-      if (query.day) {
-        sinceDate.setDate(query.day)
-        endDate.setDate(query.day + 1)
-        endDate.setFullYear(query.year ?? sinceDate.getFullYear())
-        endDate.setMonth(query.month ? query.month -1 : sinceDate.getMonth() - 1)
+      if (query.endDate) {
+        endDate.setTime(query.endDate.getTime());
       }
 
       options = {
