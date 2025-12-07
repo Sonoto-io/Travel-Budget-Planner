@@ -7,6 +7,20 @@
         <SummaryChart v-if="isGlobalDashboard" :summary="byCountrySummary" title="Summary by country" />
       </div>
     </div>
+    <!-- Controls -->
+    <div class="flex justify-between items-center mb-4">
+      <Button label="Refresh" icon="pi pi-refresh" class="p-button-text" @click="refresh" />
+      <div display="flex" class="flex items-center gap-2">
+        <label>Include Exceptions</label>
+        <ToggleSwitch v-model="withExceptions" />
+      </div>
+      <div>
+        <label class="mr-2">Start Date:</label>
+        <DatePicker id="startDate" v-model="startDate"/>
+        <label class="ml-4 mr-2">End Date:</label>
+        <DatePicker id="endDate" v-model="endDate"/>
+      </div>
+    </div>
 
 
   </Panel>
@@ -15,9 +29,12 @@
 <script setup lang="ts">
 import { getExpensesByUserSummary, getExpensesSummary, getExpensesByCountrySummary } from "@/api/expenses";
 import Panel from "primevue/panel";
-import { ref, watch } from "vue";
+import Button from "primevue/button";
+import { ref, watch, watchEffect } from "vue";
 import SummaryChart from "@/components/SummaryChart.vue";
 import SummaryMetadata from "@/components/SummaryMetadata.vue";
+import ToggleSwitch from 'primevue/toggleswitch';
+import DatePicker from 'primevue/datepicker';
 
 const props = defineProps({
   countryId: {
@@ -44,17 +61,34 @@ const globalSummary = ref({
 
 const byUserSummary = ref<Object>({});
 const byCountrySummary = ref<Object>({});
+const withExceptions = ref(true);
+const startDate = ref<Date | undefined>();
+const endDate = ref<Date | undefined>();
 
+const createQueryParam = () => {
+  let queryParams = {
+    countryId: props.countryId,
+    withoutExceptions: !withExceptions.value,
+  }
+  if (startDate.value) {
+    startDate.value.setHours(12)
+    queryParams.startDate = startDate.value.toISOString().split('T')[0];
+  }
+  if (endDate.value) {
+    endDate.value.setHours(12)
+    queryParams.endDate = endDate.value.toISOString().split('T')[0];
+  }
+  return queryParams;
+}; 
 
-watch(
-  () => props.countryId,
-  async () => {
-    globalSummary.value = await getExpensesSummary(props.countryId)
-    byUserSummary.value = await getExpensesByUserSummary(props.countryId)
+const refresh = async () => {
+    const queryParams = createQueryParam();
+    globalSummary.value = await getExpensesSummary(queryParams)
+    byUserSummary.value = await getExpensesByUserSummary(queryParams)
     if (props.isGlobalDashboard) {
-      byCountrySummary.value = await getExpensesByCountrySummary(props.countryId)
+      byCountrySummary.value = await getExpensesByCountrySummary(queryParams)
     }
-  },
-  { immediate: true },
-);
+  };
+
+watchEffect(refresh);
 </script>

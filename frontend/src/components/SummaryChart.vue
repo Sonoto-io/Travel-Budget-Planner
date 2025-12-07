@@ -18,7 +18,6 @@ const props = defineProps<{
 const chartData = ref();
 const chartOptions = ref();
 
-console.log("SummaryChart mounted with summary:", props.summary);
 onMounted(() => {
     if (props.summary) {
         chartData.value = setChartData();
@@ -74,7 +73,11 @@ const setChartOptions = () => {
                 }
             }
         },
+
         plugins: {
+            legend: {
+                display: false
+            },
             tooltip: {
                 callbacks: {
                     label: function (context) {

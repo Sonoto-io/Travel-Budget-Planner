@@ -1,9 +1,12 @@
 <template>
-    <div class="flex flex-col gap-4 p-4 items-center w-full">
-        <div>Expenses Count : {{ props.summary?.countExpenses }}</div>
-        <div>Total : {{ formatCurrency(props.summary?.totalExpenses, mainCurrency) }}</div>
+    <div class="flex flex-col items-center  gap-4 p-4 w-full">
+        <p>Expenses Count : <span class="text-[#4DC18A]">{{ props.summary?.countExpenses }}</span></p>
+        <p>Total : <span class="text-[#4DC18A]">{{ formatCurrency(props.summary?.totalExpenses, mainCurrency) }}</span></p>
+        <p>Daily Expenses : <span class="text-[#4DC18A]">{{ formatCurrency(props.summary?.dailyExpenses, mainCurrency) }}</span></p>
+        <p>Daily Expected Expenses : <span class="text-[#4DC18A]">{{ formatCurrency(props.summary?.expectedDailyExpenses, mainCurrency) }}</span></p>
+        <p>Count of Days : <span class="text-[#4DC18A]">{{ props.summary?.countDays }}</span></p>
         <div class="flex flex-col items-center">
-            <h3 class="self-">Repartition by category</h3>
+            <h3 class="self-">Repartition by category :</h3>
             <Chart type="doughnut" :data="repartitionChartData" :options="repartitionChartOptions"
                 class="w-full h-64 m-2 flex flex-col items-center" />
         </div>

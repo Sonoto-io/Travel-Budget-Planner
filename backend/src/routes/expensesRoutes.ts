@@ -22,10 +22,10 @@ export const configureExpensesRoutes = (app: Elysia) =>
           guardApp
         .onBeforeHandle(({query}) => {
             // Convert startDate and endDate strings to Date objects
-            const startDate = query.startDate ? new Date(query.startDate) : undefined;
-            const endDate = query.endDate ? new Date(query.endDate) : undefined;
-            query.startDate = startDate;
-            query.endDate = endDate;
+            query.startDate = query.startDate ? new Date(query.startDate) : undefined;
+            query.endDate = query.endDate ? new Date(query.endDate) : undefined;
+            query.endDate?.setHours(12)
+            
           })
         .get("/summary", ({ query }) => expensesController.getSummary(query))
         .get("/summary/by-country", ({ query }) => expensesController.getSummaryByCountry(query))

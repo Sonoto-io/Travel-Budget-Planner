@@ -174,7 +174,6 @@ export class ExpensesSummaryService {
         },
       };
     }
-    
     return await expenseRepository.getAll(options)
   }
 }
