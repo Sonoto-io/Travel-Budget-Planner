@@ -92,6 +92,7 @@ services:
       dockerfile: docker/Dockerfile
     environment:
       VITE_MOCKS_ENABLED : ${MOCKS_ENABLED:-false}
+      VITE_MAIN_CURRENCY_NAME : ${MAIN_CURRENCY_NAME:-EUR}
     ports:
       - "5173:5173"
     labels:

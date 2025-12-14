@@ -74,6 +74,8 @@ services:
       context: frontend
       dockerfile: docker/Dockerfile.prod
     restart: unless-stopped
+    environment:
+      VITE_MAIN_CURRENCY_NAME : ${MAIN_CURRENCY_NAME:-EUR}
     labels:
       traefik.enable: true
       traefik.http.routers.frontend.rule: PathPrefix(`/`)

@@ -26,6 +26,7 @@ import { getCurrencies } from "@/api/currencies";
 import { getUsers } from "@/api/users";
 import { useCountryStore } from "@/stores/countryStore";
 import Dashboard from "./Dashboard.vue";
+import { useConfigStore } from "@/stores/configStore";
 
 const expenses = ref([]);
 const selectCategories = ref([]);
@@ -33,6 +34,7 @@ const selectCurrencies = ref([]);
 const selectUsers = ref([]);
 
 const countryStore = useCountryStore();
+const configStore = useConfigStore();
 
 watchEffect(async () => {
   expenses.value = await getExpenses(countryStore.currentCountry.id);
@@ -41,7 +43,7 @@ watchEffect(async () => {
 
 onMounted(async () => {
   selectCategories.value = await getCategories();
-  selectCurrencies.value = await getCurrencies();
+  selectCurrencies.value = configStore.currencies ? [configStore.currencies] : await getCurrencies();
 
   selectUsers.value = await getUsers();
 });
