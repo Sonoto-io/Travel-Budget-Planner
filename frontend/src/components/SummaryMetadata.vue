@@ -2,7 +2,7 @@
     <div class="flex flex-col items-center  gap-4 p-4 w-full">
         <p>Expenses Count : <span class="text-[#4DC18A]">{{ props.summary?.countExpenses }}</span></p>
         <p>Total : <span class="text-[#4DC18A]">{{ formatCurrency(props.summary?.totalExpenses, mainCurrency) }}</span></p>
-        <p>Daily Expenses : <span class="text-[#4DC18A]">{{ formatCurrency(props.summary?.dailyExpenses, mainCurrency) }}</span></p>
+        <p>Daily Expenses : <span class="text-[#4DC18A]">{{ formatCurrency(props.summary?.dailyExpenses.toFixed(2), mainCurrency) }}</span></p>
         <p>Daily Expected Expenses : <span class="text-[#4DC18A]">{{ formatCurrency(props.summary?.expectedDailyExpenses, mainCurrency) }}</span></p>
         <p>Count of Days : <span class="text-[#4DC18A]">{{ props.summary?.countDays }}</span></p>
         <div class="flex flex-col items-center">
@@ -17,12 +17,15 @@
 import { ref, onMounted, watch, watchEffect } from "vue";
 import Chart from 'primevue/chart';
 import { formatCurrency } from "@/utils/CurrencyUtils";
+import { useConfigStore } from "@/stores/configStore";
 
+
+const configStore = useConfigStore();
 const props = defineProps<{
     summary: Object;
 }>();
 
-const mainCurrency = ref({ locale: "fr-FR", name: "EUR" }); // TODO: fetch from api
+const mainCurrency = ref(configStore.main_currency);
 const repartitionChartData = ref();
 const repartitionChartOptions = ref();
 

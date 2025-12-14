@@ -23,7 +23,6 @@ RUN cd /temp/prod && bun install --production --frozen-lockfile
 FROM base AS prerelease
 COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
-RUN cat prisma/schema.prisma
 
 # # generate prisma client during build
 # RUN bunx prisma generate

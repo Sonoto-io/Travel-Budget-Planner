@@ -26,4 +26,6 @@ import NavBar from "@/components/NavBar.vue";
 
 const navbarVisible = ref(false);
 
+
+
 </script>

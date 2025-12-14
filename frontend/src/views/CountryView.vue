@@ -8,4 +8,5 @@
 import MainLayout from "@/layouts/MainLayout.vue";
 
 import CountryMain from "@/components/CountryMain.vue";
+
 </script>

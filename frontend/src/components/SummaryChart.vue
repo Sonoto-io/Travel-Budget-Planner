@@ -6,6 +6,7 @@
 </template>
 
 <script setup lang="ts">
+import { useConfigStore } from '@/stores/configStore';
 import { formatCurrency } from '@/utils/CurrencyUtils';
 import Chart from 'primevue/chart';
 import { ref, onMounted, watch } from "vue";
@@ -15,8 +16,15 @@ const props = defineProps<{
     title: string;
 }>();
 
+const configStore = useConfigStore();
+
+const mainCurrency = ref(configStore.main_currency);
 const chartData = ref();
 const chartOptions = ref();
+
+watch(configStore, () => {
+  mainCurrency.value = configStore.main_currency;
+});
 
 onMounted(() => {
     if (props.summary) {
@@ -81,7 +89,7 @@ const setChartOptions = () => {
             tooltip: {
                 callbacks: {
                     label: function (context) {
-                        return formatCurrency(context.parsed.x, { locale: "fr-FR", name: "EUR" });
+                        return formatCurrency(context.parsed.x, mainCurrency.value);
                     }
                 }
             }

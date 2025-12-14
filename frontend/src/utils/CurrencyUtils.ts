@@ -1,8 +1,8 @@
 import type { Currency } from "@/models/Currency";
 
 export const formatCurrency = (value: number, currency: Currency): string => {
-  if (!currency.locale || !currency.name) {
-    return value.toString(); // Fallback if currency is not defined
+  if (!currency?.locale || !currency?.name) {
+    return value?.toString() ?? ""; // Fallback if currency is not defined
   }
   return new Intl.NumberFormat(currency.locale, {
     style: "currency",

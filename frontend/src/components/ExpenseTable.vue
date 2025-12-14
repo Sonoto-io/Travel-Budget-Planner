@@ -92,7 +92,7 @@
 <script setup lang="ts">
 import Column from "primevue/column";
 import DataTable from "primevue/datatable";
-import { ref } from "vue";
+import { watch, ref } from "vue";
 import InputText from "primevue/inputtext";
 import InputNumber from "primevue/inputnumber";
 import DatePicker from "primevue/datepicker";
@@ -107,9 +107,11 @@ import { useToast } from "primevue/usetoast";
 import Checkbox from "primevue/checkbox";
 import { useConfirm } from "primevue/useconfirm";
 import ConfirmPopup from 'primevue/confirmpopup';
+import { useConfigStore } from "@/stores/configStore";
 
 const toast = useToast();
 const confirm = useConfirm();
+const configStore = useConfigStore();
 
 const props = defineProps<{
   selectValues: FormSelectValues;
@@ -117,8 +119,13 @@ const props = defineProps<{
 
 const expenses = defineModel<Array<Expense>>();
 const editingRows = ref([]);
-const mainCurrency = ref({ locale: "fr-FR", name: "EUR" }); // TODO: fetch from api
+const mainCurrency = ref(configStore.main_currency);
 const selectSubcategories = ref();
+
+watch(configStore, () => {
+  mainCurrency.value = configStore.main_currency;
+  selectSubcategories.value = [];
+});
 
 const handleCategorySelect = async (category: Category) => {
   try {

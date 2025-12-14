@@ -8,7 +8,7 @@
       </div>
     </div>
     <!-- Controls -->
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex gap-4 flex-col lg:flex-row justify-between items-center mb-4">
       <Button label="Refresh" icon="pi pi-refresh" class="p-button-text" @click="refresh" />
       <div display="flex" class="flex items-center gap-2">
         <label>Include Exceptions</label>
@@ -17,7 +17,9 @@
       <div>
         <label class="mr-2">Start Date:</label>
         <DatePicker id="startDate" v-model="startDate"/>
-        <label class="ml-4 mr-2">End Date:</label>
+      </div>
+      <div>
+        <label class="mr-2">End Date:</label>
         <DatePicker id="endDate" v-model="endDate"/>
       </div>
     </div>
