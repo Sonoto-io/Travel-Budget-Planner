@@ -282,9 +282,8 @@ watch(
   () => props.selectValues,
   async (newValues) => {
     if (newValues.users.length > 0 && initialValues.value.user.length == 0) {
-      initialValues.value.user.push(newValues.users[0]);
+      initialValues.value.user.push(newValues.users[0].id);
     }
-
 
     if (newValues.categories.length > 0 && initialValues.value.category.label == "") {
       initialValues.value.category.label = newValues.categories[0].label;
