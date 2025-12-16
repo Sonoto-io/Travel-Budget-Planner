@@ -12,7 +12,7 @@
       </IftaLabel>
       <Message v-if="$form.date?.invalid" severity="error">{{
         $form.date.error?.message
-        }}</Message>
+      }}</Message>
     </div>
 
     <!-- User -->
@@ -28,7 +28,7 @@
       </IftaLabel>
       <Message v-if="$form.user?.invalid" severity="error">{{
         $form.user.error?.message
-        }}</Message>
+      }}</Message>
     </div>
 
     <!-- Currency -->
@@ -43,7 +43,7 @@
       </IftaLabel>
       <Message v-if="$form.currency?.invalid" severity="error">{{
         $form.currency.error?.message
-        }}</Message>
+      }}</Message>
     </div>
 
     <!-- Price -->
@@ -57,7 +57,7 @@
       </IftaLabel>
       <Message v-if="$form.price?.invalid" severity="error">{{
         $form.price.error?.message
-        }}</Message>
+      }}</Message>
     </div>
 
     <!-- Note -->
@@ -68,7 +68,7 @@
       </IftaLabel>
       <Message v-if="$form.note?.invalid" severity="error">{{
         $form.note.error?.message
-        }}</Message>
+      }}</Message>
     </div>
 
     <!-- Location -->
@@ -79,7 +79,7 @@
       </IftaLabel>
       <Message v-if="$form.location?.invalid" severity="error">{{
         $form.location.error?.message
-        }}</Message>
+      }}</Message>
     </div>
 
     <!-- Category -->
@@ -94,7 +94,7 @@
       </IftaLabel>
       <Message v-if="$form.category?.invalid" severity="error">{{
         $form.category.error?.message
-        }}</Message>
+      }}</Message>
     </div>
 
     <!-- Subcategory -->
@@ -108,7 +108,7 @@
       </IftaLabel>
       <Message v-if="$form.subcategory?.invalid" severity="error">{{
         $form.subcategory.error?.message
-        }}</Message>
+      }}</Message>
     </div>
 
     <!-- Exception -->
@@ -121,12 +121,11 @@
       </div>
       <Message v-if="$form.subcategory?.invalid" severity="error">{{
         $form.subcategory.error?.message
-        }}</Message>
+      }}</Message>
     </div>
 
     <!-- Submit Button -->
-    <Button type="submit" severity="secondary" label="Submit" :loading="isSubmitting" :disabled="isSubmitting" />
-
+    <Button type="submit" severity="secondary" label="Submit" />
   </Form>
 </template>
 
@@ -163,8 +162,9 @@ const selectSubcategories = ref([]);
 const countryStore = useCountryStore();
 const defaultDate = new Date()
 defaultDate.setHours(12)
+const isSubmitting = ref(false);
 const formRef = ref()
-const isSubmitting = ref(false)
+
 
 
 const initialValues = ref({
@@ -192,30 +192,6 @@ const initialValues = ref({
   exception: false,
 })
 
-const restoreForm = () => {
-  const raw = sessionStorage.getItem("formData")
-  if (!raw) return
-
-  const saved = JSON.parse(raw)
-
-  if (saved.date) {
-    saved.date = new Date(saved.date)
-    saved.date.setHours(12)
-  }
-
-  initialValues.value = {
-    ...initialValues.value,
-    ...saved,
-  }
-
-  toast.add({
-    severity: "info",
-    summary: "Restored unsaved form data.",
-    life: 3000,
-  })
-}
-
-restoreForm()
 
 
 const formData = z.object({
@@ -252,7 +228,33 @@ const formData = z.object({
   exception: z.boolean().optional(),
 })
 
+
 const resolver = zodResolver(formData);
+
+const restoreForm = () => {
+  const raw = sessionStorage.getItem("formData")
+  if (!raw) return
+
+  const saved = JSON.parse(raw)
+
+  if (saved.date) {
+    saved.date = new Date(saved.date)
+    saved.date.setHours(12)
+  }
+
+  initialValues.value = {
+    ...initialValues.value,
+    ...saved,
+  }
+
+  toast.add({
+    severity: "info",
+    summary: "Restored unsaved form data.",
+    life: 3000,
+  })
+}
+
+restoreForm()
 
 const saveFormData = (form: any) => {
   const data: Record<string, any> = {}
@@ -282,7 +284,7 @@ watch(
   () => props.selectValues,
   async (newValues) => {
     if (newValues.users.length > 0 && initialValues.value.user.length == 0) {
-      initialValues.value.user.push(newValues.users[0]);
+      initialValues.value.user.push(newValues.users[0].id);
     }
 
 
@@ -302,60 +304,81 @@ watch(
         selectSubcategories.value = [];
       }
     }
-    initialValues.value.currency = countryStore.currentMainCurrency
+
+    if (!sessionStorage.getItem("formData")) {
+      initialValues.value.currency = countryStore.currentMainCurrency
+    }
     handleCategorySelect(initialValues.value.category);
 
   },
   { deep: true, immediate: true },
 );
 
-watch(countryStore, () => {
-  formRef.value.setValues({
-    currency: countryStore.currentMainCurrency,
-  })
-}
+watch(
+  () => countryStore.currentMainCurrency,
+  currency => {
+    initialValues.value.currency = currency
+    formRef.value?.setValues({ currency })
+  }
 )
 
 const onFormSubmit = async ({ valid, values, reset }) => {
-  if (!valid || isSubmitting.value) return
-
+  if (isSubmitting.value) return
+  if (!valid) return
   isSubmitting.value = true
 
-  try {
-    values.date.setHours(12)
+  values.date.setHours(12)
 
-    const users = values.user.map((id: string) =>
-      props.selectValues.users.find(u => u.id === id)
-    )
+  const users = values.user.map((id: string) =>
+    props.selectValues.users.find(u => u.id === id)
+  )
 
-    const pricePerUser = Number(values.price) / users.length
+  const pricePerUser = Number(values.price) / users.length
 
-    for (const user of users) {
-      const expenseData = {
-        ...values,
-        user,
-        price: pricePerUser,
-        country: toRaw(countryStore.currentCountry),
-      }
-
-      await createExpense(expenseData)
-      emit("addExpense", expenseData)
+  for (const user of users) {
+    const expenseData = {
+      ...values,
+      user,
+      price: pricePerUser,
+      country: toRaw(countryStore.currentCountry),
     }
 
-    sessionStorage.removeItem("formData")
-    reset()
-  } catch (err) {
-    toast.add({
-      severity: "error",
-      summary: "Submission failed",
-      life: 3000,
+    const res = await createExpense(expenseData)
+
+    if (res.status.code !== 201) {
+      toast.add({
+        severity: "error",
+        summary: "Failed to create expense.",
+        life: 3000,
+      })
+      return
+    }
+
+    emit("addExpense", {
+      ...expenseData,
+      id: res.data.expense.id,
     })
-  } finally {
-    isSubmitting.value = false
   }
+
+  toast.add({
+    severity: "success",
+    summary: "Expense created successfully.",
+    life: 3000,
+  })
+
+  sessionStorage.removeItem("formData")
+
+  // Reset but keep some values
+  reset()
+
+  formRef.value.setValues({
+    date: values.date,
+    user: values.user,
+    location: values.location,
+  })
+
+  isSubmitting.value = false;
 }
-
-
 
 
 </script>
