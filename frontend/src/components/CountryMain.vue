@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, ComputedRef, watchEffect } from "vue";
+import { ref, onMounted, computed, ComputedRef, watchEffect, watch } from "vue";
 import ExpenseTable from "@/components/ExpenseTable.vue";
 import { getExpenses } from "@/api/expenses";
 import ExpenseForm from "@/components/ExpenseForm.vue";
@@ -28,13 +28,13 @@ import { useCountryStore } from "@/stores/countryStore";
 import Dashboard from "./Dashboard.vue";
 import { useConfigStore } from "@/stores/configStore";
 
-const expenses = ref([]);
-const selectCategories = ref([]);
-const selectCurrencies = ref([]);
-const selectUsers = ref([]);
-
 const countryStore = useCountryStore();
 const configStore = useConfigStore();
+
+const expenses = ref([]);
+const selectCategories = ref([]);
+const selectCurrencies = ref(configStore.currencies ?? []);
+const selectUsers = ref([]);
 
 watchEffect(async () => {
   expenses.value = await getExpenses(countryStore.currentCountry.id);
@@ -43,10 +43,9 @@ watchEffect(async () => {
 
 onMounted(async () => {
   selectCategories.value = await getCategories();
-  selectCurrencies.value = configStore.currencies ? [configStore.currencies] : await getCurrencies();
-
   selectUsers.value = await getUsers();
 });
+
 
 const selectValues: ComputedRef<FormSelectValues> = computed(() => ({
   categories: selectCategories.value,
