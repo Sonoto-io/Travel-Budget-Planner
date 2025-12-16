@@ -1,5 +1,5 @@
 <template>
-  <Form :key="formKey" v-slot="$form" :initialValues :resolver="resolver" @submit="onFormSubmit"
+  <Form ref="formRef" v-slot="$form" :initialValues :resolver="resolver" @submit="onFormSubmit"
     class="flex flex-wrap items-start gap-4">
     <!-- Date -->
     <div class="flex grow flex-col gap-2">
@@ -18,8 +18,9 @@
     <!-- User -->
     <div class="flex grow flex-col gap-2">
       <IftaLabel>
-        <MultiSelect inputId="user" name="user" :options="props.selectValues.users" optionLabel="label" filter
-          @change="saveFormData($form)" placeholder="Select User(s)" />
+        <MultiSelect name="user" :options="props.selectValues.users" optionLabel="label" optionValue="id" filter
+          placeholder="Select User(s)" @change="saveFormData($form)" />
+
         <label for="user">
           User
           <span class="text-red-500">*</span>
@@ -113,10 +114,10 @@
     <!-- Exception -->
     <div>
       <div>
-      <Checkbox name="exception" input-id="exception" binary @change="saveFormData($form)" />
-      <label for="exception">
-        Exception
-      </label>
+        <Checkbox name="exception" input-id="exception" binary @change="saveFormData($form)" />
+        <label for="exception">
+          Exception
+        </label>
       </div>
       <Message v-if="$form.subcategory?.invalid" severity="error">{{
         $form.subcategory.error?.message
@@ -124,7 +125,8 @@
     </div>
 
     <!-- Submit Button -->
-    <Button type="submit" severity="secondary" label="Submit" />
+    <Button type="submit" severity="secondary" label="Submit" :loading="isSubmitting" :disabled="isSubmitting" />
+
   </Form>
 </template>
 
@@ -161,30 +163,19 @@ const selectSubcategories = ref([]);
 const countryStore = useCountryStore();
 const defaultDate = new Date()
 defaultDate.setHours(12)
-const formKey = ref(0);
-
-const savedForm = sessionStorage.getItem('formData') !== "undefined" ? JSON.parse(sessionStorage.getItem('formData')) : null;
-if (savedForm) {
-  if (savedForm.date) {
-    savedForm.date = new Date(savedForm.date);
-    savedForm.date.setHours(12)
-  }
-  toast.add({
-    severity: "info",
-    summary: "Restored unsaved form data.",
-    life: 3000,
-  });
-}
+const formRef = ref()
+const isSubmitting = ref(false)
 
 
-const initialValues = savedForm ? ref(savedForm) : ref({
+const initialValues = ref({
   date: defaultDate,
-  user: [],
+  user: [] as string[],
   currency: {
-    label: "",
     id: "",
     name: "",
+    label: "",
     conversion: 1,
+    locale: "",
   },
   price: "",
   note: "",
@@ -198,15 +189,42 @@ const initialValues = savedForm ? ref(savedForm) : ref({
     label: "",
     categoryId: "",
   },
-});
+  exception: false,
+})
+
+const restoreForm = () => {
+  const raw = sessionStorage.getItem("formData")
+  if (!raw) return
+
+  const saved = JSON.parse(raw)
+
+  if (saved.date) {
+    saved.date = new Date(saved.date)
+    saved.date.setHours(12)
+  }
+
+  initialValues.value = {
+    ...initialValues.value,
+    ...saved,
+  }
+
+  toast.add({
+    severity: "info",
+    summary: "Restored unsaved form data.",
+    life: 3000,
+  })
+}
+
+restoreForm()
 
 
 const formData = z.object({
   date: z.coerce.date({ required_error: "Date is required" }),
-  user: z.array(z.object({
-    id: z.string(),
-    label: z.string().min(1, "User is required"),
-  })).min(1, "At least one user must be selected"),
+
+  user: z
+    .array(z.string())
+    .min(1, "At least one user must be selected"),
+
   currency: z.object({
     id: z.string(),
     name: z.string(),
@@ -214,37 +232,42 @@ const formData = z.object({
     conversion: z.number(),
     locale: z.string(),
   }),
+
   price: z.coerce.number().positive("Price must be positive"),
+
   note: z.string().optional(),
   location: z.string().optional(),
+
   category: z.object({
-    id: z.string().optional(),
+    id: z.string(),
     label: z.string().min(1, "Category is required"),
   }),
+
   subcategory: z.object({
-    id: z.string().optional(),
+    id: z.string(),
     label: z.string().min(1, "Subcategory is required"),
-    categoryId: z.string().optional(),
+    categoryId: z.string(),
   }),
+
   exception: z.boolean().optional(),
-});
+})
 
 const resolver = zodResolver(formData);
 
-
-const getFormValues = (form: Record<string, any>) => {
-  const result: Record<string, any> = {};
-  for (const key in form) {
-    result[key] = form[key]?.value;
-  }
-  return result;
-}
-
 const saveFormData = (form: any) => {
-  const dataToSave = getFormValues(form);
-  dataToSave.date.setHours(12)  // avoid timezone issues when saving date only
-  sessionStorage.setItem('formData', JSON.stringify(dataToSave));
+  const data: Record<string, any> = {}
+
+  for (const key in form) {
+    data[key] = form[key]?.value
+  }
+
+  if (data.date) {
+    data.date.setHours(12)
+  }
+
+  sessionStorage.setItem("formData", JSON.stringify(data))
 }
+
 
 const handleCategorySelect = async (category: Category) => {
   try {
@@ -287,47 +310,52 @@ watch(
 );
 
 watch(countryStore, () => {
-  initialValues.value.currency = countryStore.currentMainCurrency
-  formKey.value++; // reset the form to show the currency change
+  formRef.value.setValues({
+    currency: countryStore.currentMainCurrency,
+  })
 }
 )
 
 const onFormSubmit = async ({ valid, values, reset }) => {
-  if (valid) {
-    values["country"] = toRaw(countryStore.currentCountry);
-    values["price"] = Number(values["price"]) / values.user.length;
-    values["date"].setHours(12)
-    const users = values.user
-    users.forEach(async (user: any) => {
-      const expenseData = { ...values, user };
-      const res = await createExpense(expenseData);
-      if (res.status.code === 201) {
-        toast.add({
-          severity: "success",
-          summary: "Expense created successfully.",
-          life: 3000,
-        });
-        selectSubcategories.value =
-          (await fetchSubCategories(initialValues.category)) ?? [];
-        emit("addExpense", { ...expenseData, id: res.data.expense.id });
-        reset();
-        sessionStorage.removeItem('formData');
-        // keep the old date in the form after reset
-        initialValues.value.date = values.date;
-        formKey.value++; // reset the form component
+  if (!valid || isSubmitting.value) return
 
-      } else {
-        toast.add({
-          severity: "error",
-          summary: "Failed to create expense.",
-          detail: `Status: ${res.status.message}`,
-          life: 3000,
-        });
-      }
-    }
+  isSubmitting.value = true
+
+  try {
+    values.date.setHours(12)
+
+    const users = values.user.map((id: string) =>
+      props.selectValues.users.find(u => u.id === id)
     )
+
+    const pricePerUser = Number(values.price) / users.length
+
+    for (const user of users) {
+      const expenseData = {
+        ...values,
+        user,
+        price: pricePerUser,
+        country: toRaw(countryStore.currentCountry),
+      }
+
+      await createExpense(expenseData)
+      emit("addExpense", expenseData)
+    }
+
+    sessionStorage.removeItem("formData")
+    reset()
+  } catch (err) {
+    toast.add({
+      severity: "error",
+      summary: "Submission failed",
+      life: 3000,
+    })
+  } finally {
+    isSubmitting.value = false
   }
 }
+
+
 
 
 </script>
@@ -342,8 +370,9 @@ form {
 }
 
 /* each field container */
-form > div {
-  flex: 1 1 280px;  /* grows, shrinks, but keeps a nice min width */
+form>div {
+  flex: 1 1 280px;
+  /* grows, shrinks, but keeps a nice min width */
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -386,7 +415,7 @@ form button {
 
 /* On small phones */
 @media (max-width: 640px) {
-  form > div {
+  form>div {
     flex-basis: 100%;
   }
 
@@ -397,15 +426,14 @@ form button {
 
 /* On wider desktop screens */
 @media (min-width: 900px) {
-  form > div {
-    flex-basis: calc(50% - 1rem); /* 2 columns layout */
+  form>div {
+    flex-basis: calc(50% - 1rem);
+    /* 2 columns layout */
   }
 
   /* But long fields can override if needed */
-  form > div.full {
+  form>div.full {
     flex-basis: 100%;
   }
 }
-
-
 </style>
