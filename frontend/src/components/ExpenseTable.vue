@@ -9,7 +9,7 @@
       </template>
     </Column>
 
-    <Column field="user" header="User" style="min-width: 8rem; width: 10%">
+    <Column field="user" header="User" sortable style="min-width: 8rem; width: 10%">
       <template #body="{ data, field }">{{ data[field].label }}</template>
       <template #editor="{ data, field }">
         <Select v-model="data[field]" :options="selectValues.users" optionLabel="label" />

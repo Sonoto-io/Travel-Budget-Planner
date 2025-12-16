@@ -84,7 +84,7 @@ export class AuthService {
         })
         const data = await response.json();
 
-        if (!data.access_token || !data.refresh_token) {
+        if (!data.access_token && !data.refresh_token) {
             cookie.refresh_token.set({ value: "", path: "/", maxAge: 0 });
             throw new Error("Invalid refresh token, please log in again");
         }

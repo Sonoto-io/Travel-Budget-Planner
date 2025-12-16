@@ -212,6 +212,7 @@ const formData = z.object({
     name: z.string(),
     label: z.string().min(1, "Currency is required"),
     conversion: z.number(),
+    locale: z.string(),
   }),
   price: z.coerce.number().positive("Price must be positive"),
   note: z.string().optional(),
@@ -278,15 +279,18 @@ watch(
         selectSubcategories.value = [];
       }
     }
-    if (!savedForm) {
-      initialValues.value.currency = countryStore.currentMainCurrency
-    }
+    initialValues.value.currency = countryStore.currentMainCurrency
     handleCategorySelect(initialValues.value.category);
 
   },
   { deep: true, immediate: true },
 );
 
+watch(countryStore, () => {
+  initialValues.value.currency = countryStore.currentMainCurrency
+  formKey.value++; // reset the form to show the currency change
+}
+)
 
 const onFormSubmit = async ({ valid, values, reset }) => {
   if (valid) {

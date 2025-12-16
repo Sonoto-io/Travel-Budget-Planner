@@ -12,7 +12,7 @@
           'overflow-x-hidden',
         ]"
       >
-        <NavBar @country-selected="navbarVisible = false" />
+        <NavBar @country-selected="selectCountry()" />
       </nav>
       <main class="flex-1 w-0 px-4 overflow-x-auto"><slot /></main>
     </div>
@@ -26,6 +26,9 @@ import NavBar from "@/components/NavBar.vue";
 
 const navbarVisible = ref(false);
 
-
+const selectCountry = () => {
+  sessionStorage.removeItem("formData");
+  navbarVisible.value = false;
+}
 
 </script>
