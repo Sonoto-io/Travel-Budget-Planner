@@ -2,7 +2,7 @@
 
 A web app to manage Expenses during traveling multiple countries. Enter the different items you need (coutries, currencies, categories, subcategories and users) then select a country and add your expenses. 
 
-The Webapp can be used to easily add your expenses, while you can use the API to fetch the summaries of expenses per country and display them however you want elsewhere (e.g. Home assistant)
+The Webapp can be used to easily add your expenses and display basic graphs, while you can use the API to fetch the summaries of expenses per country and display them however you want elsewhere (e.g. Home assistant)
 
 ## Install
 
@@ -18,5 +18,5 @@ make dev-up
 
 Then head to your ip address or app.localhost if in local, and you can use the app
 
-The api is on /api
+The api is on /api, this is defined through Traefik in the compose files.
 
