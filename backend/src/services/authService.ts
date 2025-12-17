@@ -1,7 +1,9 @@
 import type { cookieSchema } from "@routes/authRoutes";
 import type { Context } from "elysia";
 import { jwtVerify } from "jose";
+import { LogsService } from "./logsService";
 
+const logger = new LogsService();
 interface TokenResponse {
     access_token: string;
     refresh_token: string;
@@ -86,6 +88,7 @@ export class AuthService {
 
         if (!data.access_token && !data.refresh_token) {
             cookie.refresh_token.set({ value: "", path: "/", maxAge: 0 });
+            logger.warning("Refresh token invalid or expired", { refresh_token });
             throw new Error("Invalid refresh token, please log in again");
         }
 
@@ -110,6 +113,7 @@ export class AuthService {
             ctx.set.status = 200
         } catch (err) {
             ctx.set.status = 401
+            logger.error("Authentication failed", { error: (err as Error).message });
             throw new Response(JSON.stringify({ error: (err as Error).message }), {
                 status: 401,
                 headers: { "Content-Type": "application/json" }
@@ -124,7 +128,7 @@ export class AuthService {
             return { user: null };
         }
         const apiKey = request.headers.get("x-api-key");
-    
+
         if (this.API_KEY && apiKey === this.API_KEY) return { user: { api: true } };
 
         const authHeader = request.headers.get("Authorization");
@@ -137,11 +141,14 @@ export class AuthService {
                 algorithms: [this.ALGORITHM],
             }).then(r => r.payload);
             return { user: payload };
-            
+
         } catch {
-            if (!cookie) throw new Error("Missing token, please log in");
-            const refresh = cookie.refresh_token?.value ?? null;
-           
+            if (!cookie) {
+                logger.error("Missing token in cookies", { path, cookies: cookie });
+                throw new Error("Missing token, please log in");
+            }
+            const refresh = cookie.refresh_token?.value ?? "";
+
             if (!refresh) throw new Error("Session expired, please log in again");
             const newTokens = await this.refreshToken(refresh, cookie);
             if (!newTokens) throw new Error("Missing access token and invalid refresh token");
@@ -150,7 +157,7 @@ export class AuthService {
                 audience: this.CLIENT_ID,
                 algorithms: [this.ALGORITHM],
             }).then(r => r.payload)
-            .catch(() => { throw new Error("Invalid access token") });
+                .catch(() => { throw new Error("Invalid access token") });
             return { user: payload };
         }
     }
