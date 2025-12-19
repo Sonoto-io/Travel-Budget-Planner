@@ -29,9 +29,10 @@
     </Column>
 
     <Column header="Edit" :rowEditor="true" style="width: 10%; min-width: 8rem" />
-    <Column header="Delete" style="width: 10%; min-width: 8rem">
+    <Column header="Delete" style="width: 8%; min-width: 6rem">
       <template #body="{ data }">
-        <Button icon="pi pi-trash" severity="danger" @click="deleteRow(data)" text rounded />
+        <ConfirmPopup></ConfirmPopup>
+        <Button icon="pi pi-trash" severity="danger" @click="showDeleteDialog($event, data)" text rounded />
       </template>
     </Column>
   </DataTable>
@@ -47,6 +48,8 @@ import InputText from "primevue/inputtext";
 import Select from "primevue/select";
 import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
+import { useConfirm } from "primevue/useconfirm";
+import ConfirmPopup from 'primevue/confirmpopup';
 
 import {
   getSelectOptions,
@@ -57,12 +60,11 @@ import {
 
 import type { Item } from "@/models/Item";
 
-// Props & models
 const toast = useToast();
+const confirm = useConfirm();
 const items = defineModel<Array<Item>>();
 const props = defineProps<{ itemType?: ItemName }>();
 
-// State
 const forbiddenFields = ["total_expected_expense", "order", "token"];
 const columns = ref<Array<{ field: string; header: string }>>([]);
 const editingRows = ref([]);
@@ -145,6 +147,30 @@ const onRowEditSave = async (event: { newData: any; index: number }) => {
 };
 
 // Delete
+
+const showDeleteDialog = (event, rowData) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Do you want to delete this expense ?',
+    icon: 'pi pi-info-circle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Delete',
+      severity: 'danger'
+    },
+    accept: () => {
+      deleteRow(rowData);
+    },
+    reject: () => {
+      toast.add({ severity: 'info', summary: 'Rejected', detail: "You didn't delete the expense", life: 3000 });
+    }
+  });
+}
+
 const deleteRow = async (row) => {
   if (items.value?.length > 1) {
     const response = await handleItemAction(props.itemType, "delete", row.id);
@@ -168,3 +194,10 @@ const deleteRow = async (row) => {
   }
 };
 </script>
+
+
+<style>
+  .p-button-danger {
+    color: var(--p-button-text-danger-color)!important;
+  }
+</style>

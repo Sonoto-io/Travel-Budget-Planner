@@ -221,6 +221,12 @@ const formatDate = (line) => {
 </script>
 
 <style>
+
+/* Button danger text color fix */
+.p-button-danger {
+  color: var(--p-button-text-danger-color)!important;
+}
+
 /* Table fixed layout for balanced columns */
 .expenses-table .p-datatable-tablescroll {
   table-layout: fixed;
