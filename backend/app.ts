@@ -25,8 +25,10 @@ export const createApp = () => {
     .use(cookie())
     .onBeforeHandle((ctx) => authService.authMiddleware(ctx))
     .onBeforeHandle((ctx) => {
-      new LogsService().info(`Incoming request: ${ctx.request.method} ${ctx.path}`,
-        { user: ctx.request.user?.nickname ?? 'guest' })
+      if (ctx.path !== "/" && !ctx.path.startsWith('/swagger')) {
+        new LogsService().info(`Incoming request: ${ctx.request.method} ${ctx.path}`,
+          { user: (ctx.request.user?.nickname || ctx.request.user?.preferred_username || ctx.request.user?.email || 'guest') })
+      }
     })
     .use(configureAllRoutes)
     .get("/", () => "Hello from root !")
