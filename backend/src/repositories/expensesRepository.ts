@@ -3,7 +3,7 @@ import { PrismaClient, type Expense, Prisma } from ".prisma/client";
 const prisma = new PrismaClient();
 
 export const expenseRepository = {
-  getAll(options?: Prisma.ExpenseFindManyArgs): Promise<Array<Expense>> {
+  getAll(options?: Prisma.ExpenseFindManyArgs): Promise<Expense[]> {
     return prisma.expense.findMany({
       include: {
         category: true,
@@ -12,7 +12,23 @@ export const expenseRepository = {
         currency: true,
         country: true,
       },
-      ...(options ?? {})
+      orderBy: [
+        { date: 'desc' },
+        { order: 'desc' },
+      ],
+      ...options,
+    })
+  },
+  async getNextOrderForDate(date: Date): Promise<number> {
+    return prisma.expense.aggregate({
+      _max: {
+        order: true,
+      },
+      where: {
+        date: date,
+      },
+    }).then(result => {
+      return (result._max.order ?? 0) + 1;
     });
   },
   getForCountry(countryId: string): Promise<Array<Expense>> {
@@ -32,6 +48,7 @@ export const expenseRepository = {
         note: expense.note,
         price: expense.price,
         date: expense.date,
+        order: expense.order,
         location: expense.location,
         country: { connect: { id: expense.country.id } },
         user: { connect: { id: expense.user.id } },
@@ -51,6 +68,7 @@ export const expenseRepository = {
         note: expense.note,
         price: expense.price,
         date: expense.date,
+        order: expense.order,
         location: expense.location,
         country: { connect: { id: expense.country.id } },
         user: { connect: { id: expense.user.id } },

@@ -79,8 +79,12 @@ model Expense {
   currency    Currency  @relation(fields: [currencyId], references: [id])
 
   note  String?
-  price Float     @default(0.00)
-  date  DateTime  @default(now())
+  price Float       @default(0.00)
+  date  DateTime    @db.Date
+  order Int
   location String?
   exception Boolean @default(false)
+
+  @@unique([date, order])
+  @@index([date, order])
 }

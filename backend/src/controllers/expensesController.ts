@@ -13,6 +13,8 @@ export const expensesController = {
   async create(body: Prisma.ExpenseCreateInput) {
     if (body) {
       try {
+        const nextOrder = await expenseRepository.getNextOrderForDate(body.date as Date);
+        body.order = nextOrder;
         const res = { expense: await expenseRepository.create(body)};
         return {
           message: `Expense created`,
@@ -43,6 +45,8 @@ export const expensesController = {
     }
   },
   async update(id: string, expense: Prisma.ExpenseUpdateInput) {
+    const nextOrder = await expenseRepository.getNextOrderForDate(expense.date as Date);
+    expense.order = nextOrder;
     const res = expenseRepository.update(id, expense);
     return {
       message: `Expense updated`,
