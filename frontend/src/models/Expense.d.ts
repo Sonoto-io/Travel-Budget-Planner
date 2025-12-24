@@ -2,6 +2,7 @@ interface Expense {
   id: string;
   countrId: string;
   date: string;
+  order: number;
   price: number;
   currency: {
     id: string;

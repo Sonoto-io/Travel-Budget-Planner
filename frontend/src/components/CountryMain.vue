@@ -38,6 +38,7 @@ const selectUsers = ref([]);
 
 watchEffect(async () => {
   expenses.value = await getExpenses(countryStore.currentCountry.id);
+  expenses.value.sort((a, b) => b.order - a.order);
   expenses.value.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 });
 
@@ -55,6 +56,9 @@ const selectValues: ComputedRef<FormSelectValues> = computed(() => ({
 
 const handleAddExpense = (expense: Expense) => {
   expenses.value.unshift(expense);
+  expenses.value.sort((a, b) => b.order - a.order);
+  console.log("Sorted expenses after add:", expenses.value);
   expenses.value.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  console.log("Sorted expenses after date sort:", expenses.value);
 };
 </script>

@@ -24,7 +24,6 @@ export const configureExpensesRoutes = (app: Elysia) =>
             // Convert startDate and endDate strings to Date objects
             query.startDate = query.startDate ? new Date(query.startDate) : undefined;
             query.endDate = query.endDate ? new Date(query.endDate) : undefined;
-            query.endDate?.setHours(12)
             
           })
         .get("/summary", ({ query }) => expensesController.getSummary(query))
