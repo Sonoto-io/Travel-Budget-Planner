@@ -12,38 +12,73 @@ export class ExpensesSummaryService {
 
     const allCountries = ExpensesSummaryService.getCountriesList(expenses);
     const expectedCountDays = allCountries.reduce((acc: number, country: Country) => acc + country.expected_count_days, 0);
-    const countDays = ExpensesSummaryService.getCountDays(expenses) ?? expectedCountDays;
+    const countDaysPerUser = ExpensesSummaryService.getCountDaysPerUser(expenses) ?? expectedCountDays;
+    let daysSet = new Set<string>()
+    expenses.forEach(expense => {
+      daysSet.add(new Date(expense.date).toISOString().split('T')[0]);
+    })
+    const dailyExpensePerUser = ExpensesSummaryService.getDailyExpensesPerUser(expenses, countDaysPerUser);
     const expectedDailyExpenses = allCountries.reduce((acc: number, country: Country) => acc + country.expected_daily_expenses, 0);
-    const dailyExpenses = countExpenses > 0 ? totalExpenses / countDays : 0;
+    
+    let dailyExpenses = 0;
+
+    dailyExpensePerUser.forEach((dailyExpense) => {
+      dailyExpenses += dailyExpense;
+    })
+    dailyExpenses = dailyExpenses / dailyExpensePerUser.size;
+    
 
     return {
       totalExpenses,
       countExpenses,
       expectedCountDays,
-      countDays,
+      countDays: daysSet.size,
       dailyExpenses,
       expectedDailyExpenses,
       repartition: ExpensesSummaryService.calculateRepartition(expenses)
     };
   }
+  static getDailyExpensesPerUser(expenses:Expense[], countDaysPerUser: Map<string, number>) {
+    const totalExpensesPerUser = new Map<string, number>();
+    
+    expenses.forEach(expense => {
+      const userId = expense.user.id;
+      const expenseAmount = expense.price * expense.currency.conversion;
+      if (!totalExpensesPerUser.has(userId)) {
+        totalExpensesPerUser.set(userId, 0);
+      }
+      totalExpensesPerUser.set(userId, totalExpensesPerUser.get(userId)! + expenseAmount);
+    });
 
-  static getCountDays(expenses: Expense[]): number {
-    const startDate = expenses.reduce((earliest, expense) => {
-      const expenseDate = new Date(expense.date);
-      return expenseDate < earliest ? expenseDate : earliest;
-    }, new Date());
+    const dailyExpensesPerUser = new Map<string, number>();
+    totalExpensesPerUser.forEach((total, userId) => {
+      const days = countDaysPerUser.get(userId) || 1; // avoid division by zero
+      dailyExpensesPerUser.set(userId, total / days);
+    });
 
-    const lastDate = expenses.reduce((latest, expense) => {
-      const expenseDate = new Date(expense.date);
-      return expenseDate > latest ? expenseDate : latest;
-    }, new Date(0));
+    return dailyExpensesPerUser;
+  }
 
-    if (startDate.getTime() === new Date().getTime() || lastDate.getTime() === new Date(0).getTime()) {
-      return 0; // No valid dates found
-    }
-    const date1 = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).getTime();
-    const date2 = new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate()).getTime();
-    return Math.abs(date1 - date2) / (1000 * 60 * 60 * 24) + 1;
+  static getCountDaysPerUser(expenses: Expense[]): Map<string, number> {
+    // Count every day that has an expense for each user
+    const userDatesMap: Map<string, Set<string>> = new Map();
+    expenses.forEach(expense => {
+      const userId = expense.user.id;
+      const dateStr = new Date(expense.date).toISOString().split('T')[0];
+      if (!userDatesMap.has(userId)) {
+        userDatesMap.set(userId, new Set());
+      }
+      userDatesMap.get(userId)!.add(dateStr);
+    })
+
+    // Count daily expenses per user
+    const userDailyExpenses = new Map<string, number>();
+
+    userDatesMap.forEach((datesSet, userId) => {
+      userDailyExpenses.set(userId, datesSet.size);
+    })
+    
+    return userDailyExpenses;
   }
 
   static async getSummaryByCountry(expenses: Expense[]): Promise<Record<string, ISummary> | { message: string, status: number }> {
