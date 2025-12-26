@@ -81,10 +81,9 @@ model Expense {
   note  String?
   price Float       @default(0.00)
   date  DateTime    @db.Date
-  order Int
+  order Int         @default(0)
   location String?
   exception Boolean @default(false)
 
-  @@unique([date, order])
   @@index([date, order])
 }
