@@ -18,7 +18,8 @@ export class ExpensesSummaryService {
       daysSet.add(new Date(expense.date).toISOString().split('T')[0]);
     })
     const dailyExpensePerUser = ExpensesSummaryService.getDailyExpensesPerUser(expenses, countDaysPerUser);
-    const expectedDailyExpenses = allCountries.reduce((acc: number, country: Country) => acc + country.expected_daily_expenses, 0);
+    const expectedDailyExpenses = allCountries.reduce((acc: number, country: Country) => acc + country.expected_daily_expenses, 0) / allCountries.length;
+    
     
     let dailyExpenses = 0;
 
