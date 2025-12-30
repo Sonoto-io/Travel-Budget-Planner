@@ -17,18 +17,12 @@ export class ExpensesSummaryService {
     expenses.forEach(expense => {
       daysSet.add(new Date(expense.date).toISOString().split('T')[0]);
     })
-    const dailyExpensePerUser = ExpensesSummaryService.getDailyExpensesPerUser(expenses, countDaysPerUser);
     const expectedDailyExpenses = allCountries.reduce(
       (acc: number, country: Country) => acc + country.expected_daily_expenses * country.expected_count_days, 0
     ) / daysSet.size;
     
     
-    let dailyExpenses = 0;
-
-    dailyExpensePerUser.forEach((dailyExpense) => {
-      dailyExpenses += dailyExpense;
-    })
-    dailyExpenses = dailyExpenses / dailyExpensePerUser.size;
+    let dailyExpenses = totalExpenses / daysSet.size;
     
 
     return {
@@ -60,6 +54,7 @@ export class ExpensesSummaryService {
     });
 
     return dailyExpensesPerUser;
+
   }
 
   static getCountDaysPerUser(expenses: Expense[]): Map<string, number> {
