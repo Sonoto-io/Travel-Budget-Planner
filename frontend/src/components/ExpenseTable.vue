@@ -119,11 +119,11 @@ const props = defineProps<{
 
 const expenses = defineModel<Array<Expense>>();
 const editingRows = ref([]);
-const mainCurrency = ref(configStore.main_currency);
+const mainCurrency = ref(configStore.mainCurrency);
 const selectSubcategories = ref();
 
 watch(configStore, () => {
-  mainCurrency.value = configStore.main_currency;
+  mainCurrency.value = configStore.mainCurrency;
   selectSubcategories.value = [];
 });
 

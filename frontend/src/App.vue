@@ -17,7 +17,7 @@ const authStore = useAuthStore();
 watch(authStore, async () => {
   try {
     if (authStore.accessToken) {
-      await configStore.initMaincurrency();
+      await configStore.initStore();
     }
   } catch (error) {
     console.error("Failed to initialize main currency:", error);

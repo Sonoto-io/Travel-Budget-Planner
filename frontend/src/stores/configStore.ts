@@ -1,29 +1,41 @@
+import { getConfig, setConfig } from "@/api/config";
 import { getCurrencies } from "@/api/currencies";
 import { defineStore } from "pinia";
 
 export const useConfigStore = defineStore("config", {
   state: () => ({
-    main_currency: {id: "", locale: "fr-FR", name: "EUR", label: "Euro", conversion: 1 },
+    mainCurrency: {id: "", locale: "fr-FR", name: "EUR", label: "Euro", conversion: 1 },
     currencies: [] as Currency[],
+    enableBackground: true,
     loaded: false,
   }),
   actions: {
-    async initMaincurrency() {
+    async initStore() {
       if (this.loaded) return;
-      const currencyName = import.meta.env.VITE_MAIN_CURRENCY_NAME ?? "EUR"
+      
       this.loaded = true;
       this.currencies = []
-      // this.main_currency = {id: "", locale: "fr-FR", name: "EUR", label: "Euro", conversion: 1 };
       try {
         this.currencies = await getCurrencies();
-        this.main_currency =
-          this.currencies.find(
-            (currency) => currency.name === currencyName
-          ) || this.main_currency;
+        await this.getConfig();
       } catch (err) {
         console.error("Failed to initialize currency:", err);
         this.currencies = [];
       }
     },
+    async getConfig() {
+      const config = await getConfig()
+      if (config.currencyId) {
+        this.mainCurrency = this.currencies.find(currency => currency.id === config.currencyId) || this.mainCurrency;
+      }
+      this.enableBackground = config.enableBackground ?? true
+    },
+    async saveConfig() {
+      // Save the current configuration
+      setConfig({
+        currencyId: this.mainCurrency.id,
+        enableBackground: this.enableBackground,
+      })
+    }
   },
 });

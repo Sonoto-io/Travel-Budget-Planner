@@ -31,6 +31,7 @@ model Currency {
 
   expenses  Expense[]
   countries Country[]
+  config  Config[]
 }
 
 model Country {
@@ -86,4 +87,12 @@ model Expense {
   exception Boolean @default(false)
 
   @@index([date, order])
+}
+
+model Config {
+  id                Int      @id @default(1)   // constant primary key
+  currencyId       String?   @db.Uuid
+  enableBackground  Boolean  @default(true)
+
+  mainCurrency Currency? @relation(fields: [currencyId], references: [id])
 }

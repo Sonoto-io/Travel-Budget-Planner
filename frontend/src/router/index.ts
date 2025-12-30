@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "@/views/HomeView.vue";
 import CountryView from "@/views/CountryView.vue";
 import ManagementView from "@/views/ManagementView.vue";
+import SettingsView from "@/views/SettingsView.vue";
 import { useCountryStore } from "@/stores/countryStore";
 import { getCountries } from "@/api/countries";
 import LoginView from "@/views/LoginView.vue";
@@ -27,6 +28,11 @@ const routes = [
     path: "/management/:item",
     name: "management",
     component: ManagementView,
+  },
+  {
+    path: "/settings",
+    name: "settings",
+    component: SettingsView,
   },
 ];
 
