@@ -92,6 +92,11 @@ const items = ref([
       { label: "Users", route: "/management/users" },
     ],
   },
+  {
+    label: "Settings",
+    icon: "pi pi-sliders-h",
+    route: "/settings",
+  },
 ]);
 </script>
 

@@ -7,6 +7,7 @@ import { configureCurrenciesRoutes } from "./currenciesRoutes";
 import { configureSubcategoriesRoutes } from "./subcategoriesRoutes";
 import { configureUsersRoutes } from "./usersRoutes";
 import { configureAuthRoutes } from "./authRoutes";
+import { configureConfigRoutes } from "./configRoutes";
 
 const routeModules = [
         configureCategoriesRoutes,
@@ -16,6 +17,7 @@ const routeModules = [
         configureSubcategoriesRoutes,
         configureUsersRoutes,
         configureAuthRoutes,
+        configureConfigRoutes
     ];
 
 

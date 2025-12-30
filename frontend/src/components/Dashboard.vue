@@ -1,30 +1,34 @@
 <template>
   <Panel header="Dashboard" toggleable :collapsed="props.collapsed" class="w-full">
-    <div class=" mb-4 flex flex-wrap lg:flex-nowrap flex-row justify-between">
-      <SummaryMetadata :summary="globalSummary" />
-      <div class="w-full flex flex-wrap gap-4">
-        <SummaryChart :summary="byUserSummary" title="Summary by User" />
-        <SummaryChart v-if="isGlobalDashboard" :summary="byCountrySummary" title="Summary by country" />
-      </div>
+    <div v-if="Object.values(byUserSummary)[0]?.totalExpenses == 0" class="text-center p-4 font-bold mb-4">
+      No Data Yet, add expenses first
     </div>
-    <!-- Controls -->
-    <div class="flex gap-4 flex-col lg:flex-row justify-between items-center mb-4">
-      <Button label="Refresh" icon="pi pi-refresh" class="p-button-text" @click="refresh" />
-      <div display="flex" class="flex items-center gap-2">
-        <label>Include Exceptions</label>
-        <ToggleSwitch v-model="withExceptions" />
+    <div v-else>
+      <div class=" mb-4 flex flex-wrap lg:flex-nowrap flex-row justify-between">
+        <SummaryMetadata :summary="globalSummary" />
+        <div class="w-full flex flex-wrap gap-4">
+          <SummaryChart :summary="byUserSummary" title="Summary by User" />
+          <SummaryChart v-if="isGlobalDashboard" :summary="byCountrySummary" title="Summary by country" />
+        </div>
       </div>
-      <div>
-        <label class="mr-2">Start Date:</label>
-        <DatePicker id="startDate" v-model="startDate"/>
-      </div>
-      <div>
-        <label class="mr-2">End Date:</label>
-        <DatePicker id="endDate" v-model="endDate"/>
-      </div>
-    </div>
+          </div>
 
-
+      <!-- Controls -->
+      <div class="flex gap-4 flex-col lg:flex-row justify-between items-center mb-4">
+        <Button label="Refresh" icon="pi pi-refresh" class="p-button-text" @click="refresh" />
+        <div display="flex" class="flex items-center gap-2">
+          <label>Include Exceptions</label>
+          <ToggleSwitch v-model="withExceptions" />
+        </div>
+        <div>
+          <label class="mr-2">Start Date:</label>
+          <DatePicker id="startDate" v-model="startDate" />
+        </div>
+        <div>
+          <label class="mr-2">End Date:</label>
+          <DatePicker id="endDate" v-model="endDate" />
+        </div>
+      </div>
   </Panel>
 </template>
 
@@ -81,16 +85,16 @@ const createQueryParam = () => {
     queryParams.endDate = endDate.value.toISOString().split('T')[0];
   }
   return queryParams;
-}; 
+};
 
 const refresh = async () => {
-    const queryParams = createQueryParam();
-    globalSummary.value = await getExpensesSummary(queryParams)
-    byUserSummary.value = await getExpensesByUserSummary(queryParams)
-    if (props.isGlobalDashboard) {
-      byCountrySummary.value = await getExpensesByCountrySummary(queryParams)
-    }
-  };
+  const queryParams = createQueryParam();
+  globalSummary.value = await getExpensesSummary(queryParams)
+  byUserSummary.value = await getExpensesByUserSummary(queryParams)
+  if (props.isGlobalDashboard) {
+    byCountrySummary.value = await getExpensesByCountrySummary(queryParams)
+  }
+};
 
 watchEffect(refresh);
 </script>

@@ -18,12 +18,12 @@ const props = defineProps<{
 
 const configStore = useConfigStore();
 
-const mainCurrency = ref(configStore.main_currency);
+const mainCurrency = ref(configStore.mainCurrency);
 const chartData = ref();
 const chartOptions = ref();
 
 watch(configStore, () => {
-  mainCurrency.value = configStore.main_currency;
+  mainCurrency.value = configStore.mainCurrency;
 });
 
 onMounted(() => {
