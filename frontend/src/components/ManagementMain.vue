@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col gap-4 overflow-x-scroll">
-    <h1 class="text-lg">Management {{ itemType }}</h1>
     <div class="">
       <ManagementForm :items="items" :itemType="itemType"
       @addItem="handleAddItem"/>
