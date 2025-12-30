@@ -21,9 +21,10 @@ export class ExpensesSummaryService {
     const expectedDailyExpenses = allCountries.reduce(
       (acc: number, country: Country) => acc + country.expected_daily_expenses * country.expected_count_days, 0
     ) / totalExpectedDays;
-    
-    let dailyExpenses = totalExpenses / daysSet.size;
-    
+
+    const usersCount = new Set(expenses.map(expense => expense.user.id)).size;
+
+    let dailyExpenses = totalExpenses / daysSet.size / usersCount;
 
     return {
       totalExpenses,
