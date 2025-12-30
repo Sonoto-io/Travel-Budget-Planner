@@ -17,10 +17,11 @@ export class ExpensesSummaryService {
     expenses.forEach(expense => {
       daysSet.add(new Date(expense.date).toISOString().split('T')[0]);
     })
+
+    const totalExpectedDays = allCountries.reduce((acc: number, country: Country) => acc + country.expected_count_days, 0);
     const expectedDailyExpenses = allCountries.reduce(
       (acc: number, country: Country) => acc + country.expected_daily_expenses * country.expected_count_days, 0
-    ) / daysSet.size;
-    
+    ) / totalExpectedDays;
     
     let dailyExpenses = totalExpenses / daysSet.size;
     
