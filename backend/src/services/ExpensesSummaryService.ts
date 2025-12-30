@@ -12,7 +12,6 @@ export class ExpensesSummaryService {
 
     const allCountries = ExpensesSummaryService.getCountriesList(expenses);
     const expectedCountDays = allCountries.reduce((acc: number, country: Country) => acc + country.expected_count_days, 0);
-    const countDaysPerUser = ExpensesSummaryService.getCountDaysPerUser(expenses) ?? expectedCountDays;
     let daysSet = new Set<string>()
     expenses.forEach(expense => {
       daysSet.add(new Date(expense.date).toISOString().split('T')[0]);
