@@ -1,22 +1,120 @@
 # Travel Budget Planner
 
-A web app to manage Expenses during traveling multiple countries. Enter the different items you need (coutries, currencies, categories, subcategories and users) then select a country and add your expenses. 
+Travel Budget Planner is a self-hosted web application designed to help you track and analyze expenses while traveling across multiple countries.
 
-The Webapp can be used to easily add your expenses and display basic graphs, while you can use the API to fetch the summaries of expenses per country and display them however you want elsewhere (e.g. Home assistant)
+You can define your own structure (countries, currencies, categories, subcategories, and users), then log expenses per country.  
+The web interface is optimized for quick daily expense entry, while the API allows you to reuse the data elsewhere (for example in dashboards, automations, or Home Assistant).
 
-## Install
+---
+
+## Features
+
+- Multi-country expense tracking
+- Multiple currencies with conversion to a main currency
+- Custom categories and subcategories
+- Multi-user support
+- Expense summaries and basic dashboards
+- REST API with Swagger documentation
+- Designed for self-hosting
+
+---
+
+## Installation
 
 ### Prerequisites
 
-- make, npm, docker, docker-compose
+Make sure you have the following installed:
 
-### Command
+- `make`
+- `npm`
+- `docker`
+- `docker-compose`
+
+### Start the app
 
 ```bash
 make dev-up
 ```
+Once started:
 
-Then head to your ip address or app.localhost if in local, and you can use the app
+Access the web app via your IP address or app.localhost (when running locally)
 
-The api is on /api, this is defined through Traefik in the compose files.
+The API is available at /api
 
+Routing is handled via Traefik, as defined in the Docker Compose configuration.
+
+---
+
+## Usage
+### Initial setup
+
+Before adding expenses, configure the following in the Management section:
+
+- Users
+- Currencies
+- Countries
+- Categories
+- Subcategories
+
+### Adding expenses
+
+1. Select a country from the Select a country menu
+2. Add expenses linked to that country, category, and user
+
+### Currency configuration
+
+- Choose your main currency in the settings
+
+- Currency conversion rates are defined relative to the main currency
+  - The main currency rate must be 1
+
+- Currency symbols are determined using the LOCALE value
+
+The LOCALE follows the BCP 47 format:
+```
+language-REGION
+```
+
+#### Examples:
+
+- ```en-US``` → USD
+- ```fr-FR``` → EUR
+
+A list of locale identifiers can be found here:
+https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
+
+### Dashboards
+
+After adding expenses, you can view:
+
+- Total expenses
+- Breakdown by country
+- Breakdown by user
+
+---
+
+## API
+
+Swagger documentation is available at:
+
+```
+/api/swagger
+```
+
+### Expense summaries
+
+Summary endpoints are available under:
+
+```
+/api/expenses/summary
+/api/expenses/summary/by-user
+/api/expenses/summary/by-country
+```
+
+These endpoints are useful if you want to visualize or reuse the data in external tools (e.g. custom dashboards, Home Assistant, or other apps).
+
+---
+
+## License
+
+This project is licensed under the MIT License.
