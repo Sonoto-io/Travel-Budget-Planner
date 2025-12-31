@@ -91,8 +91,15 @@ const refresh = async () => {
   const queryParams = createQueryParam();
   globalSummary.value = await getExpensesSummary(queryParams)
   byUserSummary.value = await getExpensesByUserSummary(queryParams)
+  // get only 6 entries max with expenses > 0
+  byUserSummary.value = Object.fromEntries(
+    Object.entries(byUserSummary.value).filter(([_, value]) => value.totalExpenses > 0).slice(0, 6)
+  );
   if (props.isGlobalDashboard) {
     byCountrySummary.value = await getExpensesByCountrySummary(queryParams)
+    byCountrySummary.value = Object.fromEntries(
+      Object.entries(byCountrySummary.value).filter(([_, value]) => value.totalExpenses > 0).slice(0, 6)
+    );
   }
 };
 
