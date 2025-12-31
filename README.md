@@ -30,14 +30,35 @@ Make sure you have the following installed:
 - `docker`
 - `docker-compose`
 
-### Start the app
+fill a .env file with the examples given in .env.examples
+
+### Start the app for dev
 
 ```bash
 make dev-up
+or 
+make dev-reset (to reset db too)
 ```
+
 Once started:
 
 Access the web app via your IP address or app.localhost (when running locally)
+
+The API is available at /api
+
+Routing is handled via Traefik, as defined in the Docker Compose configuration.
+
+
+
+### Start the app for prod
+
+```bash
+make prod-up
+```
+
+Once started:
+
+Access the web app via localhost:5173
 
 The API is available at /api
 
