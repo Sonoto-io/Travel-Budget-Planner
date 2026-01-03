@@ -4,8 +4,8 @@ import { cookieSchema } from "@routes/authRoutes";
 export const authService = new AuthService()
 
 export const authController = {
-  async getAuthorization() {
-    return authService.getAuthorization();
+  async getAuthorization(query: URLSearchParams) {
+    return authService.getAuthorization(query);
   },
   async callback(code : string, cookie: typeof cookieSchema) {
     return authService.getTokenByCode(code, cookie);

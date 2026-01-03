@@ -10,7 +10,7 @@ export const configureAuthRoutes = (app: Elysia) => app.group(
   "/auth",
   (app) =>
     app
-      .get("/init", () => authController.getAuthorization())
+      .get("/init", ({ query }) => authController.getAuthorization(query))
       .get("/callback", ({ query, cookie }) => authController.callback(query.code, cookie), {
                 query: t.Object({
                   code: t.String(),

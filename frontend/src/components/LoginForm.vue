@@ -6,9 +6,20 @@
 
 <script setup lang="ts">
 import Button from "primevue/button";
+import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
 
-const login = () => {
-  window.location.href = "/api/auth/init";
+const login = async () => {
+  const url = Capacitor.isNativePlatform()
+    ? encodeURI(`http://192.168.0.122:3000/auth/init?redirect_uri=io.sonoto.travelbudgetplanner://auth/callback`)
+    : '/api/auth/init';
+
+    console.log("Login URL:", url);
+  if (Capacitor.isNativePlatform()) {
+    await Browser.open({ url });
+  } else {
+    window.location.href = url;
+  }
 };
 
 </script>
