@@ -17,7 +17,7 @@ export class AuthService {
     REDIRECT_URI = process.env.REDIRECT_URI ?? "http://localhost/auth/callback"
     ALGORITHM = process.env.ALGORITHM ?? "HS256"
     ISSUER = process.env.ISSUER ?? "http://sso.domain.com/application/o/"
-    FRONTEND_URL = process.env.FRONTEND_URL ?? "http://app.localhost/"
+    FRONTEND_URL = process.env.FRONTEND_URL ?? "http://app.localhost"
 
     API_KEY = process.env.API_KEY
 
@@ -68,7 +68,7 @@ export class AuthService {
     async redirectWithTmpCode(provider_subject: string, username: string) {
         // generate temp auth code and store in DB with expiration
         const tempAuthCode = await authService.createTempAuthCode(provider_subject, username);
-        return Response.redirect(`${authService.FRONTEND_URL}finalize-authentication?code=${tempAuthCode}`);
+        return Response.redirect(`${authService.FRONTEND_URL}/finalize-authentication?code=${tempAuthCode}`);
     }
 
     async createTempAuthCode(provider_subject: string, username: string) {
