@@ -21,12 +21,11 @@ export class AuthService {
 
     API_KEY = process.env.API_KEY
 
-    async getAuthorization(query: URLSearchParams) {
+    async getAuthorization() {
         const url = new URL(this.AUTHORIZE_URL);
         url.searchParams.set("response_type", "code");
         url.searchParams.set("client_id", this.CLIENT_ID);
-        console.log("redirect_url:", query.redirect_uri);
-        url.searchParams.set("redirect_uri", query.redirect_uri ?? this.REDIRECT_URI);
+        url.searchParams.set("redirect_uri", this.REDIRECT_URI);
         url.searchParams.set("scope", "openid profile email offline_access");
 
         return Response.redirect(url.toString());
