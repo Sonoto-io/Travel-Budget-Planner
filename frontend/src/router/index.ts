@@ -6,7 +6,7 @@ import SettingsView from "@/views/SettingsView.vue";
 import { useCountryStore } from "@/stores/countryStore";
 import { getCountries } from "@/api/countries";
 import LoginView from "@/views/LoginView.vue";
-import { getToken } from "@/services/login";
+import { isAuthenticated, getTokenFromCode } from "@/services/login";
 
 const routes = [
   {
@@ -34,6 +34,11 @@ const routes = [
     name: "settings",
     component: SettingsView,
   },
+  {
+    path: "/finalize-authentication",
+    name: "finalize-authentication",
+    component: LoginView,
+  },
 ];
 
 const router = createRouter({
@@ -43,19 +48,27 @@ const router = createRouter({
 
 
 router.beforeEach(async (to, _from, next) => {
-  const isAuthenticated = await getToken()
+  const authenticated = await isAuthenticated()
 
-  if (!isAuthenticated &&
+  if (to.name == 'finalize-authentication'
+    && !authenticated
+  ) {
+    await getTokenFromCode(to.query.code as string)
+    next({ name: 'dashboard' });
+    return
+  }
+
+  if (!authenticated &&
       to.name !== 'login'
       && !to.fullPath.includes("/api")
     ) {
     next({ name: 'login' });
     return
-  } else if (to.name == "login" && isAuthenticated) {
+  } else if (to.name == "login" && authenticated) {
     next({ name: 'dashboard' });
     return
   }
-  if (to.name !== 'login' && isAuthenticated) {
+  if (to.name !== 'login' && authenticated) {
     const countryStore = useCountryStore();
     countryStore.countryList = (await getCountries());
     if (to.fullPath.startsWith("/country/") && to.params.shortname) {

@@ -30,7 +30,7 @@
       "@routes/*": ["./src/routes/*"],
       "@repositories/*": ["./src/repositories/*"],
       "@controllers/*": ["./src/controllers/*"],
-      "@generated/*": ["./src/generated/*"]
+      "@generated/*": ["./src/generated/*"],
     }
   }
 }
