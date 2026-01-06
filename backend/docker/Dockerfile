@@ -44,6 +44,9 @@ COPY --from=prerelease /app/src/ ./src/
 COPY --from=prerelease /app/prisma/ ./prisma/
 COPY --from=prerelease /app/docker/entrypoint.sh .
 
+ENV PRISMA_QUERY_ENGINE_LIBRARY=/tmp/prisma
+ENV PRISMA_QUERY_ENGINE_BINARY=/tmp/prisma
+
 RUN mkdir -p src/generated
 RUN chown -R bun:bun src/generated
 
