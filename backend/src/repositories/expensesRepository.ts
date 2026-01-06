@@ -1,4 +1,4 @@
-import { type Expense, Prisma } from ".prisma/client";
+import { type Expense, Prisma } from "@generated/client";
 
 import { prismaClient } from "./prismaClient";
 
