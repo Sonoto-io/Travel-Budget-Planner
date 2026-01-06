@@ -1,6 +1,7 @@
-import { PrismaClient, type Subcategory, Prisma } from ".prisma/client";
+import { type Subcategory, Prisma } from ".prisma/client";
+import { prismaClient } from "./prismaClient";
 
-const prisma = new PrismaClient();
+const prisma = prismaClient;
 
 export const subcategoryRepository = {
   getAll(): Promise<Array<Subcategory>> {

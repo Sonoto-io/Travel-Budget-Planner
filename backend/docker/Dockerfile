@@ -39,12 +39,14 @@ COPY --from=prerelease /app/index.ts .
 COPY --from=prerelease /app/app.ts .
 COPY --from=prerelease /app/package.json .
 COPY --from=prerelease /app/tsconfig.json .
+COPY --from=prerelease /app/prisma.config.ts .
 COPY --from=prerelease /app/src/ ./src/
 COPY --from=prerelease /app/prisma/ ./prisma/
 COPY --from=prerelease /app/docker/entrypoint.sh .
 
-RUN chown -R bun:bun node_modules
-RUN mkdir -p /app/node_modules/.prisma/
+RUN mkdir -p src/generated
+RUN chown -R bun:bun src/generated
+
 # run the app
 USER bun
 EXPOSE 3000/tcp

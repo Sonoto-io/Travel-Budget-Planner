@@ -5,13 +5,12 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
+  provider = "prisma-client"
+  output   = "../src/generated"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -95,4 +94,31 @@ model Config {
   enableBackground  Boolean  @default(true)
 
   mainCurrency Currency? @relation(fields: [currencyId], references: [id])
+}
+
+model AuthLoginCode {
+  code        String @id
+  accountId    String @db.Uuid
+  expires_at  DateTime
+  used_at     DateTime?
+
+  account Account @relation(fields: [accountId], references: [id])
+}
+
+model Account {
+  id String @db.Uuid @id @default(uuid())
+  username String
+  provider_subject String @unique
+  created_at DateTime @default(now())
+
+  AuthLoginCode AuthLoginCode[]
+  Session       Session[]
+}
+
+model Session {
+  id  String @id @db.Uuid @default(uuid())
+  accountId String @db.Uuid
+  expiresAt DateTime
+
+  account Account @relation(fields: [accountId], references: [id])
 }

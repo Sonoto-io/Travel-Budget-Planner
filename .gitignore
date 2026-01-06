@@ -36,3 +36,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # Capacitor build folders
 android/
 ios/
+
+# Prisma
+backend/src/generated/

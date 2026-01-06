@@ -1,6 +1,7 @@
-import { PrismaClient, type Currency, Prisma } from ".prisma/client";
+import { type Currency, Prisma } from ".prisma/client";
+import { prismaClient } from "./prismaClient";
 
-const prisma = new PrismaClient();
+const prisma = prismaClient;
 
 export const currencyRepository = {
   getAll(): Promise<Array<Currency>> {

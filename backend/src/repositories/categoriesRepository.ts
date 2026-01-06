@@ -1,6 +1,7 @@
-import { PrismaClient, type Category, Prisma } from ".prisma/client";
+import { type Category, Prisma } from ".prisma/client";
+import { prismaClient } from "./prismaClient";
 
-const prisma = new PrismaClient();
+const prisma = prismaClient;
 
 export const categoryRepository = {
   getAll(): Promise<Array<Category>> {

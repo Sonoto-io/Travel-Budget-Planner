@@ -1,6 +1,7 @@
-import { PrismaClient, type User, Prisma } from ".prisma/client";
+import { type User, Prisma } from ".prisma/client";
+import { prismaClient } from "./prismaClient";
 
-const prisma = new PrismaClient();
+const prisma = prismaClient;
 
 export const userRepository = {
   getAll(): Promise<Array<User>> {
