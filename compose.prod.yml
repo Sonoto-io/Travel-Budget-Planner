@@ -2,7 +2,6 @@ services:
   reverse-proxy:
     image: traefik:v3.3.5
     command:
-      - --api.insecure=true
       - --providers.docker
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
