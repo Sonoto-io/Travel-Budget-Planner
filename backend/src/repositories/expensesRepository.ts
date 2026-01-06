@@ -1,6 +1,8 @@
-import { PrismaClient, type Expense, Prisma } from ".prisma/client";
+import { type Expense, Prisma } from ".prisma/client";
 
-const prisma = new PrismaClient();
+import { prismaClient } from "./prismaClient";
+
+const prisma = prismaClient;
 
 export const expenseRepository = {
   getAll(options?: Prisma.ExpenseFindManyArgs): Promise<Expense[]> {

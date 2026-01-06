@@ -1,5 +1,6 @@
 import { AuthService } from "@services/authService";
 import { cookieSchema } from "@routes/authRoutes";
+import { sessionsRepository } from "@repositories/sessionsRepository";
 
 export const authService = new AuthService()
 
@@ -7,15 +8,22 @@ export const authController = {
   async getAuthorization() {
     return authService.getAuthorization();
   },
-  async callback(code : string, cookie: typeof cookieSchema) {
-    return authService.getTokenByCode(code, cookie);
+  async callback(providerCode : string, cookie: typeof cookieSchema) {
+    const account = await authService.getUserData(providerCode, cookie);
+    return authService.redirectWithTmpCode(account.provider_subject, account.username);
   },
-  async refreshToken(request: Request, cookie: typeof cookieSchema) {
-    const cookieHeader = request.headers.get("cookie") || "";
-    const refreshToken = cookieHeader.split("; ").find(row => row.startsWith("refresh_token="))?.split("=")[1];
-    if (!refreshToken) {
-      return { error: "No refresh token" };
+  finalizeAuthentication(code: string, cookie: typeof cookieSchema) {
+    return authService.finalizeAuthentication(code, cookie);
+  },
+  verifySession(cookie: typeof cookieSchema) {
+    const sessionToken = cookie.session;
+    if (!sessionToken.value) {
+      return { valid: false };
     }
-    return authService.refreshToken(refreshToken, cookie);
+    // clean sessions
+    sessionsRepository.deleteExpiredSessions().catch(() => { /* ignore errors */ });
+    return sessionsRepository.verifySession(sessionToken.value)
+      .then(valid => ({ valid }))
+      .catch(() => ({ valid: false }));
   },
 };

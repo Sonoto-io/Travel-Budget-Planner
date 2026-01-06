@@ -16,7 +16,7 @@ const authStore = useAuthStore();
 
 watch(authStore, async () => {
   try {
-    if (authStore.accessToken) {
+    if (authStore.authenticated) {
       await configStore.initStore();
     }
   } catch (error) {

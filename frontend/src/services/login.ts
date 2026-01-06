@@ -1,37 +1,25 @@
 import { useAuthStore } from "@/stores/authStore";
 import { pinia } from "@/pinia";
 
-const getToken = async () => {
-  const authStore = useAuthStore(pinia);
-  let token = authStore.accessToken;
-
-  if (!token) {
-    try {
-      const newTokenData = await refreshAccessToken();
-      token = newTokenData.access_token;
-
-      authStore.setAccessToken(token);
-    } catch (err) {
-      console.error("Failed to refresh token:", err);
-      token = null;
-    }
-  }
-
-  return token;
-};
-
-export const refreshAccessToken = async () => {
-  const res = await fetch("/api/auth/refresh", {
+const isAuthenticated = async () => {
+  // verify session cookie is valid from backend
+  const res = await fetch("/api/auth/verify-session", {
     method: "POST",
     credentials: "include"
   });
-  const data = (await res.body?.getReader().read()
-    .then(({ value }) => {
-      const decoder = new TextDecoder();
-      return JSON.parse(decoder.decode(value));
-    })) as { access_token: string, refresh_token: string }
+  const valid = await res.json().then(data => data.valid)
+  useAuthStore(pinia).setAuthenticated(valid);
+  return valid;
+};
 
-  if (!res.ok) throw new Error("Failed to refresh");
-  return data;
+export const getTokenFromCode = (code: string) => {
+  // TODO: if native, close browser and ask for token from app
+  return fetch(`/api/auth/finalize`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code }),
+  });
 }
-export { getToken };
+
+export { isAuthenticated };

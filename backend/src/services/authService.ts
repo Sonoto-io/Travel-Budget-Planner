@@ -1,16 +1,12 @@
 import type { cookieSchema } from "@routes/authRoutes";
 import type { Context } from "elysia";
-import { jwtVerify } from "jose";
 import { LogsService } from "./logsService";
+import { authLoginCodesRepository } from "@repositories/authLoginCodesRepository";
+import { accountsRepository } from "@repositories/accountsRepository";
+import { authService } from "@controllers/authController";
+import { sessionsRepository } from "@repositories/sessionsRepository";
 
 const logger = new LogsService();
-interface TokenResponse {
-    access_token: string;
-    refresh_token: string;
-    expires_in: number;
-    token_type: string;
-    scope: string;
-}
 
 export class AuthService {
     CLIENT_ID = process.env.CLIENT_ID ?? ""
@@ -35,7 +31,7 @@ export class AuthService {
         return Response.redirect(url.toString());
     }
 
-    async getTokenByCode(code: string, cookie: typeof cookieSchema) {
+    async getUserData(code: string) {
         const params = new URLSearchParams({
             'grant_type': 'authorization_code',
             'code': code,
@@ -51,115 +47,134 @@ export class AuthService {
             body: params.toString()
         });
 
-        const data = await response.json() as TokenResponse;
 
-        const refresh_token = data["refresh_token"] ?? "";
-        if (!refresh_token) {
-            throw new Error("No refresh token received");
+
+        const idToken = response.ok ? response.json().then(data => data.id_token) : "";
+
+        const payload = JSON.parse(
+            Buffer.from((await idToken).split(".")[1], "base64").toString()
+        );
+
+        // add account creation here
+        return await accountsRepository.createIfNotExist({
+            username: payload.preferred_username,
+            provider_subject: payload.sub,
+            created_at: new Date(),
         }
+        );
 
-        cookie.refresh_token.set({
-            value: refresh_token,
-            httpOnly: true,
-            secure: true,
-            sameSite: "Strict",
-            path: "/",
-            maxAge: 60 * 60 * 24 * 30,
-        });
-
-        return Response.redirect(this.FRONTEND_URL);
     }
 
-    async refreshToken(refresh_token: string, cookie: typeof cookieSchema) {
-        const params = new URLSearchParams({
-            'grant_type': 'refresh_token',
-            'refresh_token': refresh_token,
-            'client_id': this.CLIENT_ID,
-            'client_secret': this.CLIENT_SECRET,
-        });
-
-        const headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
-        const response = await fetch(this.TOKEN_URL, {
-            method: 'POST',
-            headers: headers,
-            body: params.toString()
-        })
-        const data = await response.json();
-
-        if (!data.access_token && !data.refresh_token) {
-            cookie.refresh_token.set({ value: "", path: "/", maxAge: 0 });
-            logger.warning("Refresh token invalid or expired", { refresh_token });
-            throw new Error("Invalid refresh token, please log in again");
-        }
-
-        cookie.refresh_token.set({
-            value: data.refresh_token,
-            httpOnly: true,
-            secure: true,
-            sameSite: "Strict",
-            path: "/",
-            maxAge: 60 * 60 * 24 * 30, // optional, 30 days
-        });
-
-        return data;
+    async redirectWithTmpCode(provider_subject: string, username: string) {
+        // generate temp auth code and store in DB with expiration
+        const tempAuthCode = await authService.createTempAuthCode(provider_subject, username);
+        return Response.redirect(`${authService.FRONTEND_URL}finalize-authentication?code=${tempAuthCode}`);
     }
 
+    async createTempAuthCode(provider_subject: string, username: string) {
+        // generate temp auth code and store in DB with expiration
+        const code = crypto.randomUUID();
+
+        let account = await accountsRepository.findByProviderSubject(provider_subject);
+        if (!account) {
+            // create account
+            account = await accountsRepository.createIfNotExist({
+                username: username,
+                provider_subject: provider_subject,
+                created_at: new Date(),
+            });
+        }
+
+        try {
+            await authLoginCodesRepository.create({
+                code: code,
+                expires_at: new Date(Date.now() + 60 * 1000), // 1 minute from now
+                account: { connect: { id: account.id } },
+            });
+        } catch (error) {
+            console.error("Error creating auth login code:", error);
+            throw new Error("Could not create temporary authentication code");
+        }
+
+        return code;
+    }
+    async finalizeAuthentication(code: string, cookie: typeof cookieSchema) {
+        // verify that code exists in DB
+        const authLogin = await authLoginCodesRepository.get(code)
+
+        if (!authLogin || authLogin.expires_at < new Date()) {
+            throw new Error("Invalid or expired login code");
+        }
+        // exchange code for tokens
+        await this.createSession(authLogin.accountId, cookie);
+        // remove code from DB
+        await authLoginCodesRepository.deleteCode(code)
+        return;
+    }
+
+    // Create session and set cookies
+    async createSession(accountId: string, cookie: typeof cookieSchema) {
+        const account = await accountsRepository.get(accountId);
+
+        if (!account) {
+            throw new Error("Account not found for session creation");
+        }
+        // generate access and refresh tokens
+        const session = await sessionsRepository.create(account);
+
+        if (!session) {
+            throw new Error("Could not create session");
+        }
+
+        cookie.session.set({
+            value: session.id,
+            httpOnly: true,
+            secure: true,
+            sameSite: "lax",
+            path: "/",
+        });
+    }
 
     // Auth middleware
     async authMiddleware(ctx: Context) {
-        try {
-            const { user } = await this.validateRequest(ctx);
-            ctx.request.user = user;
-            ctx.set.status = 200
-        } catch (err) {
-            ctx.set.status = 401
-            logger.error("Authentication failed", { error: (err as Error).message });
-            throw new Response(JSON.stringify({ error: (err as Error).message }), {
-                status: 401,
-                headers: { "Content-Type": "application/json" }
-            });
-        }
-    };
+            try {
+                const { user } = await this.validateRequest(ctx);
+                ctx.request.user = user;
+                ctx.set.status = 200
+            } catch (err) {
+                ctx.set.status = 401
+                logger.error("Authentication failed", { error: (err as Error).message });
+                throw new Response(JSON.stringify({ error: (err as Error).message }), {
+                    status: 401,
+                    headers: { "Content-Type": "application/json" }
+                });
+            }
+        };
 
     async validateRequest(ctx: Context) {
-        const { request, cookie, path } = ctx;
+            const { request, cookie, path } = ctx;
 
-        if (path.startsWith("/auth") || path === "/swagger" || path === "/") {
-            return { user: null };
-        }
-        const apiKey = request.headers.get("x-api-key");
+            if (path.startsWith("/auth") || path === "/swagger" || path === "/") {
+                return { user: null };
+            }
+            const apiKey = request.headers.get("x-api-key");
 
-        if (this.API_KEY && apiKey === this.API_KEY) return { user: { api: true } };
+            if (this.API_KEY && apiKey === this.API_KEY) return { user: { api: true } };
 
-        const authHeader = request.headers.get("Authorization");
-        const token = authHeader?.split(" ")[1];
-
-        try {
-            const payload = await jwtVerify(token, new TextEncoder().encode(this.CLIENT_SECRET), {
-                issuer: this.ISSUER,
-                audience: this.CLIENT_ID,
-                algorithms: [this.ALGORITHM],
-            }).then(r => r.payload);
-            return { user: payload };
-
-        } catch {
+            
             if (!cookie) {
-                logger.error("Missing token in cookies", { path, cookies: cookie });
+                logger.error("Missing session cookie", { path, cookies: cookie });
                 throw new Error("Missing token, please log in");
             }
-            const refresh = cookie.refresh_token?.value ?? "";
 
-            if (!refresh) throw new Error("Session expired, please log in again");
-            const newTokens = await this.refreshToken(refresh, cookie);
-            if (!newTokens) throw new Error("Missing access token and invalid refresh token");
-            const payload = await jwtVerify(newTokens.access_token, new TextEncoder().encode(this.CLIENT_SECRET), {
-                issuer: this.ISSUER,
-                audience: this.CLIENT_ID,
-                algorithms: [this.ALGORITHM],
-            }).then(r => r.payload)
-                .catch(() => { throw new Error("Invalid access token") });
-            return { user: payload };
+            const sessionToken = cookie.session;
+            if (!sessionToken) {
+                return { valid: false };
+            }
+
+            return sessionsRepository.verifySession(sessionToken.value)
+                .then(valid => ({ valid }))
+                .catch(() => ({ valid: false }));
         }
-    }
 
-}
+    }
