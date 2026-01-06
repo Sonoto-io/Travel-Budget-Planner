@@ -1,5 +1,5 @@
 import { expenseRepository } from "@repositories/expensesRepository";
-import { Prisma } from ".prisma/client";
+import { Prisma } from "@generated/client";
 import { status } from "elysia";
 import { ExpensesSummaryService } from "@services/ExpensesSummaryService";
 
