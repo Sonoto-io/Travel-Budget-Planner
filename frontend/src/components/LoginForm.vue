@@ -11,7 +11,7 @@ import { Capacitor } from '@capacitor/core';
 
 const login = async () => {
   const url = Capacitor.isNativePlatform()
-    ? encodeURI(`http://192.168.0.122:3000/auth/init?redirect_uri=io.sonoto.travelbudgetplanner://auth/callback`)
+    ? encodeURI(`/api/auth/init?redirect_uri=travelbudget://api/auth/callback`)
     : '/api/auth/init';
 
     console.log("Login URL:", url);

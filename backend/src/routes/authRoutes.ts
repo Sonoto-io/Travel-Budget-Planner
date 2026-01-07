@@ -11,7 +11,11 @@ export const configureAuthRoutes = (app: Elysia) => app.group(
   (app) =>
     app
       // frontend asks to go to SSO authorization endpoint
-      .get("/init", () => authController.getAuthorization())
+      .get("/init", ({ query }) => authController.getAuthorization(query.redirect_uri ?? null), {
+        query: t.Object({
+          redirect_uri: t.Optional(t.String()),
+        }),
+      })
       // SSO redirects back here with authorization code
       .get("/callback", ({ query, cookie }) => authController.callback(query.code, cookie), {
         query: t.Object({

@@ -5,8 +5,8 @@ import { sessionsRepository } from "@repositories/sessionsRepository";
 export const authService = new AuthService()
 
 export const authController = {
-  async getAuthorization() {
-    return authService.getAuthorization();
+  async getAuthorization(redirect_uri: string | null) {
+    return authService.getAuthorization(redirect_uri);
   },
   async callback(providerCode : string, cookie: typeof cookieSchema) {
     const account = await authService.getUserData(providerCode, cookie);

@@ -9,13 +9,13 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
-    allowedHosts: ["travelbudget.ensibf-holdings.com/api"]
+    allowedHosts: ["travelbudget.ensibf-holdings.fr"]
   },
   test: {
     globals: true,
     environment: "jsdom",
     env: {
-      VITE_API_URL: "http://travelbudget.ensibf-holdings.com/api",
+      VITE_API_URL: "http://app.localhost/api",
     },
     setupFiles: ['./vitest.setup.ts'],
     include: ["tests/**/*.{test,spec}.{ts,js}"],
