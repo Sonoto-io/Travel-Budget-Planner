@@ -2,6 +2,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { pinia } from "@/pinia";
 import { Capacitor } from '@capacitor/core';
 import api from "@/api/apiClient";
+import apiClient from "@/api/apiClient";
 
 const isAuthenticated = async () => {
   // verify session cookie is valid from backend
@@ -20,13 +21,26 @@ const isAuthenticated = async () => {
   }
 };
 
-export const getTokenFromCode = (code: string) => {
-    return fetch(`/api/auth/finalize`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code }),
-    });
-  }
+export const getTokenFromCode = async (code: string) => {
+  console.log("Finalizing authentication with code:", code);
+  const res = apiClient.post(
+    "/auth/finalize",
+    { code },
+    {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  ).then(response => {
+    return response;
+  }).catch(error => {
+    console.error("Error finalizing authentication:", JSON.stringify(error));
+    throw "Error finalizing authentication";
+  });
+
+  console.log("Finalize authentication response:", JSON.stringify(await res));
+  return res
+}
 
 export { isAuthenticated };

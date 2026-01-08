@@ -93,6 +93,7 @@ services:
     environment:
       MOCKS_ENABLED : ${MOCKS_ENABLED:-false}
       MAIN_CURRENCY_NAME : ${MAIN_CURRENCY_NAME:-EUR}
+      VITE_BACKEND_URL : ${VITE_BACKEND_URL:-http://app.localhost}
     ports:
       - "5173:5173"
     labels:

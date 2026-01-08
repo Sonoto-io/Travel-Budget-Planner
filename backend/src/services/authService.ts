@@ -99,16 +99,21 @@ export class AuthService {
         return code;
     }
     async finalizeAuthentication(code: string, cookie: typeof cookieSchema) {
-        console.log("Finalizing authentication with code:", code);
+        console.log("Inside finalize", code);
         // verify that code exists in DB
-        const authLogin = await authLoginCodesRepository.get(code)
+        try {
+            const authLogin = await authLoginCodesRepository.get(code)
 
-        if (!authLogin || authLogin.expires_at < new Date()) {
-            throw new Error("Invalid or expired login code");
+            if (!authLogin || authLogin.expires_at < new Date()) {
+                throw new Error("Invalid or expired login code");
+            }
+            console.log("Auth login code verified, creating session...");
+            // exchange code for tokens
+            await this.createSession(authLogin.accountId, cookie);
+        } catch (error) {
+            console.error("Error finalizing authentication:", error);
+            throw new Error("Could not finalize authentication");
         }
-        console.log("Auth login code verified, creating session...");
-        // exchange code for tokens
-        await this.createSession(authLogin.accountId, cookie);
         console.log("Session created successfully.");
         console.log("Cookies after session creation:", cookie);
         // remove code from DB
@@ -142,44 +147,44 @@ export class AuthService {
 
     // Auth middleware
     async authMiddleware(ctx: Context) {
-            try {
-                const { user } = await this.validateRequest(ctx);
-                ctx.request.user = user;
-                ctx.set.status = 200
-            } catch (err) {
-                ctx.set.status = 401
-                logger.error("Authentication failed", { error: (err as Error).message });
-                throw new Response(JSON.stringify({ error: (err as Error).message }), {
-                    status: 401,
-                    headers: { "Content-Type": "application/json" }
-                });
-            }
-        };
+        try {
+            const { user } = await this.validateRequest(ctx);
+            ctx.request.user = user;
+            ctx.set.status = 200
+        } catch (err) {
+            ctx.set.status = 401
+            logger.error("Authentication failed", { error: (err as Error).message });
+            throw new Response(JSON.stringify({ error: (err as Error).message }), {
+                status: 401,
+                headers: { "Content-Type": "application/json" }
+            });
+        }
+    };
 
     async validateRequest(ctx: Context) {
-            const { request, cookie, path } = ctx;
+        const { request, cookie, path } = ctx;
 
-            if (path.startsWith("/auth") || path === "/swagger" || path === "/") {
-                return { user: null };
-            }
-            const apiKey = request.headers.get("x-api-key");
+        if (path.startsWith("/auth") || path === "/swagger" || path === "/") {
+            return { user: null };
+        }
+        const apiKey = request.headers.get("x-api-key");
 
-            if (this.API_KEY && apiKey === this.API_KEY) return { user: { api: true } };
+        if (this.API_KEY && apiKey === this.API_KEY) return { user: { api: true } };
 
-            
-            if (!cookie) {
-                logger.error("Missing session cookie", { path, cookies: cookie });
-                throw new Error("Missing token, please log in");
-            }
 
-            const sessionToken = cookie.session;
-            if (!sessionToken) {
-                return { valid: false };
-            }
-
-            return sessionsRepository.verifySession(sessionToken.value)
-                .then(valid => ({ valid }))
-                .catch(() => ({ valid: false }));
+        if (!cookie) {
+            logger.error("Missing session cookie", { path, cookies: cookie });
+            throw new Error("Missing token, please log in");
         }
 
+        const sessionToken = cookie.session;
+        if (!sessionToken) {
+            return { valid: false };
+        }
+
+        return sessionsRepository.verifySession(sessionToken.value)
+            .then(valid => ({ valid }))
+            .catch(() => ({ valid: false }));
     }
+
+}
