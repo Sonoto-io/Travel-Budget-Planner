@@ -17,6 +17,7 @@ const authStore = useAuthStore();
 
 import { App } from '@capacitor/app';
 import { getTokenFromCode } from "@/services/login";
+import router from "@/router";
 
 App.addListener('appUrlOpen', async ({ url }) => {
   console.log('App opened with URL:', url);
@@ -28,10 +29,9 @@ App.addListener('appUrlOpen', async ({ url }) => {
     const code = parsed.searchParams.get('code');
     if (code) {
       console.log('Authorization code received:', code);
-      const sessionToken = await getTokenFromCode(code)
-      console.log('Session token obtained:', sessionToken);
-      window.location.href = "/dashboard"; // or use your router
-
+      await getTokenFromCode(code)
+      console.log('Token exchange completed, redirecting to home.');
+      router.push(`/`);
     }
   }
 });

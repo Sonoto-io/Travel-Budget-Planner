@@ -48,8 +48,6 @@ export class AuthService {
             body: params.toString()
         });
 
-
-
         const idToken = response.ok ? response.json().then(data => data.id_token) : "";
 
         const payload = JSON.parse(

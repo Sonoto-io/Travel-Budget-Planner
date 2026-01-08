@@ -10,7 +10,7 @@ const isAuthenticated = async () => {
       method: "POST",
       credentials: "include"
     });
-    console.log("Session verification response:", (await res).data);
+    console.log("Session verification response:", (await res).data.valid);
     const valid = (await res).data.valid;
     useAuthStore(pinia).setAuthenticated(valid);
     return valid;
