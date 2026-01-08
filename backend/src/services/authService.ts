@@ -99,14 +99,18 @@ export class AuthService {
         return code;
     }
     async finalizeAuthentication(code: string, cookie: typeof cookieSchema) {
+        console.log("Finalizing authentication with code:", code);
         // verify that code exists in DB
         const authLogin = await authLoginCodesRepository.get(code)
 
         if (!authLogin || authLogin.expires_at < new Date()) {
             throw new Error("Invalid or expired login code");
         }
+        console.log("Auth login code verified, creating session...");
         // exchange code for tokens
         await this.createSession(authLogin.accountId, cookie);
+        console.log("Session created successfully.");
+        console.log("Cookies after session creation:", cookie);
         // remove code from DB
         await authLoginCodesRepository.deleteCode(code)
         return;
