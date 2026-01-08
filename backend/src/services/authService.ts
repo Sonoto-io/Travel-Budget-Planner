@@ -125,6 +125,7 @@ export class AuthService {
         if (!session) {
             throw new Error("Could not create session");
         }
+        console.log("Session created, ading cookie now with id : ", session.id)
 
         cookie.session.set({
             value: session.id,
