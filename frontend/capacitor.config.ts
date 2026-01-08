@@ -5,10 +5,10 @@ const config: CapacitorConfig = {
   appName: 'Travel Budget Planner',
   webDir: 'dist',
   
-  server: {
-    url: 'https://travelbudget.ensibf-holdings.fr',
-    cleartext: false,
-  },
+  // server: {
+  //   url: 'https://travelbudget.ensibf-holdings.fr',
+  //   cleartext: false,
+  // },
 };
 
 

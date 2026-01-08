@@ -1,16 +1,17 @@
 import { useAuthStore } from "@/stores/authStore";
 import { pinia } from "@/pinia";
 import { Capacitor } from '@capacitor/core';
-
+import api from "@/api/apiClient";
 
 const isAuthenticated = async () => {
   // verify session cookie is valid from backend
   try {
-    const res = await fetch("/api/auth/verify-session", {
+    const res = api.post("/auth/verify-session", {
       method: "POST",
       credentials: "include"
     });
-    const valid = await res.json().then(data => data.valid)
+    console.log("Session verification response:", (await res).data);
+    const valid = (await res).data.valid;
     useAuthStore(pinia).setAuthenticated(valid);
     return valid;
   } catch (error) {

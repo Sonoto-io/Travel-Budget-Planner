@@ -4,9 +4,28 @@ import { configureAllRoutes } from "@routes";
 import { cookie } from "@elysiajs/cookie";
 import { authService } from "@controllers/authController";
 import { LogsService } from "@services/logsService";
+import { cors } from '@elysiajs/cors'
+
+const allowedOrigins = [
+  'http://localhost:5173',        // dev browser
+  'capacitor://localhost',        // native Capacitor
+  'https://localhost',            // some WebView builds
+  'https://travelbudget.ensibf-holdings.fr' // production
+];
 
 export const createApp = () => {
   return new Elysia()
+    // Enable CORS
+  .use(cors({
+    origin: (request) => {
+      if (!request.headers.has('origin')) {
+        // Some native requests have no origin, allow them
+        return true
+      }
+      return allowedOrigins.includes(request.headers.get('origin') || '')
+    },
+    credentials: true
+  }))
     .use(swagger({
       documentation: {
         info: {

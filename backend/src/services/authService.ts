@@ -8,6 +8,7 @@ import { sessionsRepository } from "@repositories/sessionsRepository";
 
 const logger = new LogsService();
 
+
 export class AuthService {
     CLIENT_ID = process.env.CLIENT_ID ?? ""
     CLIENT_SECRET = process.env.CLIENT_SECRET ?? ""

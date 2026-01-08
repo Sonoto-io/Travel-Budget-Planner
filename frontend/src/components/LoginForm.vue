@@ -8,11 +8,12 @@
 import Button from "primevue/button";
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
+import { BACKEND_URL } from "@/api/apiClient";
 
 const login = async () => {
   const url = Capacitor.isNativePlatform()
-    ? encodeURI(`/api/auth/init?redirect_uri=travelbudget://api/auth/callback`)
-    : '/api/auth/init';
+    ? encodeURI(`https://travelbudget.ensibf-holdings.fr/api/auth/init?redirect_uri=travelbudget://api/auth/callback`)
+    : `/auth/init`;
 
     console.log("Login URL:", url);
   if (Capacitor.isNativePlatform()) {

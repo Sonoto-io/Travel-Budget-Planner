@@ -9,7 +9,15 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
-    allowedHosts: ["travelbudget.ensibf-holdings.fr"]
+    allowedHosts: ["travelbudget.ensibf-holdings.fr"],
+    cors: {
+      origin: [
+        'http://localhost:3000',       // browser dev
+        'capacitor://localhost',       // Capacitor on iOS/Android
+        'https://localhost',           // some Capacitor versions use https
+      ],
+      credentials: true,
+    },
   },
   test: {
     globals: true,
@@ -22,5 +30,5 @@ export default defineConfig({
     exclude: ["**/node_modules/**", "**/dist/**"],
     isolate: false,
   },
-  
+
 });

@@ -16,18 +16,22 @@ const authStore = useAuthStore();
 
 
 import { App } from '@capacitor/app';
-import { Browser } from '@capacitor/browser';
+import { getTokenFromCode } from "@/services/login";
 
 App.addListener('appUrlOpen', async ({ url }) => {
   console.log('App opened with URL:', url);
 
-  if (url.startsWith('io.sonoto.travelbudgetplanner://auth/callback')) {
-    await Browser.close();
+  if (url.startsWith('travelbudget://api/auth/callback')) {
+    // await Browser.close();
 
     const parsed = new URL(url);
-    const token = parsed.searchParams.get('token');
-    if (token) {
-      authStore.setAccessToken(token);
+    const code = parsed.searchParams.get('code');
+    if (code) {
+      console.log('Authorization code received:', code);
+      const sessionToken = await getTokenFromCode(code)
+      console.log('Session token obtained:', sessionToken);
+      window.location.href = "/dashboard"; // or use your router
+
     }
   }
 });
