@@ -130,7 +130,7 @@ export class AuthService {
             value: session.id,
             httpOnly: true,
             secure: true,
-            sameSite: "lax",
+            sameSite: "none",
             path: "/",
         });
     }

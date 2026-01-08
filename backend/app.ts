@@ -49,6 +49,10 @@ export const createApp = () => {
           { user: (ctx.request.user?.nickname || ctx.request.user?.preferred_username || ctx.request.user?.email || 'guest') })
       }
     })
+    // TODO: remove after logs
+    .onAfterHandle(({ set }) => {
+      console.log(set.headers['set-cookie']);
+    })
     .use(configureAllRoutes)
     .get("/", () => "Hello from root !")
 };
