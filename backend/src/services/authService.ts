@@ -103,8 +103,10 @@ export class AuthService {
         // verify that code exists in DB
         try {
             const authLogin = await authLoginCodesRepository.get(code)
+            console.log("Retrieved auth login code from DB:", authLogin);
 
             if (!authLogin || authLogin.expires_at < new Date()) {
+                // TOOD: fails here
                 throw new Error("Invalid or expired login code");
             }
             console.log("Auth login code verified, creating session...");
