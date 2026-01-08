@@ -17,7 +17,7 @@ export const authController = {
   },
   verifySession(cookie: typeof cookieSchema) {
     const sessionToken = cookie.session;
-    
+    console.log("cookies = ", cookie)
     console.log("Verifying session token:", sessionToken.value);
     if (!sessionToken.value) {
       return { valid: false };

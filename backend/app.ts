@@ -6,26 +6,21 @@ import { authService } from "@controllers/authController";
 import { LogsService } from "@services/logsService";
 import { cors } from '@elysiajs/cors'
 
-const allowedOrigins = [
-  'http://localhost:5173',        // dev browser
-  'capacitor://localhost',        // native Capacitor
-  'https://localhost',            // some WebView builds
-  'https://travelbudget.ensibf-holdings.fr' // production
-];
 
 export const createApp = () => {
   return new Elysia()
     // Enable CORS
-  .use(cors({
-    origin: (request) => {
-      if (!request.headers.has('origin')) {
-        // Some native requests have no origin, allow them
-        return true
-      }
-      return allowedOrigins.includes(request.headers.get('origin') || '')
-    },
-    credentials: true
-  }))
+    .use(
+      cors({
+        origin: [
+          "https://localhost", // Capacitor Android WebView
+          "capacitor://localhost",
+          "http://localhost:5173", // Vite dev (optional)
+          "https://travelbudget.ensibf-holdings.fr", // prod frontend
+        ],
+        credentials: true,
+      })
+    )
     .use(swagger({
       documentation: {
         info: {
