@@ -23,7 +23,7 @@ export class AuthService {
     API_KEY = process.env.API_KEY
 
     async getAuthorization(native: boolean) {
-const state = JSON.stringify({ platform: (native ? "native" : "web") });
+        const state = JSON.stringify({ platform: (native ? "native" : "web") });
         const url = new URL(this.AUTHORIZE_URL);
         url.searchParams.set("response_type", "code");
         url.searchParams.set("client_id", this.CLIENT_ID);
