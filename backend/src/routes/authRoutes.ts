@@ -12,7 +12,7 @@ export const configureAuthRoutes = (app: Elysia) => app.group(
     app
       // frontend asks to go to SSO authorization endpoint
       .get("/init", ({ query }) => authController.getAuthorization(query.native ?? false), {
-          query: t.Object({
+        query: t.Object({
           native: t.Optional(t.Boolean()),
         }),
       })
@@ -23,9 +23,7 @@ export const configureAuthRoutes = (app: Elysia) => app.group(
       }, {
         query: t.Object({
           code: t.String(),
-          state: t.Optional(t.Object(
-            { platform: t.String()}
-          )),
+          state: t.Optional(t.String()),
         }),
         cookie: cookieSchema,
       })
