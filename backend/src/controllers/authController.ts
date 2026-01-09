@@ -5,12 +5,12 @@ import { sessionsRepository } from "@repositories/sessionsRepository";
 export const authService = new AuthService()
 
 export const authController = {
-  async getAuthorization(native: boolean) {
+  async getAuthorization(query: Object) {
     return authService.getAuthorization(native);
   },
-  async callback(providerCode : string, native: boolean, cookie: typeof cookieSchema) {
+  async callback(providerCode : string, state: string | null, cookie: typeof cookieSchema) {
     const account = await authService.getUserData(providerCode, cookie);
-    return authService.redirectWithTmpCode(account.provider_subject, native, account.username);
+    return authService.redirectWithTmpCode(account.provider_subject, state, account.username);
   },
   finalizeAuthentication(code: string, cookie: typeof cookieSchema) {
     return authService.finalizeAuthentication(code, cookie);

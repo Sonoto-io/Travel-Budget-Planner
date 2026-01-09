@@ -67,10 +67,17 @@ export class AuthService {
 
     }
 
-    async redirectWithTmpCode(provider_subject: string, native: boolean, username: string) {
+    async redirectWithTmpCode(provider_subject: string, state: string | null, username: string) {
         // generate temp auth code and store in DB with expiration
         const tempAuthCode = await authService.createTempAuthCode(provider_subject, username);
         console.log("Generated temp auth code:", tempAuthCode);
+        let native = false
+        console.log("state: ", state)
+        if (state) {
+            const stateObject = atob(state)
+            console.log("stateObject", stateObject)
+            native = stateObject.platform == "native"
+        }
         console.log("Redirecting to ", native ? "native app" : "web app");
         if (native) {
             return Response.redirect(`travelbudget://finalize-authentication?code=${tempAuthCode}`);
