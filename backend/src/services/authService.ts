@@ -75,6 +75,7 @@ export class AuthService {
         // generate temp auth code and store in DB with expiration
         const code = crypto.randomUUID();
 
+        console.log("Creating temp auth code for provider_subject:", provider_subject, code);
         let account = await accountsRepository.findByProviderSubject(provider_subject);
         if (!account) {
             // create account
@@ -86,11 +87,13 @@ export class AuthService {
         }
 
         try {
-            await authLoginCodesRepository.create({
+            console.log("Storing auth login code in DB for account ID:", code);
+            const res = await authLoginCodesRepository.create({
                 code: code,
                 expires_at: new Date(Date.now() + 60 * 1000), // 1 minute from now
                 account: { connect: { id: account.id } },
             });
+            console.log("Auth login code stored successfully:", JSON.stringify(res));
         } catch (error) {
             console.error("Error creating auth login code:", error);
             throw new Error("Could not create temporary authentication code");
