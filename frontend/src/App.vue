@@ -18,6 +18,7 @@ const authStore = useAuthStore();
 import { App } from '@capacitor/app';
 import { getTokenFromCode } from "@/services/login";
 import router from "@/router";
+import apiClient from "@/api/apiClient";
 
 App.addListener('appUrlOpen', async ({ url }) => {
   console.log('App opened with URL:', url);
@@ -29,6 +30,8 @@ App.addListener('appUrlOpen', async ({ url }) => {
     const code = parsed.searchParams.get('code');
     if (code) {
       console.log('Authorization code received:', code);
+      // launch the callback to create the session with the code
+      await apiClient.post("/api/auth/callback", { code });
       await getTokenFromCode(code)
       console.log('Token exchange completed, redirecting to home.');
       router.push(`/`);
