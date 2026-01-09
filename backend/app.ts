@@ -46,7 +46,7 @@ export const createApp = () => {
     })
     // TODO: remove after logs
     .onAfterHandle(({ set }) => {
-      console.log(set.headers['set-cookie']);
+      console.log("cookies after", set.headers['set-cookie']);
     })
     .use(configureAllRoutes)
     .get("/", () => "Hello from root !")
