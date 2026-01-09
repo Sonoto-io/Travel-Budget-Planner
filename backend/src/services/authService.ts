@@ -83,8 +83,8 @@ export class AuthService {
         let native = false
         console.log("state: ", state)
         if (state) {
-            const stateObject = atob(state)
-            console.log("stateObject", stateObject)
+            const stateObject = JSON.parse(atob(state))
+            console.log("stateObject", stateObject.platform)
             native = stateObject.platform == "native"
         }
         console.log("Redirecting to ", native ? "native app" : "web app");
