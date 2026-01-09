@@ -66,7 +66,6 @@ router.beforeEach(async (to, _from, next) => {
   if (to.name == 'finalize-authentication'
     && !authenticated
   ) {
-    console.log("Finalizing authentication with code:", to.query.code);
     await getTokenFromCode(to.query.code as string)
     next({ name: 'dashboard' });
     return

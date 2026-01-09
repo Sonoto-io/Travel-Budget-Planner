@@ -9,7 +9,6 @@ const isAuthenticated = async () => {
       method: "POST",
       credentials: "include"
     });
-    console.log("Session verification response:", (await res).data.valid);
     const valid = (await res).data.valid;
     useAuthStore(pinia).setAuthenticated(valid);
     return valid;
@@ -20,7 +19,6 @@ const isAuthenticated = async () => {
 };
 
 export const getTokenFromCode = async (code: string) => {
-  console.log("Finalizing authentication with code:", code);
   const res = api.post(
     "/auth/finalize",
     { code },
@@ -37,7 +35,6 @@ export const getTokenFromCode = async (code: string) => {
     throw "Error finalizing authentication";
   });
 
-  console.log("Finalize authentication response:", JSON.stringify(await res));
   return res
 }
 

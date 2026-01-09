@@ -17,14 +17,11 @@ export const authController = {
   },
   verifySession(cookie: typeof cookieSchema) {
     const sessionToken = cookie.session;
-    console.log("cookies = ", cookie)
-    console.log("Verifying session token:", sessionToken.value);
     if (!sessionToken.value) {
       return { valid: false };
     }
     // clean sessions
     sessionsRepository.deleteExpiredSessions().catch(() => { /* ignore errors */ });
-    console.log("Session token found, verifying...");
     const response = sessionsRepository.verifySession(sessionToken.value)
       .then(valid => ({ valid }))
       .catch(() => ({ valid: false }));

@@ -21,18 +21,14 @@ import router from "@/router";
 import apiClient from "@/api/apiClient";
 
 App.addListener('appUrlOpen', async ({ url }) => {
-  console.log('App opened with URL:', url);
 
   if (url.startsWith('travelbudget://finalize-authentication')) {
-    // await Browser.close();
 
     const parsed = new URL(url);
     const code = parsed.searchParams.get('code');
     if (code) {
-      console.log('Authorization code received:', code);
       // launch the callback to create the session with the code
       await getTokenFromCode(code)
-      console.log('Token exchange completed, redirecting to home.');
       router.push(`/`);
     }
   }
