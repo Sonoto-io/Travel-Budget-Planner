@@ -5,11 +5,7 @@ import { sessionsRepository } from "@repositories/sessionsRepository";
 export const authService = new AuthService()
 
 export const authController = {
-  async getAuthorization(query: { platform: "native" | "web"; } | undefined) {
-    console.log("Auth init query parameters:", JSON.stringify(query));
-    const native = query?.platform === "native";
-    console.log("Initiating authorization, platform:", native ? "native" : "web");
-
+  async getAuthorization(native: boolean) {
     return authService.getAuthorization(native);
   },
   async callback(providerCode : string, native: boolean, cookie: typeof cookieSchema) {
