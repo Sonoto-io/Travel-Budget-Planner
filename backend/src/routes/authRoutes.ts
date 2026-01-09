@@ -14,7 +14,7 @@ export const configureAuthRoutes = (app: Elysia) => app.group(
       .get("/init", ({ query }) => authController.getAuthorization(query), {
         query: t.Object({
           state: t.Optional(t.Object(
-            { platform: t.String() }
+            { platform: t.Union([t.Literal("native"), t.Literal("web")]) }
           )),
         }),
       })
