@@ -23,12 +23,13 @@ export class AuthService {
     API_KEY = process.env.API_KEY
 
     async getAuthorization(native: boolean) {
+const state = JSON.stringify({ platform: (native ? "native" : "web") });
         const url = new URL(this.AUTHORIZE_URL);
         url.searchParams.set("response_type", "code");
         url.searchParams.set("client_id", this.CLIENT_ID);
         url.searchParams.set("redirect_uri", this.REDIRECT_URI);
         url.searchParams.set("scope", "openid profile email offline_access");
-        url.searchParams.set("native", native ? "true" : "false");
+        url.searchParams.set("state", btoa(JSON.stringify(state)));
 
         console.log("Redirecting to SSO authorization endpoint:", url.toString());
         return Response.redirect(url.toString());
