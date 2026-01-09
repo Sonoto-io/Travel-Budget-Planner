@@ -10,6 +10,8 @@ export const authLoginCodesRepository = {
         data: authCodeData });
     },
     async get(code: string) {
+        const allCodes = await prisma.authLoginCode.findMany();
+        console.log("All auth login codes in DB:", allCodes);
         return await prisma.authLoginCode.findUnique({ where: { code: code } });
     },
     async isCodeValid(code: string):  Promise<boolean> {
