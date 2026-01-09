@@ -1,8 +1,6 @@
 import { useAuthStore } from "@/stores/authStore";
 import { pinia } from "@/pinia";
-import { Capacitor } from '@capacitor/core';
 import api from "@/api/apiClient";
-import apiClient from "@/api/apiClient";
 
 const isAuthenticated = async () => {
   // verify session cookie is valid from backend
@@ -23,7 +21,7 @@ const isAuthenticated = async () => {
 
 export const getTokenFromCode = async (code: string) => {
   console.log("Finalizing authentication with code:", code);
-  const res = apiClient.post(
+  const res = api.post(
     "/auth/finalize",
     { code },
     {

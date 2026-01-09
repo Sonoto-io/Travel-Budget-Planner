@@ -12,7 +12,7 @@ import { BACKEND_URL } from "@/api/apiClient";
 
 const login = async () => {
   const url = Capacitor.isNativePlatform()
-    ? encodeURI(`${BACKEND_URL}/api/auth/init?redirect_uri=travelbudget://api/auth/callback`)
+    ? encodeURI(`${BACKEND_URL}/api/auth/init?native=true`)
     : `/api/auth/init`;
 
     console.log("Login URL:", url);

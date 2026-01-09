@@ -49,6 +49,12 @@ const router = createRouter({
 
 router.beforeEach(async (to, _from, next) => {
   let authenticated = false;
+  
+  if (to.query.error === 'backend_unreachable') {
+    next();
+    return
+  }
+
   try {
     authenticated = await isAuthenticated()
   } catch (error) {

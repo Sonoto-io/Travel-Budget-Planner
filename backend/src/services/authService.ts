@@ -22,14 +22,14 @@ export class AuthService {
 
     API_KEY = process.env.API_KEY
 
-    async getAuthorization(redirect_uri: string | null) {
+    async getAuthorization(native: boolean) {
         const url = new URL(this.AUTHORIZE_URL);
         url.searchParams.set("response_type", "code");
         url.searchParams.set("client_id", this.CLIENT_ID);
-        url.searchParams.set("redirect_uri", redirect_uri ?? this.REDIRECT_URI);
+        url.searchParams.set("redirect_uri", this.REDIRECT_URI);
         url.searchParams.set("scope", "openid profile email offline_access");
 
-        return Response.redirect(url.toString());
+        return Response.redirect(`${url.toString()}?native=${native}`);
     }
 
     async getUserData(code: string) {
@@ -64,10 +64,13 @@ export class AuthService {
 
     }
 
-    async redirectWithTmpCode(provider_subject: string, username: string) {
+    async redirectWithTmpCode(provider_subject: string, native: boolean, username: string) {
         // generate temp auth code and store in DB with expiration
         const tempAuthCode = await authService.createTempAuthCode(provider_subject, username);
         console.log("Generated temp auth code:", tempAuthCode);
+        if (native) {
+            return Response.redirect(`travelbudget://api/auth//finalize-authentication?code=${tempAuthCode}`);
+        }
         return Response.redirect(`${authService.FRONTEND_URL}/finalize-authentication?code=${tempAuthCode}`);
     }
 
