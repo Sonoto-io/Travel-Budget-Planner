@@ -19,7 +19,7 @@ export const configureAuthRoutes = (app: Elysia) => app.group(
       // SSO redirects back here with authorization code
       .get("/callback", ({ query, cookie }) => {
         console.log("Auth callback received with query:", JSON.stringify(query));
-        authController.callback(query.code, query.state ?? null, cookie)
+        return authController.callback(query.code, query.state ?? null, cookie)
       }, {
         query: t.Object({
           code: t.String(),

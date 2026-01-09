@@ -47,6 +47,7 @@ export class AuthService {
         });
 
         const headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
+        
         const response = await fetch(this.TOKEN_URL, {
             method: 'POST',
             headers: headers,
