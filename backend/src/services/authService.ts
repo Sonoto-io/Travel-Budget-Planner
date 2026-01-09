@@ -68,8 +68,9 @@ export class AuthService {
         // generate temp auth code and store in DB with expiration
         const tempAuthCode = await authService.createTempAuthCode(provider_subject, username);
         console.log("Generated temp auth code:", tempAuthCode);
+        console.log("Redirecting to ", native ? "native app" : "web app");
         if (native) {
-            return Response.redirect(`travelbudget://api/auth//finalize-authentication?code=${tempAuthCode}`);
+            return Response.redirect(`travelbudget://finalize-authentication?code=${tempAuthCode}`);
         }
         return Response.redirect(`${authService.FRONTEND_URL}/finalize-authentication?code=${tempAuthCode}`);
     }
