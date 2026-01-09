@@ -31,7 +31,7 @@ export class AuthService {
         url.searchParams.set("client_id", this.CLIENT_ID);
         url.searchParams.set("redirect_uri", this.REDIRECT_URI);
         url.searchParams.set("scope", "openid profile email offline_access");
-        url.searchParams.set("state", btoa(JSON.stringify(state)));
+        url.searchParams.set("state", btoa(state));
 
         console.log("Redirecting to SSO authorization endpoint:", url.toString());
         return Response.redirect(url.toString());
@@ -84,7 +84,8 @@ export class AuthService {
         console.log("state: ", state)
         if (state) {
             const stateObject = JSON.parse(atob(state))
-            console.log("stateObject", stateObject.platform)
+            console.log("stateObject", stateObject)
+            console.log("platform :", stateObject.platform)
             native = stateObject.platform == "native"
         }
         console.log("Redirecting to ", native ? "native app" : "web app");
