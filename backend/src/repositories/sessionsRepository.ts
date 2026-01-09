@@ -16,6 +16,7 @@ export const sessionsRepository = {
         const session = await prisma.session.findUnique({
             where: { id: sessionToken },
         });
+        console.log("Session retrieved for verification:", session);
         if (!session) {
             return false;
         }

@@ -17,7 +17,7 @@ export const configureAuthRoutes = (app: Elysia) => app.group(
         }),
       })
       // SSO redirects back here with authorization code
-      .get("/callback", ({ query, cookie }) => authController.callback(query.code, query.native, cookie), {
+      .get("/callback", ({ query, cookie }) => authController.callback(query.code, query.native ?? false, cookie), {
         query: t.Object({
           code: t.String(),
           native: t.Optional(t.Boolean())

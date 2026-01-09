@@ -29,6 +29,7 @@ export class AuthService {
         url.searchParams.set("redirect_uri", this.REDIRECT_URI);
         url.searchParams.set("scope", "openid profile email offline_access");
 
+        console.log("Redirecting to SSO authorization endpoint:", `${url.toString()}?native=${native}`);
         return Response.redirect(`${url.toString()}?native=${native}`);
     }
 
