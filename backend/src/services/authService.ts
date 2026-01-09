@@ -192,9 +192,13 @@ export class AuthService {
             return { valid: false };
         }
 
-        return sessionsRepository.verifySession(sessionToken.value)
+        const response = sessionsRepository.verifySession(sessionToken.value)
             .then(valid => ({ valid }))
             .catch(() => ({ valid: false }));
+        if (!response && cookie) {
+            cookie.session = undefined;
+        }
+        return response;
     }
 
 }

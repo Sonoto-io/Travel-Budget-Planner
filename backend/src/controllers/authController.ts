@@ -25,8 +25,12 @@ export const authController = {
     // clean sessions
     sessionsRepository.deleteExpiredSessions().catch(() => { /* ignore errors */ });
     console.log("Session token found, verifying...");
-    return sessionsRepository.verifySession(sessionToken.value)
+    const response = sessionsRepository.verifySession(sessionToken.value)
       .then(valid => ({ valid }))
       .catch(() => ({ valid: false }));
+      if (!response) {
+        cookie.session = undefined;
+      }
+    return response;
   },
 };
