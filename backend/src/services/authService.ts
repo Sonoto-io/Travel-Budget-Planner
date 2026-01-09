@@ -53,19 +53,26 @@ export class AuthService {
             body: params.toString()
         });
 
-        const idToken = response.ok ? response.json().then(data => data.id_token) : "";
+        console.log("SSO response : ", JSON.stringify(response))
 
-        const payload = JSON.parse(
-            Buffer.from((await idToken).split(".")[1], "base64").toString()
+        const idToken = response.ok ? response.json().then(data => data.id_token) : null;
+
+        console.log("ID TOKEN ", idToken)
+        try {
+            const payload = JSON.parse(
+                Buffer.from((await idToken).split(".")[1], "base64").toString()
+            )
+            // add account creation here
+            return await accountsRepository.createIfNotExist({
+                username: payload.preferred_username,
+                provider_subject: payload.sub,
+                created_at: new Date(),
+            }
         );
-
-        // add account creation here
-        return await accountsRepository.createIfNotExist({
-            username: payload.preferred_username,
-            provider_subject: payload.sub,
-            created_at: new Date(),
+        } catch(error){
+            console.error("Couldn't get user info from SSO", JSON.stringify(error))
+            throw {"Couldn't get user info from SSO": JSON.stringify(error)}
         }
-        );
 
     }
 
