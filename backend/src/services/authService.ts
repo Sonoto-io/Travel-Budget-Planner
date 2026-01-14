@@ -154,12 +154,18 @@ export class AuthService {
             throw new Error("Could not create session");
         }
 
+        console.log("frontend url : ", this.FRONTEND_URL)
+        const frontendUrl = new URL(this.FRONTEND_URL);
+        const domain = frontendUrl.hostname;
+        console.log("DOMAIN : ", domain)
+
         cookie.session.set({
             value: session.id,
             httpOnly: true,
             secure: true,
             sameSite: "none",
             path: "/",
+            domain: domain, // required for ios
         });
     }
 
