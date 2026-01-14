@@ -16,7 +16,6 @@ export const createApp = () => {
           "https://localhost", // Capacitor Android WebView
           "capacitor://localhost",
           "http://localhost:5173", // Vite dev (optional)
-          "https://travelbudget.ensibf-holdings.fr", // prod frontend
         ],
         credentials: true,
       })

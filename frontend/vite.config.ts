@@ -9,7 +9,7 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
-    allowedHosts: ["travelbudget.ensibf-holdings.fr"],
+    allowedHosts: [process.env.VITE_BACKEND_URL ?? ""],
     cors: {
       origin: [
         'http://localhost:3000',       // browser dev

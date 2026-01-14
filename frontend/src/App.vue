@@ -18,7 +18,6 @@ const authStore = useAuthStore();
 import { App } from '@capacitor/app';
 import { getTokenFromCode } from "@/services/login";
 import router from "@/router";
-import apiClient from "@/api/apiClient";
 
 App.addListener('appUrlOpen', async ({ url }) => {
 

@@ -23,7 +23,6 @@ export class AuthService {
     API_KEY = process.env.API_KEY
 
     async getAuthorization(native: boolean) {
-        console.log("native at init ? ", native)
         
         const state = JSON.stringify({ platform: (native ? "native" : "web") });
         const url = new URL(this.AUTHORIZE_URL);
@@ -33,7 +32,6 @@ export class AuthService {
         url.searchParams.set("scope", "openid profile email offline_access");
         url.searchParams.set("state", btoa(state));
 
-        console.log("Redirecting to SSO authorization endpoint:", url.toString());
         return Response.redirect(url.toString());
     }
 
@@ -47,18 +45,16 @@ export class AuthService {
         });
 
         const headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
-        
+
         const response = await fetch(this.TOKEN_URL, {
             method: 'POST',
             headers: headers,
             body: params.toString()
         });
 
-        console.log("SSO response : ", JSON.stringify(response))
 
         const idToken = response.ok ? response.json().then(data => data.id_token) : null;
 
-        console.log("ID TOKEN ", idToken)
         try {
             const payload = JSON.parse(
                 Buffer.from((await idToken).split(".")[1], "base64").toString()
@@ -80,18 +76,19 @@ export class AuthService {
     async redirectWithTmpCode(provider_subject: string, state: string | null, username: string) {
         // generate temp auth code and store in DB with expiration
         const tempAuthCode = await authService.createTempAuthCode(provider_subject, username);
-        console.log("Generated temp auth code:", tempAuthCode);
         let native = false
-        console.log("state: ", state)
         if (state) {
             const stateObject = JSON.parse(atob(state))
-            console.log("stateObject", stateObject)
-            console.log("platform :", stateObject.platform)
             native = stateObject.platform == "native"
         }
-        console.log("Redirecting to ", native ? "native app" : "web app");
         if (native) {
-            return Response.redirect(`travelbudget://finalize-authentication?code=${tempAuthCode}`);
+            return new Response(null, {
+                status: 302,
+                headers: {
+                    Location: `travelbudget://finalize-authentication?code=${tempAuthCode}`,
+                    'Cache-Control': 'no-store',
+                },
+            });
         }
         return Response.redirect(`${authService.FRONTEND_URL}/finalize-authentication?code=${tempAuthCode}`);
     }
@@ -100,7 +97,6 @@ export class AuthService {
         // generate temp auth code and store in DB with expiration
         const code = crypto.randomUUID();
 
-        console.log("Creating temp auth code for provider_subject:", provider_subject, code);
         let account = await accountsRepository.findByProviderSubject(provider_subject);
         if (!account) {
             // create account
@@ -112,13 +108,11 @@ export class AuthService {
         }
 
         try {
-            console.log("Storing auth login code in DB for account ID:", code);
             const res = await authLoginCodesRepository.create({
                 code: code,
                 expires_at: new Date(Date.now() + 60 * 1000), // 1 minute from now
                 account: { connect: { id: account.id } },
             });
-            console.log("Auth login code stored successfully:", JSON.stringify(res));
         } catch (error) {
             console.error("Error creating auth login code:", error);
             throw new Error("Could not create temporary authentication code");
@@ -127,25 +121,20 @@ export class AuthService {
         return code;
     }
     async finalizeAuthentication(code: string, cookie: typeof cookieSchema) {
-        console.log("Inside finalize", code);
         // verify that code exists in DB
         try {
             const authLogin = await authLoginCodesRepository.get(code)
-            console.log("Retrieved auth login code from DB:", authLogin);
 
             if (!authLogin || authLogin.expires_at < new Date()) {
                 // TOOD: fails here
                 throw new Error("Invalid or expired login code");
             }
-            console.log("Auth login code verified, creating session...");
             // exchange code for tokens
             await this.createSession(authLogin.accountId, cookie);
         } catch (error) {
             console.error("Error finalizing authentication:", error);
             throw new Error("Could not finalize authentication");
         }
-        console.log("Session created successfully.");
-        console.log("Cookies after session creation:", cookie);
         // remove code from DB
         await authLoginCodesRepository.deleteCode(code)
         return;
@@ -164,7 +153,6 @@ export class AuthService {
         if (!session) {
             throw new Error("Could not create session");
         }
-        console.log("Session created, ading cookie now with id : ", session.id)
 
         cookie.session.set({
             value: session.id,

@@ -15,7 +15,6 @@ const login = async () => {
     ? encodeURI(`${BACKEND_URL}/api/auth/init?native=true`)
     : `/api/auth/init`;
 
-    console.log("Login URL:", url);
   if (Capacitor.isNativePlatform()) {
     await Browser.open({ url });
   } else {
