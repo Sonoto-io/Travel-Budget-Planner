@@ -200,6 +200,7 @@ export class AuthService {
             logger.error("Missing session cookie", { path, cookies: cookie });
             throw new Error("Missing token, please log in");
         }
+        console.log("ccokies: ", cookie)
 
         const sessionToken = cookie.session;
         if (!sessionToken) {
