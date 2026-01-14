@@ -171,6 +171,7 @@ export class AuthService {
 
     // Auth middleware
     async authMiddleware(ctx: Context) {
+        console.log("auth middleware start")
         try {
             const { user } = await this.validateRequest(ctx);
             ctx.request.user = user;
@@ -187,6 +188,8 @@ export class AuthService {
 
     async validateRequest(ctx: Context) {
         const { request, cookie, path } = ctx;
+        console.log("ccokies before sess : ", cookie)
+        console.log("PATH : ", path)
 
         if (path.startsWith("/auth") || path === "/swagger" || path === "/") {
             return { user: null };
@@ -194,7 +197,6 @@ export class AuthService {
         const apiKey = request.headers.get("x-api-key");
 
         if (this.API_KEY && apiKey === this.API_KEY) return { user: { api: true } };
-        console.log("ccokies before sess : ", cookie)
 
         if (!cookie) {
             logger.error("Missing session cookie", { path, cookies: cookie });
