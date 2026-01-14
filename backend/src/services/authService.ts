@@ -194,7 +194,7 @@ export class AuthService {
         const apiKey = request.headers.get("x-api-key");
 
         if (this.API_KEY && apiKey === this.API_KEY) return { user: { api: true } };
-
+        console.log("ccokies before sess : ", cookie)
 
         if (!cookie) {
             logger.error("Missing session cookie", { path, cookies: cookie });
