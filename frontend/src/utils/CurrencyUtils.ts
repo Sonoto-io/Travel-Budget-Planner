@@ -27,16 +27,3 @@ export const convertValueToCurrency = (
     value: convertedValue
   }
 };
-
-export const calculTotal = (expenses: Expense[]) => {
-  const res = expenses.reduce(
-    (acc, expense) => acc + expense.price * expense.currency.conversion,
-    0,
-  );
-  return convertValueToCurrency(res, expenses[0].currency, {
-    label: "Euro",
-    locale: "fr-FR",
-    name: "EUR",
-    conversion: 1,
-  }); // TODO: get from store
-};

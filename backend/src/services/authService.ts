@@ -108,7 +108,7 @@ export class AuthService {
         }
 
         try {
-            const res = await authLoginCodesRepository.create({
+            await authLoginCodesRepository.create({
                 code: code,
                 expires_at: new Date(Date.now() + 60 * 1000), // 1 minute from now
                 account: { connect: { id: account.id } },
