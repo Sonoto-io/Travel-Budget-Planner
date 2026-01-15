@@ -189,7 +189,7 @@ export class AuthService {
         console.log("ccokies before sess : ", cookie)
         console.log("PATH : ", path)
 
-        if (path.startsWith("/auth") || path === "/swagger") {
+        if (path.startsWith("/auth") || path === "/swagger" || path === "/") {
             return { user: null };
         }
         const apiKey = request.headers.get("x-api-key");
