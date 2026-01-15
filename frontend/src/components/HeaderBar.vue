@@ -11,6 +11,7 @@
           'pi',
           isNavbarVisible ? 'pi-minus' : 'pi-bars',
           'cursor-pointer',
+          'w-20'
         ]"
       />
     </div>

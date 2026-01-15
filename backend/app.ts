@@ -4,9 +4,22 @@ import { configureAllRoutes } from "@routes";
 import { cookie } from "@elysiajs/cookie";
 import { authService } from "@controllers/authController";
 import { LogsService } from "@services/logsService";
+import { cors } from '@elysiajs/cors'
+
 
 export const createApp = () => {
   return new Elysia()
+    // Enable CORS
+    .use(
+      cors({
+        origin: [
+          "https://localhost", // Capacitor Android WebView
+          "capacitor://localhost",
+          "http://localhost:5173", // Vite dev (optional)
+        ],
+        credentials: true,
+      })
+    )
     .use(swagger({
       documentation: {
         info: {

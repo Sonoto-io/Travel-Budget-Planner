@@ -21,6 +21,8 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .env.test.local
 .env.production.local
 .env.local
+.env.android.local
+.env.ios.local
 
 # caches
 .eslintcache
@@ -32,6 +34,10 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # Finder (MacOS) folder config
 .DS_Store
+
+# Capacitor build folders
+android/
+ios/
 
 # Prisma
 backend/src/generated/
