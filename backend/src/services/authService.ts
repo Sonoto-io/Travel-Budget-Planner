@@ -153,11 +153,6 @@ export class AuthService {
             throw new Error("Could not create session");
         }
 
-        console.log("frontend url : ", this.FRONTEND_URL)
-        const frontendUrl = new URL(this.FRONTEND_URL);
-        const domain = frontendUrl.hostname;
-        console.log("DOMAIN : ", domain)
-
         cookie.session.set({
             value: session.id,
             httpOnly: true,
@@ -169,7 +164,6 @@ export class AuthService {
 
     // Auth middleware
     async authMiddleware(ctx: Context) {
-        console.log("auth middleware start")
         try {
             const { user } = await this.validateRequest(ctx);
             ctx.request.user = user;
@@ -186,8 +180,6 @@ export class AuthService {
 
     async validateRequest(ctx: Context) {
         const { request, cookie, path } = ctx;
-        console.log("ccokies before sess : ", cookie)
-        console.log("PATH : ", path)
 
         if (path.startsWith("/auth") || path === "/swagger" || path === "/") {
             return { user: null };
@@ -200,7 +192,6 @@ export class AuthService {
             logger.error("Missing session cookie", { path, cookies: cookie });
             throw new Error("Missing token, please log in");
         }
-        console.log("ccokies: ", cookie)
 
         const sessionToken = cookie.session;
         if (!sessionToken) {
