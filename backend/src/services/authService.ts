@@ -8,6 +8,7 @@ import { sessionsRepository } from "@repositories/sessionsRepository";
 
 const logger = new LogsService();
 
+
 export class AuthService {
     CLIENT_ID = process.env.CLIENT_ID ?? ""
     CLIENT_SECRET = process.env.CLIENT_SECRET ?? ""
@@ -21,12 +22,15 @@ export class AuthService {
 
     API_KEY = process.env.API_KEY
 
-    async getAuthorization() {
+    async getAuthorization(native: boolean) {
+        
+        const state = JSON.stringify({ platform: (native ? "native" : "web") });
         const url = new URL(this.AUTHORIZE_URL);
         url.searchParams.set("response_type", "code");
         url.searchParams.set("client_id", this.CLIENT_ID);
         url.searchParams.set("redirect_uri", this.REDIRECT_URI);
         url.searchParams.set("scope", "openid profile email offline_access");
+        url.searchParams.set("state", btoa(state));
 
         return Response.redirect(url.toString());
     }
@@ -41,6 +45,7 @@ export class AuthService {
         });
 
         const headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
+
         const response = await fetch(this.TOKEN_URL, {
             method: 'POST',
             headers: headers,
@@ -48,26 +53,43 @@ export class AuthService {
         });
 
 
+        const idToken = response.ok ? response.json().then(data => data.id_token) : null;
 
-        const idToken = response.ok ? response.json().then(data => data.id_token) : "";
-
-        const payload = JSON.parse(
-            Buffer.from((await idToken).split(".")[1], "base64").toString()
+        try {
+            const payload = JSON.parse(
+                Buffer.from((await idToken).split(".")[1], "base64").toString()
+            )
+            // add account creation here
+            return await accountsRepository.createIfNotExist({
+                username: payload.preferred_username,
+                provider_subject: payload.sub,
+                created_at: new Date(),
+            }
         );
-
-        // add account creation here
-        return await accountsRepository.createIfNotExist({
-            username: payload.preferred_username,
-            provider_subject: payload.sub,
-            created_at: new Date(),
+        } catch(error){
+            console.error("Couldn't get user info from SSO", JSON.stringify(error))
+            throw {"Couldn't get user info from SSO": JSON.stringify(error)}
         }
-        );
 
     }
 
-    async redirectWithTmpCode(provider_subject: string, username: string) {
+    async redirectWithTmpCode(provider_subject: string, state: string | null, username: string) {
         // generate temp auth code and store in DB with expiration
         const tempAuthCode = await authService.createTempAuthCode(provider_subject, username);
+        let native = false
+        if (state) {
+            const stateObject = JSON.parse(atob(state))
+            native = stateObject.platform == "native"
+        }
+        if (native) {
+            return new Response(null, {
+                status: 302,
+                headers: {
+                    Location: `travelbudget://finalize-authentication?code=${tempAuthCode}`,
+                    'Cache-Control': 'no-store',
+                },
+            });
+        }
         return Response.redirect(`${authService.FRONTEND_URL}/finalize-authentication?code=${tempAuthCode}`);
     }
 
@@ -100,13 +122,18 @@ export class AuthService {
     }
     async finalizeAuthentication(code: string, cookie: typeof cookieSchema) {
         // verify that code exists in DB
-        const authLogin = await authLoginCodesRepository.get(code)
+        try {
+            const authLogin = await authLoginCodesRepository.get(code)
 
-        if (!authLogin || authLogin.expires_at < new Date()) {
-            throw new Error("Invalid or expired login code");
+            if (!authLogin || authLogin.expires_at < new Date()) {
+                throw new Error("Invalid or expired login code");
+            }
+            // exchange code for tokens
+            await this.createSession(authLogin.accountId, cookie);
+        } catch (error) {
+            console.error("Error finalizing authentication:", error);
+            throw new Error("Could not finalize authentication");
         }
-        // exchange code for tokens
-        await this.createSession(authLogin.accountId, cookie);
         // remove code from DB
         await authLoginCodesRepository.deleteCode(code)
         return;
@@ -130,51 +157,54 @@ export class AuthService {
             value: session.id,
             httpOnly: true,
             secure: true,
-            sameSite: "lax",
+            sameSite: "none",
             path: "/",
         });
     }
 
     // Auth middleware
     async authMiddleware(ctx: Context) {
-            try {
-                const { user } = await this.validateRequest(ctx);
-                ctx.request.user = user;
-                ctx.set.status = 200
-            } catch (err) {
-                ctx.set.status = 401
-                logger.error("Authentication failed", { error: (err as Error).message });
-                throw new Response(JSON.stringify({ error: (err as Error).message }), {
-                    status: 401,
-                    headers: { "Content-Type": "application/json" }
-                });
-            }
-        };
+        try {
+            const { user } = await this.validateRequest(ctx);
+            ctx.request.user = user;
+            ctx.set.status = 200
+        } catch (err) {
+            ctx.set.status = 401
+            logger.error("Authentication failed", { error: (err as Error).message });
+            throw new Response(JSON.stringify({ error: (err as Error).message }), {
+                status: 401,
+                headers: { "Content-Type": "application/json" }
+            });
+        }
+    };
 
     async validateRequest(ctx: Context) {
-            const { request, cookie, path } = ctx;
+        const { request, cookie, path } = ctx;
 
-            if (path.startsWith("/auth") || path === "/swagger" || path === "/") {
-                return { user: null };
-            }
-            const apiKey = request.headers.get("x-api-key");
+        if (path.startsWith("/auth") || path === "/swagger" || path === "/") {
+            return { user: null };
+        }
+        const apiKey = request.headers.get("x-api-key");
 
-            if (this.API_KEY && apiKey === this.API_KEY) return { user: { api: true } };
+        if (this.API_KEY && apiKey === this.API_KEY) return { user: { api: true } };
 
-            
-            if (!cookie) {
-                logger.error("Missing session cookie", { path, cookies: cookie });
-                throw new Error("Missing token, please log in");
-            }
-
-            const sessionToken = cookie.session;
-            if (!sessionToken) {
-                return { valid: false };
-            }
-
-            return sessionsRepository.verifySession(sessionToken.value)
-                .then(valid => ({ valid }))
-                .catch(() => ({ valid: false }));
+        if (!cookie) {
+            logger.error("Missing session cookie", { path, cookies: cookie });
+            throw new Error("Missing token, please log in");
         }
 
+        const sessionToken = cookie.session;
+        if (!sessionToken) {
+            return { valid: false };
+        }
+
+        const response = sessionsRepository.verifySession(sessionToken.value)
+            .then(valid => ({ valid }))
+            .catch(() => ({ valid: false }));
+        if (!response && cookie) {
+            cookie.session = undefined;
+        }
+        return response;
     }
+
+}

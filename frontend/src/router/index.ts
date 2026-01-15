@@ -48,7 +48,20 @@ const router = createRouter({
 
 
 router.beforeEach(async (to, _from, next) => {
-  const authenticated = await isAuthenticated()
+  let authenticated = false;
+  
+  if (to.query.error === 'backend_unreachable') {
+    next();
+    return
+  }
+
+  try {
+    authenticated = await isAuthenticated()
+  } catch (error) {
+    console.error("Error during authentication check:", error);
+    next({ name: 'login', query: { error: 'backend_unreachable' } });
+    return
+  }
 
   if (to.name == 'finalize-authentication'
     && !authenticated

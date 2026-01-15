@@ -10,6 +10,8 @@ import { worker } from "./mocks/worker";
 import router from "@/router";
 import { pinia } from "@/pinia";
 import ConfirmationService from 'primevue/confirmationservice';
+import cors from 'cors';
+
 
 async function main() {
   console.log("ENV : ", import.meta.env);

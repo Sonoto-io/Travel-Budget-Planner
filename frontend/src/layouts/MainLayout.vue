@@ -1,4 +1,6 @@
 <template>
+  <!-- padding for native -->
+  <div class="pt-4" v-if="Capacitor.isNativePlatform()"></div>
   <div class="min-h-screen">
     <header>
       <HeaderBar v-model:is-navbar-visible="navbarVisible" />
@@ -23,6 +25,7 @@
 import { ref } from "vue";
 import HeaderBar from "@/components/HeaderBar.vue";
 import NavBar from "@/components/NavBar.vue";
+import { Capacitor } from "@capacitor/core";
 
 const navbarVisible = ref(false);
 

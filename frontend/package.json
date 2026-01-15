@@ -13,12 +13,18 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/browser": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/ios": "^8.0.0",
     "@primeuix/themes": "^1.1.1",
     "@primevue/forms": "^4.3.4",
     "@prisma/client": "^6.13.0",
     "@tailwindcss/vite": "^4.1.6",
     "axios": "^1.9.0",
     "chart.js": "^4.5.1",
+    "cors": "^2.8.5",
     "pinia": "^3.0.3",
     "primeicons": "^7.0.0",
     "primevue": "^4.3.4",
@@ -28,7 +34,9 @@
     "zod": "^3.24.4"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.0.0",
     "@tsconfig/recommended": "^1.0.8",
+    "@types/cors": "^2.8.19",
     "@vitejs/plugin-basic-ssl": "^2.0.0",
     "@vitejs/plugin-vue": "^5.2.4",
     "@vue/compiler-sfc": "^3.5.16",

@@ -2,7 +2,6 @@ services:
   reverse-proxy:
     image: traefik:v3.3.5
     command:
-      - --api.insecure=true
       - --providers.docker
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
@@ -75,7 +74,8 @@ services:
       dockerfile: docker/Dockerfile.prod
     restart: unless-stopped
     environment:
-      VITE_MAIN_CURRENCY_NAME : ${MAIN_CURRENCY_NAME:-EUR}
+      VITE_MAIN_CURRENCY_NAME : ${VITE_MAIN_CURRENCY_NAME:-EUR}
+      VITE_BACKEND_URL : ${VITE_BACKEND_URL:-http://localhost:3000}
     labels:
       traefik.enable: true
       traefik.http.routers.frontend.rule: PathPrefix(`/`)
