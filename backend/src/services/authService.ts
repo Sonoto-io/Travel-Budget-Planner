@@ -126,7 +126,6 @@ export class AuthService {
             const authLogin = await authLoginCodesRepository.get(code)
 
             if (!authLogin || authLogin.expires_at < new Date()) {
-                // TOOD: fails here
                 throw new Error("Invalid or expired login code");
             }
             // exchange code for tokens
@@ -162,7 +161,7 @@ export class AuthService {
         cookie.session.set({
             value: session.id,
             httpOnly: true,
-            secure: true,
+            secure: false,
             sameSite: "none",
             path: "/",
             domain: domain, // required for ios
