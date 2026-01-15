@@ -161,10 +161,9 @@ export class AuthService {
         cookie.session.set({
             value: session.id,
             httpOnly: true,
-            secure: false,
+            secure: true,
             sameSite: "none",
             path: "/",
-            domain: domain, // required for ios
         });
     }
 
