@@ -151,7 +151,7 @@ const onRowEditSave = async (event: { newData: any; index: number }) => {
 const showDeleteDialog = (event, rowData) => {
   confirm.require({
     target: event.currentTarget,
-    message: 'Do you want to delete this expense ?',
+    message: 'Do you want to delete this item ?',
     icon: 'pi pi-info-circle',
     rejectProps: {
       label: 'Cancel',
@@ -166,7 +166,7 @@ const showDeleteDialog = (event, rowData) => {
       deleteRow(rowData);
     },
     reject: () => {
-      toast.add({ severity: 'info', summary: 'Rejected', detail: "You didn't delete the expense", life: 3000 });
+      toast.add({ severity: 'info', summary: 'Rejected', detail: "You didn't delete the item", life: 3000 });
     }
   });
 }
