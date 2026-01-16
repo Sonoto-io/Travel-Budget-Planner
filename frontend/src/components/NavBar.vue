@@ -88,7 +88,7 @@ const items = ref([
       { label: "Countries", route: "/management/countries" },
       { label: "Currencies", route: "/management/currencies" },
       { label: "Categories", route: "/management/categories" },
-      { label: "Subategories", route: "/management/subcategories" },
+      { label: "Subcategories", route: "/management/subcategories" },
       { label: "Users", route: "/management/users" },
     ],
   },
