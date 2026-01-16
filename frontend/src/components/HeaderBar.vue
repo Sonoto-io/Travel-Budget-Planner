@@ -11,7 +11,7 @@
           'pi',
           isNavbarVisible ? 'pi-minus' : 'pi-bars',
           'cursor-pointer',
-          'w-20'
+          '!text-2xl !sm:text-3xl p-2'
         ]"
       />
     </div>
