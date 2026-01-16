@@ -51,25 +51,7 @@ const api = {
 
     const res = await CapacitorHttp.post({
       url: BASE_URL + url,
-      data,
-      headers: {
-        "Content-Type": "application/json",
-        ...(config?.headers as any),
-      },
-      webFetchExtra: { credentials: "include" },
-    });
-
-    return normalize(res);
-  },
-
-  async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig) {
-    if (!isNative) {
-      return axiosApi.put<T>(url, data, config);
-    }
-
-    const res = await CapacitorHttp.put({
-      url: BASE_URL + url,
-      data,
+      data: JSON.stringify(data),
       headers: {
         "Content-Type": "application/json",
         ...(config?.headers as any),

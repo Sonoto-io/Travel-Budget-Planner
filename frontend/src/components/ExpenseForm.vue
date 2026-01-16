@@ -343,8 +343,9 @@ const onFormSubmit = async ({ valid, values, reset }) => {
     }
 
     const res = await createExpense(expenseData)
-
+    
     if (res.status.code !== 201) {
+      console.error("unable to add expense", JSON.stringify(res), "data", JSON.stringify(expenseData))
       toast.add({
         severity: "error",
         summary: "Failed to create expense.",
