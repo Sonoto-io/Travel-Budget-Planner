@@ -24,13 +24,10 @@ FROM base AS prerelease
 COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
 
-# # generate prisma client during build
-# RUN bunx prisma generate
-
-# [optional] tests & build
-# ENV NODE_ENV=production
-# RUN bun test
-# RUN bun run build
+# Set Prisma engine paths and generate as root
+ENV PRISMA_QUERY_ENGINE_LIBRARY=/tmp/prisma
+ENV PRISMA_QUERY_ENGINE_BINARY=/tmp/prisma
+RUN bunx prisma generate
 
 # copy production dependencies and source code into final image
 FROM base AS release
@@ -44,11 +41,9 @@ COPY --from=prerelease /app/src/ ./src/
 COPY --from=prerelease /app/prisma/ ./prisma/
 COPY --from=prerelease /app/docker/entrypoint.sh .
 
-ENV PRISMA_QUERY_ENGINE_LIBRARY=/tmp/prisma
-ENV PRISMA_QUERY_ENGINE_BINARY=/tmp/prisma
-
 RUN mkdir -p src/generated
 RUN chown -R bun:bun src/generated
+RUN chown -R bun:bun node_modules
 
 # run the app
 USER bun
